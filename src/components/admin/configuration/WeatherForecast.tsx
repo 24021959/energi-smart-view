@@ -1,11 +1,9 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sun, Cloud, CloudRain, CloudSnow, Wind, Thermometer, Droplets, ArrowDown, ArrowUp, Map } from "lucide-react";
 import { fetchWeatherForecast, geocodeCity, estimateSolarProduction, getWindDirectionText, WeatherForecastData, GeoLocation } from "@/services/weatherService";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader } from "@googlemaps/js-api-loader";
 
 // Add Google Maps type declaration
 declare global {
@@ -32,6 +30,7 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
   const map = useRef<any>(null);
   const marker = useRef<any>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [googleScriptLoaded, setGoogleScriptLoaded] = useState(false);
 
   useEffect(() => {
     const loadWeatherData = async () => {
@@ -55,77 +54,91 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
     loadWeatherData();
   }, [city]);
   
-  // Initialize map once we have location
+  // Load Google Maps API script separately
   useEffect(() => {
-    if (!location || !mapContainer.current || currentTab !== "map") {
+    if (currentTab === "map" && !googleScriptLoaded) {
+      const loadGoogleMapsScript = () => {
+        try {
+          // Check if script already exists
+          const existingScript = document.getElementById('google-maps-script');
+          if (existingScript) {
+            setGoogleScriptLoaded(true);
+            return;
+          }
+          
+          console.log("Loading Google Maps API script...");
+          const script = document.createElement('script');
+          script.id = 'google-maps-script';
+          script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&callback=initMap`;
+          script.async = true;
+          script.defer = true;
+          
+          // Create a global callback that will be called when script loads
+          window.initMap = () => {
+            console.log("Google Maps script loaded successfully");
+            setGoogleScriptLoaded(true);
+          };
+          
+          document.head.appendChild(script);
+        } catch (error) {
+          console.error("Error loading Google Maps script:", error);
+          setMapError("Errore nel caricamento della libreria di Google Maps");
+        }
+      };
+      
+      loadGoogleMapsScript();
+    }
+  }, [currentTab, googleScriptLoaded]);
+  
+  // Initialize map once Google Maps is loaded and we have location
+  useEffect(() => {
+    if (!location || !mapContainer.current || currentTab !== "map" || !googleScriptLoaded) {
       return;
     }
     
-    let googleMap: any = null;
-    let mapMarker: any = null;
-
-    const initMap = async () => {
-      try {
-        console.log("Initializing map for location:", location);
-        
-        // Load Google Maps with fixed API key
-        const loader = new Loader({
-          apiKey: GOOGLE_MAPS_API_KEY,
-          version: "weekly",
-        });
-
-        await loader.load();
-        console.log("Google Maps API loaded successfully");
-        setMapLoaded(true);
-        
-        // Initialize map
-        const position = { lat: location.lat, lng: location.lon };
-        
-        if (!mapContainer.current) {
-          console.error("Map container ref is null");
-          return;
-        }
-        
-        console.log("Creating map with position:", position);
-        googleMap = new window.google.maps.Map(mapContainer.current, {
-          center: position,
-          zoom: 10,
-          mapTypeId: window.google.maps.MapTypeId.ROADMAP
-        });
-        
-        // Add a marker for the city
-        mapMarker = new window.google.maps.Marker({
-          position,
-          map: googleMap,
-          title: city
-        });
-        
-        // Store references for cleanup
-        map.current = googleMap;
-        marker.current = mapMarker;
-        
-        console.log("Map initialized successfully");
-        
-        // Reset error if previously set
-        setMapError(null);
-      } catch (error) {
-        console.error("Map initialization error:", error);
-        setMapLoaded(false);
-        setMapError("Errore nell'inizializzazione della mappa. Per favore riprova più tardi.");
-      }
-    };
-    
-    initMap();
+    try {
+      console.log("Initializing map for location:", location);
+      
+      // Initialize map
+      const position = { lat: location.lat, lng: location.lon };
+      
+      const googleMap = new window.google.maps.Map(mapContainer.current, {
+        center: position,
+        zoom: 10,
+        mapTypeId: window.google.maps.MapTypeId.ROADMAP
+      });
+      
+      // Add a marker for the city
+      const mapMarker = new window.google.maps.Marker({
+        position,
+        map: googleMap,
+        title: city
+      });
+      
+      // Store references
+      map.current = googleMap;
+      marker.current = mapMarker;
+      
+      console.log("Map initialized successfully");
+      setMapLoaded(true);
+      
+      // Reset error if previously set
+      setMapError(null);
+    } catch (error) {
+      console.error("Map initialization error:", error);
+      setMapLoaded(false);
+      setMapError("Errore nell'inizializzazione della mappa: " + (error instanceof Error ? error.message : "Errore sconosciuto"));
+    }
     
     // Clean up on unmount or when tab changes
     return () => {
-      if (googleMap) {
-        // Just remove references, Google will handle actual cleanup
+      if (map.current) {
+        // Just remove references
         map.current = null;
         marker.current = null;
       }
     };
-  }, [location, currentTab, city]);
+  }, [location, currentTab, city, googleScriptLoaded]);
   
   // Helper function to get weather icon
   const getWeatherIcon = (iconCode: string, size: "sm" | "md" | "lg" = "md") => {
@@ -378,25 +391,28 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
               <div className="relative w-full h-[400px] rounded-lg overflow-hidden border border-gray-200">
                 <div 
                   ref={mapContainer} 
-                  className="absolute inset-0"
+                  className="absolute inset-0 z-10"
                   id="google-map-container"
                 />
                 
                 {!location && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                  <div className="absolute inset-0 flex items-center justify-center bg-gray-100 z-20">
                     <p>Impossibile caricare la posizione per questa località.</p>
                   </div>
                 )}
                 
                 {mapError && (
-                  <div className="absolute inset-0 flex items-center justify-center flex-col bg-gray-100 p-4">
+                  <div className="absolute inset-0 flex items-center justify-center flex-col bg-gray-100 p-4 z-20">
                     <p className="text-red-500 mb-2">{mapError}</p>
                   </div>
                 )}
 
                 {location && !mapLoaded && !mapError && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-                    <p>Caricamento della mappa in corso...</p>
+                  <div className="absolute inset-0 flex items-center justify-center bg-gray-100 z-20">
+                    <div className="flex flex-col items-center">
+                      <div className="w-10 h-10 border-4 border-t-blue-500 border-blue-200 rounded-full animate-spin mb-2"></div>
+                      <p>Caricamento della mappa in corso...</p>
+                    </div>
                   </div>
                 )}
               </div>
