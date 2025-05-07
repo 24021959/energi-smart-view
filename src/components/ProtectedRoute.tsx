@@ -2,14 +2,15 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuthContext';
 import { UserRole } from '@/types/auth';
-import { useEffect } from 'react';
+import { useEffect, ReactNode } from 'react';
 import { toast } from '@/hooks/use-toast';
 
 interface ProtectedRouteProps {
   allowedRoles?: UserRole[];
+  children?: ReactNode;
 }
 
-export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
+export const ProtectedRoute = ({ allowedRoles, children }: ProtectedRouteProps) => {
   const { authState } = useAuth();
   const { user, isLoading, error } = authState;
 
@@ -22,6 +23,11 @@ export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
       });
     }
   }, [error]);
+  
+  // Log per debug
+  console.log("ProtectedRoute - user:", user);
+  console.log("ProtectedRoute - isLoading:", isLoading);
+  console.log("ProtectedRoute - allowedRoles:", allowedRoles);
 
   // Mostra un loader mentre verifica l'autenticazione
   if (isLoading) {
@@ -55,6 +61,6 @@ export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
     return <Navigate to="/" replace />;
   }
 
-  // Altrimenti, renderizza i componenti figlio
-  return <Outlet />;
+  // Se è presente il children, renderizzalo, altrimenti usa Outlet
+  return children ? <>{children}</> : <Outlet />;
 };

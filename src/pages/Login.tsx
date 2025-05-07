@@ -1,6 +1,5 @@
-
 import { useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -29,17 +28,21 @@ export default function Login() {
     authState,
     login
   } = useAuth();
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [loginType, setLoginType] = useState<'user' | 'cer_manager'>('user');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Se l'utente è già autenticato, reindirizza
+  // Se l'utente è gi�� autenticato, reindirizza
   if (authState.user) {
+    console.log("Utente autenticato:", authState.user);
     // Reindirizza in base al ruolo
     if (authState.user.role === 'cer_manager') {
-      return <Navigate to="/admin" />;
+      console.log("Reindirizzamento a /admin");
+      return <Navigate to="/admin" replace />;
     } else {
-      return <Navigate to="/" />;
+      console.log("Reindirizzamento a /");
+      return <Navigate to="/" replace />;
     }
   }
 
@@ -65,6 +68,15 @@ export default function Login() {
           title: "Accesso effettuato",
           description: `Benvenuto nel sistema EnergiSmart`
         });
+        
+        // Forza il reindirizzamento in base all'email
+        if (data.email.toLowerCase() === 'gestore@gestore.it') {
+          console.log("Login come gestore, reindirizzamento a /admin");
+          navigate('/admin');
+        } else {
+          console.log("Login come utente normale, reindirizzamento a /");
+          navigate('/');
+        }
       } else {
         toast({
           variant: "destructive",

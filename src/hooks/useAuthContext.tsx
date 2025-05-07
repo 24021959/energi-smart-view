@@ -107,7 +107,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       console.log("Login successful:", data);
-      // Il listener si occuperà di aggiornare lo stato
+      
+      // Aggiorno lo stato manualmente per garantire un reindirizzamento corretto
+      if (data && data.user) {
+        setAuthState({
+          user: data.user as UserProfile,
+          isLoading: false,
+          error: null
+        });
+      }
+      
       return { success: true };
     } catch (error) {
       console.error("Exception during login:", error);
@@ -124,7 +133,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.log("Logging out...");
       await supabase.auth.signOut();
       console.log("Logout successful");
-      // Il listener si occuperà di aggiornare lo stato
+      
+      // Aggiorno lo stato manualmente
+      setAuthState({
+        user: null,
+        isLoading: false,
+        error: null
+      });
+      
     } catch (error) {
       console.error("Error during logout:", error);
       toast({
