@@ -30,7 +30,7 @@ export function ConfigurationForm() {
   const form = useForm<ConfigurationFormData>({
     defaultValues: {
       name: '',
-      type: 'CER',
+      type: 'cer',
       description: '',
       address: '',
       city: '',
@@ -103,11 +103,12 @@ export function ConfigurationForm() {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="CER">CER</SelectItem>
-                    <SelectItem value="CECER">CECER</SelectItem>
-                    <SelectItem value="test">Test</SelectItem>
-                    <SelectItem value="pilota">Pilota</SelectItem>
-                    <SelectItem value="monitoraggio">Monitoraggio</SelectItem>
+                    <SelectItem value="cer">CER</SelectItem>
+                    <SelectItem value="gac">GAC</SelectItem>
+                    <SelectItem value="aid">AID</SelectItem>
+                    <SelectItem value="cs">CS</SelectItem>
+                    <SelectItem value="msu">MSU</SelectItem>
+                    <SelectItem value="edificio">Edificio</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />

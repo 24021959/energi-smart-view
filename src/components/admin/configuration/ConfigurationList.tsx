@@ -14,7 +14,7 @@ const mockConfigurations: Configuration[] = [
   {
     id: '1',
     name: 'CER Di Peccioli',
-    type: 'CER',
+    type: 'cer',
     description: 'Simulazione Gruppo di autoconsumo',
     address: 'Via Carlo Serassi, 21',
     city: 'Bergamo',
@@ -26,8 +26,8 @@ const mockConfigurations: Configuration[] = [
   },
   {
     id: '2',
-    name: 'CECER Testing',
-    type: 'CECER',
+    name: 'GAC Testing',
+    type: 'gac',
     description: 'Via Roma 123',
     address: 'Via Roma, 123',
     city: 'Roma',
@@ -39,7 +39,7 @@ const mockConfigurations: Configuration[] = [
   {
     id: '3',
     name: 'Energy Dream',
-    type: 'CER',
+    type: 'cer',
     description: 'Test CER 2 Gate',
     address: 'Via Energia, 45',
     city: 'Milano',
@@ -52,7 +52,7 @@ const mockConfigurations: Configuration[] = [
   {
     id: '4',
     name: 'Stefano Pistoia',
-    type: 'monitoraggio',
+    type: 'msu',
     description: 'Monitoraggio utenza Stefano Pistoia',
     address: 'Via Immaginetta, 28',
     city: 'Pisa',
@@ -66,16 +66,17 @@ const mockConfigurations: Configuration[] = [
 // Badge per visualizzare il tipo di configurazione
 const TypeBadge = ({ type }: { type: ConfigurationType }) => {
   const colors: Record<ConfigurationType, string> = {
-    'CER': 'bg-green-100 text-green-800',
-    'CECER': 'bg-blue-100 text-blue-800',
-    'test': 'bg-purple-100 text-purple-800',
-    'pilota': 'bg-yellow-100 text-yellow-800',
-    'monitoraggio': 'bg-orange-100 text-orange-800',
+    'cer': 'bg-green-100 text-green-800',
+    'gac': 'bg-blue-100 text-blue-800',
+    'aid': 'bg-purple-100 text-purple-800',
+    'cs': 'bg-yellow-100 text-yellow-800',
+    'msu': 'bg-orange-100 text-orange-800',
+    'edificio': 'bg-gray-100 text-gray-800',
   };
 
   return (
     <span className={`text-xs px-2 py-1 rounded-full font-medium ${colors[type]}`}>
-      {type}
+      {type.toUpperCase()}
     </span>
   );
 };

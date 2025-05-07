@@ -13,7 +13,7 @@ export interface Configuration {
   createdAt: string;
 }
 
-export type ConfigurationType = 'CER' | 'CECER' | 'test' | 'pilota' | 'monitoraggio';
+export type ConfigurationType = 'cer' | 'gac' | 'aid' | 'cs' | 'msu' | 'edificio';
 
 export type ConfigurationStatus = 'active' | 'pending' | 'planning';
 
