@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sun, Cloud, CloudRain, CloudSnow, Wind, Thermometer, Droplets, Waves, ArrowDown, ArrowUp, Navigation, Map, Key } from "lucide-react";
@@ -31,8 +32,8 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
   const [location, setLocation] = useState<GeoLocation | null>(null);
   const [mapError, setMapError] = useState<string | null>(null);
   const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<google.maps.Map | null>(null);
-  const marker = useRef<google.maps.Marker | null>(null);
+  const map = useRef<any>(null);
+  const marker = useRef<any>(null);
 
   useEffect(() => {
     const loadWeatherData = async () => {
@@ -398,4 +399,23 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
       </Card>
     </>
   );
+
+  function getWeatherIcon(iconCode: string, size: "sm" | "md" | "lg" = "md") {
+    const sizeMap = {
+      sm: "h-6 w-6",
+      md: "h-8 w-8",
+      lg: "h-12 w-12"
+    };
+    const className = sizeMap[size];
+    
+    // Map OpenWeatherMap icon codes to Lucide icons
+    if (iconCode.includes('01')) return <Sun className={`${className} text-yellow-400`} />;
+    if (iconCode.includes('02') || iconCode.includes('03') || iconCode.includes('04')) 
+      return <Cloud className={`${className} text-gray-400`} />;
+    if (iconCode.includes('09') || iconCode.includes('10')) 
+      return <CloudRain className={`${className} text-blue-400`} />;
+    if (iconCode.includes('13')) 
+      return <CloudSnow className={`${className} text-blue-200`} />;
+    return <Wind className={`${className} text-gray-500`} />;
+  }
 }
