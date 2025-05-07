@@ -1,4 +1,3 @@
-
 import { Configuration, ConfigurationType } from "@/types/configuration";
 import { Badge } from "@/components/ui/badge";
 import { Sun, Zap, Car } from "lucide-react";
@@ -19,14 +18,13 @@ const statusLabels: Record<string, string> = {
   'pending': 'In attesa',
   'planning': 'Pianificato'
 };
-
 interface ConfigurationHeaderProps {
   configuration: Configuration;
 }
-
-export function ConfigurationHeader({ configuration }: ConfigurationHeaderProps) {
-  return (
-    <div className="flex items-center gap-6">
+export function ConfigurationHeader({
+  configuration
+}: ConfigurationHeaderProps) {
+  return <div className="flex items-center gap-6">
       {/* Icon circle */}
       <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
         <Sun className="h-10 w-10 text-green-600" />
@@ -39,9 +37,9 @@ export function ConfigurationHeader({ configuration }: ConfigurationHeaderProps)
           <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200">
             {typeLabels[configuration.type]}
           </Badge>
-          <span className="text-gray-500">•</span>
-          <span className="text-gray-600">{configuration.description}</span>
-          <span className="text-gray-500">•</span>
+          
+          
+          
           <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-200">
             {statusLabels[configuration.status]}
           </Badge>
@@ -63,6 +61,5 @@ export function ConfigurationHeader({ configuration }: ConfigurationHeaderProps)
           <p className="mt-1 font-semibold">- kWh</p>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 }
