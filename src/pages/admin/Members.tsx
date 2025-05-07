@@ -6,15 +6,45 @@ import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { UserPlus, Search } from 'lucide-react';
+import { UserPlus, Search, Zap, ZapOff } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Link } from 'react-router-dom';
 
-// Dati di esempio
+// Dati di esempio aggiornati con il tipo di membro CER
 const membersData = [
-  { id: 1, name: 'Mario Rossi', email: 'mario.rossi@example.com', type: 'Domestico', status: 'Attivo' },
-  { id: 2, name: 'Laura Bianchi', email: 'laura.bianchi@example.com', type: 'Commerciale', status: 'Attivo' },
-  { id: 3, name: 'Giuseppe Verdi', email: 'giuseppe.verdi@example.com', type: 'Domestico', status: 'In attesa' },
-  { id: 4, name: 'Francesca Neri', email: 'francesca.neri@example.com', type: 'Industriale', status: 'Attivo' },
+  { 
+    id: 1, 
+    name: 'Mario Rossi', 
+    email: 'mario.rossi@example.com', 
+    type: 'Domestico', 
+    status: 'Attivo',
+    memberType: 'consumer' // consumatore di energia
+  },
+  { 
+    id: 2, 
+    name: 'Laura Bianchi', 
+    email: 'laura.bianchi@example.com', 
+    type: 'Commerciale', 
+    status: 'Attivo',
+    memberType: 'prosumer' // produttore e consumatore
+  },
+  { 
+    id: 3, 
+    name: 'Giuseppe Verdi', 
+    email: 'giuseppe.verdi@example.com', 
+    type: 'Domestico', 
+    status: 'In attesa',
+    memberType: 'consumer'
+  },
+  { 
+    id: 4, 
+    name: 'Francesca Neri', 
+    email: 'francesca.neri@example.com', 
+    type: 'Industriale', 
+    status: 'Attivo',
+    memberType: 'prosumer'
+  },
 ];
 
 export default function Members() {
@@ -40,9 +70,11 @@ export default function Members() {
         <main className="flex-1 overflow-y-auto p-4 md:p-6">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold">Membri CER</h1>
-            <Button className="gap-2">
-              <UserPlus size={18} />
-              <span>Aggiungi Membro</span>
+            <Button className="gap-2" asChild>
+              <Link to="/admin/members/add">
+                <UserPlus size={18} />
+                <span>Aggiungi Membro</span>
+              </Link>
             </Button>
           </div>
           
@@ -69,6 +101,7 @@ export default function Members() {
                     <TableHead>Nome</TableHead>
                     <TableHead>Email</TableHead>
                     <TableHead>Tipo</TableHead>
+                    <TableHead>Ruolo CER</TableHead>
                     <TableHead>Stato</TableHead>
                     <TableHead>Azioni</TableHead>
                   </TableRow>
@@ -79,6 +112,19 @@ export default function Members() {
                       <TableCell className="font-medium">{member.name}</TableCell>
                       <TableCell>{member.email}</TableCell>
                       <TableCell>{member.type}</TableCell>
+                      <TableCell>
+                        {member.memberType === 'prosumer' ? (
+                          <Badge className="bg-purple-600 hover:bg-purple-700 flex w-fit gap-1 items-center">
+                            <Zap size={14} />
+                            Prosumer
+                          </Badge>
+                        ) : (
+                          <Badge className="bg-blue-600 hover:bg-blue-700 flex w-fit gap-1 items-center">
+                            <ZapOff size={14} />
+                            Consumer
+                          </Badge>
+                        )}
+                      </TableCell>
                       <TableCell>
                         <span className={`px-2 py-1 rounded-full text-xs ${
                           member.status === 'Attivo' 

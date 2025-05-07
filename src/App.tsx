@@ -11,6 +11,7 @@ import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import Members from "./pages/admin/Members";
+import AddMember from "./pages/admin/AddMember";
 import EnergyData from "./pages/admin/EnergyData";
 import Reports from "./pages/admin/Reports";
 import Settings from "./pages/admin/Settings";
@@ -48,6 +49,16 @@ const App = () => (
               element={
                 <ProtectedRoute allowedRoles={['cer_manager']}>
                   <Members />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Nuova rotta per l'aggiunta di membri */}
+            <Route 
+              path="/admin/members/add" 
+              element={
+                <ProtectedRoute allowedRoles={['cer_manager']}>
+                  <AddMember />
                 </ProtectedRoute>
               } 
             />
