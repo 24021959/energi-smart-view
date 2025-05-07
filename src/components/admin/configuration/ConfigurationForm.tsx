@@ -9,6 +9,9 @@ import { BasicInfoFields } from './form/BasicInfoFields';
 import { AddressFields } from './form/AddressFields';
 import { StatusSelector } from './form/StatusSelector';
 import { FormActions } from './form/FormActions';
+import { MembersSection } from './form/MembersSection';
+import { PlantsSection } from './form/PlantsSection';
+import { DocumentsSection } from './form/DocumentsSection';
 
 export function ConfigurationForm() {
   const navigate = useNavigate();
@@ -16,13 +19,21 @@ export function ConfigurationForm() {
   
   const form = useForm<ConfigurationFormData>({
     defaultValues: {
-      name: '',
+      name: 'CER Quartiere Verde',
       type: 'cer',
-      description: '',
-      address: '',
-      city: '',
-      postalCode: '',
-      status: 'planning'
+      description: 'Comunità energetica per famiglie e una scuola',
+      address: 'Via dei Fiori 12',
+      city: 'Massa',
+      postalCode: '54100',
+      province: 'MS',
+      status: 'planning',
+      plants: ['impianto_001', 'impianto_004'],
+      members: [
+        { id: 'utente_001', role: 'consumer', pod: 'IT001...', quota: '25%' },
+        { id: 'utente_002', role: 'producer', pod: 'IT002...', quota: '50%' }
+      ],
+      startDate: '2025-06-01',
+      documents: ['statuto.pdf', 'mappa.jpg']
     }
   });
   
@@ -66,6 +77,12 @@ export function ConfigurationForm() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <StatusSelector control={form.control} />
         </div>
+        
+        <PlantsSection control={form.control} />
+        
+        <MembersSection control={form.control} />
+        
+        <DocumentsSection control={form.control} />
         
         <FormActions isSubmitting={isSubmitting} onCancel={handleCancel} />
       </form>

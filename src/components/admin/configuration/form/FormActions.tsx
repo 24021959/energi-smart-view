@@ -8,7 +8,7 @@ interface FormActionsProps {
 
 export function FormActions({ isSubmitting, onCancel }: FormActionsProps) {
   return (
-    <div className="flex justify-end space-x-4 pt-4 border-t">
+    <div className="flex justify-end space-x-4 pt-6 mt-6 border-t">
       <Button 
         type="button" 
         variant="outline" 
@@ -17,7 +17,7 @@ export function FormActions({ isSubmitting, onCancel }: FormActionsProps) {
         Annulla
       </Button>
       <Button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? 'Creazione in corso...' : 'Crea Configurazione'}
+        {isSubmitting ? 'Creazione in corso...' : 'Salva Configurazione'}
       </Button>
     </div>
   );

@@ -12,7 +12,9 @@ interface BasicInfoFieldsProps {
 
 export function BasicInfoFields({ control }: BasicInfoFieldsProps) {
   return (
-    <>
+    <div className="space-y-4">
+      <h3 className="text-lg font-medium">Informazioni di Base</h3>
+      
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Nome Configurazione */}
         <FormField
@@ -31,6 +33,21 @@ export function BasicInfoFields({ control }: BasicInfoFieldsProps) {
         
         {/* Tipo Configurazione */}
         <TypeSelector control={control} />
+        
+        {/* Data Inizio */}
+        <FormField
+          control={control}
+          name="startDate"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Data Inizio</FormLabel>
+              <FormControl>
+                <Input type="date" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </div>
       
       {/* Descrizione */}
@@ -51,6 +68,6 @@ export function BasicInfoFields({ control }: BasicInfoFieldsProps) {
           </FormItem>
         )}
       />
-    </>
+    </div>
   );
 }
