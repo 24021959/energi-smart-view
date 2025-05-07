@@ -9,7 +9,8 @@ import {
   Settings,
   ChartBar,
   FileText,
-  Zap
+  Zap,
+  List
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Logo } from '@/components/Logo';
@@ -36,6 +37,11 @@ const navItems = [
     title: 'Impianti',
     href: '/admin/plants',
     icon: Zap,
+  },
+  {
+    title: 'Configurazioni',
+    href: '/admin/configurations',
+    icon: List,
   },
   {
     title: 'Dati Energetici',

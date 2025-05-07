@@ -1,251 +1,147 @@
-
-import { useParams, useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useParams, Link, Navigate } from 'react-router-dom';
+import { Plant } from '@/types/plant';
 import { AdminLayout } from '@/layouts/AdminLayout';
 import { Button } from '@/components/ui/button';
-import { Plant } from '@/types/plant';
-import { ArrowLeft, Edit } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-
-// Dati di esempio per gli impianti
-const demoPlants: Plant[] = [
-  {
-    id: '1',
-    name: 'Impianto Fotovoltaico Centro',
-    type: 'solar',
-    power: 10.5,
-    address: 'Via Roma 123',
-    city: 'Milano',
-    province: 'MI',
-    postalCode: '20100',
-    status: 'active',
-    owner: 'Comune di Milano',
-    installationDate: '2022-06-15',
-    createdAt: '2022-05-01',
-  },
-  {
-    id: '2',
-    name: 'Parco Eolico Nord',
-    type: 'wind',
-    power: 50.0,
-    address: 'Strada Provinciale 45',
-    city: 'Bergamo',
-    province: 'BG',
-    postalCode: '24100',
-    status: 'active',
-    owner: 'EnergyCoop',
-    installationDate: '2021-11-30',
-    createdAt: '2021-09-15',
-  },
-  {
-    id: '3',
-    name: 'Mini-idro Fiume Adda',
-    type: 'hydro',
-    power: 5.2,
-    address: 'Lungo Fiume 78',
-    city: 'Lecco',
-    province: 'LC',
-    postalCode: '23900',
-    status: 'maintenance',
-    owner: 'Consorzio Acque',
-    installationDate: '2023-01-20',
-    createdAt: '2022-11-05',
-  },
-  {
-    id: '4',
-    name: 'Biomassa Agricola Sud',
-    type: 'biomass',
-    power: 7.8,
-    address: 'Via delle Industrie 42',
-    city: 'Pavia',
-    province: 'PV',
-    postalCode: '27100',
-    status: 'inactive',
-    owner: 'Cooperativa Agricola',
-    installationDate: '2022-03-10',
-    createdAt: '2022-01-25',
-  },
-  {
-    id: '5',
-    name: 'Solare Scuola',
-    type: 'solar',
-    power: 3.2,
-    address: 'Viale dell\'Educazione 15',
-    city: 'Como',
-    province: 'CO',
-    postalCode: '22100',
-    status: 'pending',
-    owner: 'Istituto Comprensivo',
-    installationDate: '2023-04-05',
-    createdAt: '2023-02-10',
-  },
-];
-
-// Helper per ottenere il colore del badge in base allo stato
-const getStatusBadgeVariant = (status: string) => {
-  switch (status) {
-    case 'active':
-      return 'success';
-    case 'inactive':
-      return 'destructive';
-    case 'pending':
-      return 'warning';
-    case 'maintenance':
-      return 'outline';
-    default:
-      return 'secondary';
-  }
-};
-
-// Helper per ottenere l'etichetta in italiano dello stato
-const getStatusLabel = (status: string) => {
-  switch (status) {
-    case 'active':
-      return 'Attivo';
-    case 'inactive':
-      return 'Inattivo';
-    case 'pending':
-      return 'In attesa';
-    case 'maintenance':
-      return 'Manutenzione';
-    default:
-      return status;
-  }
-};
-
-// Helper per ottenere l'etichetta in italiano del tipo di impianto
-const getTypeLabel = (type: string) => {
-  switch (type) {
-    case 'solar':
-      return 'Fotovoltaico';
-    case 'wind':
-      return 'Eolico';
-    case 'hydro':
-      return 'Idroelettrico';
-    case 'biomass':
-      return 'Biomassa';
-    case 'geothermal':
-      return 'Geotermico';
-    default:
-      return type;
-  }
-};
+import { ArrowLeft, Edit, Trash2 } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 
 export default function PlantDetail() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const [plant, setPlant] = useState<Plant | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Simuliamo il recupero dei dati dell'impianto
-    setLoading(true);
+    if (!id) {
+      setError('Impianto non trovato');
+      setIsLoading(false);
+      return;
+    }
+
+    // Simula il caricamento dei dati
     setTimeout(() => {
-      const foundPlant = demoPlants.find(p => p.id === id);
-      setPlant(foundPlant || null);
-      setLoading(false);
+      const mockPlant: Plant = {
+        id: '1',
+        name: 'Impianto Test',
+        type: 'solar',
+        power: 100,
+        address: 'Via Roma, 1',
+        city: 'Roma',
+        province: 'RM',
+        postalCode: '00100',
+        status: 'active',
+        owner: 'Mario Rossi',
+        installationDate: '2023-01-01',
+        createdAt: '2023-01-01',
+      };
+
+      setPlant(mockPlant);
+      setIsLoading(false);
     }, 500);
   }, [id]);
 
-  if (loading) {
+  if (isLoading) {
     return (
       <AdminLayout title="Dettaglio Impianto">
-        <div className="flex items-center justify-center h-64">
-          <div className="w-10 h-10 border-4 border-t-purple-700 border-purple-200 rounded-full animate-spin"></div>
+        <div className="flex flex-col items-center justify-center h-full">
+          <div className="w-16 h-16 border-4 border-t-primary border-primary/30 rounded-full animate-spin"></div>
+          <p className="mt-4 text-muted-foreground">Caricamento dettagli impianto...</p>
         </div>
       </AdminLayout>
     );
   }
 
-  if (!plant) {
-    return (
-      <AdminLayout title="Impianto non trovato">
-        <div className="text-center py-10">
-          <h2 className="text-2xl font-bold mb-4">Impianto non trovato</h2>
-          <p className="mb-6">L'impianto richiesto non esiste o è stato rimosso.</p>
-          <Button 
-            onClick={() => navigate('/admin/plants')}
-            variant="outline"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Torna alla lista
-          </Button>
-        </div>
-      </AdminLayout>
-    );
+  if (error || !plant) {
+    toast({
+      variant: "destructive",
+      title: "Impianto non trovato",
+      description: "L'impianto specificato non esiste o è stato rimosso."
+    });
+    return <Navigate to="/admin/plants" replace />;
   }
 
   return (
-    <AdminLayout title={`Impianto: ${plant.name}`}>
-      <div className="max-w-5xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <Button 
-            variant="outline" 
-            onClick={() => navigate('/admin/plants')}
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Torna alla lista
-          </Button>
-          <Button>
-            <Edit className="h-4 w-4 mr-2" />
-            Modifica
-          </Button>
+    <AdminLayout title="Dettaglio Impianto">
+      <div className="container mx-auto mt-4">
+        <div className="mb-4">
+          <Link to="/admin/plants" className="inline-flex items-center text-purple-600 hover:text-purple-800">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Torna alla lista impianti
+          </Link>
         </div>
-        
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <div className="p-6 border-b">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-purple-900">{plant.name}</h2>
-              <Badge variant={getStatusBadgeVariant(plant.status)}>
-                {getStatusLabel(plant.status)}
-              </Badge>
-            </div>
+
+        <div className="bg-white shadow rounded-lg overflow-hidden">
+          <div className="px-4 py-5 sm:px-6">
+            <h3 className="text-lg font-medium leading-6 text-gray-900">{plant.name}</h3>
+            <p className="mt-1 max-w-2xl text-sm text-gray-500">
+              Dettagli e informazioni sull'impianto.
+            </p>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
-            <div className="space-y-4">
-              <div>
-                <h3 className="text-sm font-medium text-muted-foreground">Tipo impianto</h3>
-                <p className="text-base">{getTypeLabel(plant.type)}</p>
+
+          <div className="border-t border-gray-200">
+            <dl>
+              <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <dt className="text-sm font-medium text-gray-500">ID Impianto</dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">{plant.id}</dd>
               </div>
-              
-              <div>
-                <h3 className="text-sm font-medium text-muted-foreground">Potenza</h3>
-                <p className="text-base">{plant.power} kW</p>
+
+              <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <dt className="text-sm font-medium text-gray-500">Tipo di Impianto</dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">{plant.type}</dd>
               </div>
-              
-              <div>
-                <h3 className="text-sm font-medium text-muted-foreground">Proprietario</h3>
-                <p className="text-base">{plant.owner}</p>
+
+              <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <dt className="text-sm font-medium text-gray-500">Potenza (kW)</dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">{plant.power} kW</dd>
               </div>
-              
-              <div>
-                <h3 className="text-sm font-medium text-muted-foreground">Data installazione</h3>
-                <p className="text-base">{new Date(plant.installationDate).toLocaleDateString('it-IT')}</p>
+
+              <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <dt className="text-sm font-medium text-gray-500">Indirizzo</dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                  {plant.address}, {plant.city}, {plant.province} {plant.postalCode}
+                </dd>
               </div>
-            </div>
-            
-            <div className="space-y-4">
-              <div>
-                <h3 className="text-sm font-medium text-muted-foreground">Indirizzo</h3>
-                <p className="text-base">{plant.address}</p>
+
+              <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <dt className="text-sm font-medium text-gray-500">Proprietario</dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">{plant.owner}</dd>
               </div>
-              
-              <div>
-                <h3 className="text-sm font-medium text-muted-foreground">Città</h3>
-                <p className="text-base">{plant.city} ({plant.province}), {plant.postalCode}</p>
+
+              <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <dt className="text-sm font-medium text-gray-500">Data di Installazione</dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">{plant.installationDate}</dd>
               </div>
-              
-              <div>
-                <h3 className="text-sm font-medium text-muted-foreground">Data creazione</h3>
-                <p className="text-base">{new Date(plant.createdAt).toLocaleDateString('it-IT')}</p>
+
+              <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <dt className="text-sm font-medium text-gray-500">Stato</dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                  {plant.status === 'active' ? (
+                    <Button 
+                      variant="default" 
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      Attivo
+                    </Button>
+                  ) : plant.status === 'inactive' ? (
+                    <Button variant="outline" className="text-gray-500">Inattivo</Button>
+                  ) : (
+                    <Button variant="secondary">In Manutenzione</Button>
+                  )}
+                </dd>
               </div>
-            </div>
+            </dl>
           </div>
-          
-          <div className="bg-muted/20 p-6">
-            <h3 className="font-medium mb-4">Dati energetici</h3>
-            <p className="text-muted-foreground">I dati energetici di questo impianto saranno disponibili prossimamente.</p>
+
+          <div className="px-4 py-4 sm:px-6 flex justify-end space-x-3">
+            <Link to={`/admin/plants/edit/${plant.id}`} className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+              <Edit className="mr-2 h-5 w-5" />
+              Modifica
+            </Link>
+            <Button variant="destructive" size="sm">
+              <Trash2 className="mr-2 h-4 w-4" />
+              Elimina
+            </Button>
           </div>
         </div>
       </div>
