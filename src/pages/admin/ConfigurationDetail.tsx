@@ -13,7 +13,7 @@ import { EnergyStats } from '@/components/admin/configuration/EnergyStats';
 import { EnergyProductionConsumption } from '@/components/admin/configuration/EnergyProductionConsumption';
 import { FinancialBenefits } from '@/components/admin/configuration/FinancialBenefits';
 import { ConfigMembersExpander } from '@/components/admin/configuration/ConfigMembersExpander';
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, ArrowLeft } from "lucide-react";
 
 const ConfigurationDetail = () => {
   const { id } = useParams();
@@ -51,6 +51,16 @@ const ConfigurationDetail = () => {
   return (
     <AdminLayout title={configuration.name}>
       <div className="container mx-auto px-4 space-y-6">
+        {/* Back button */}
+        <div className="mb-2">
+          <Button variant="ghost" size="sm" asChild className="flex items-center gap-1">
+            <Link to="/admin/configurations">
+              <ArrowLeft className="h-4 w-4" />
+              <span>Torna alle configurazioni</span>
+            </Link>
+          </Button>
+        </div>
+        
         {/* Header con informazioni principali */}
         <ConfigurationHeader configuration={configuration} />
         
