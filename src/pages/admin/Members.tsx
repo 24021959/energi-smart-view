@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { UserPlus, Search, Zap, ZapOff, Eye, Check, X } from 'lucide-react';
+import { UserPlus, Search, Zap, ZapOff, Eye, Check, X, Battery } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
@@ -52,6 +52,15 @@ const membersData: MemberListItem[] = [
     type: 'Industriale', 
     status: 'Attivo',
     memberType: 'prosumer',
+    isActive: true
+  },
+  { 
+    id: 5, 
+    name: 'Energia Sole srl', 
+    email: 'info@energiasole.it', 
+    type: 'Industriale', 
+    status: 'Attivo',
+    memberType: 'producer', // solo produttore
     isActive: true
   },
 ];
@@ -162,6 +171,11 @@ export default function Members() {
                             <Zap size={14} />
                             Prosumer
                           </Badge>
+                        ) : member.memberType === 'producer' ? (
+                          <Badge className="bg-green-600 hover:bg-green-700 flex w-fit gap-1 items-center">
+                            <Battery size={14} />
+                            Producer
+                          </Badge>
                         ) : (
                           <Badge className="bg-blue-600 hover:bg-blue-700 flex w-fit gap-1 items-center">
                             <ZapOff size={14} />
@@ -247,7 +261,10 @@ export default function Members() {
                 <div>{selectedMember.type}</div>
                 
                 <div className="font-semibold">Ruolo CER:</div>
-                <div>{selectedMember.memberType === 'prosumer' ? 'Prosumer' : 'Consumer'}</div>
+                <div>
+                  {selectedMember.memberType === 'prosumer' ? 'Prosumer' : 
+                   selectedMember.memberType === 'producer' ? 'Producer' : 'Consumer'}
+                </div>
                 
                 <div className="font-semibold">Stato:</div>
                 <div>{selectedMember.status}</div>

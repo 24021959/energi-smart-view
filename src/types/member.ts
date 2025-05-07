@@ -3,7 +3,7 @@
 export interface MemberFormValues {
   // Dati generali
   entityType: 'person' | 'company'; // Tipo di entità: persona fisica o giuridica
-  memberType: 'consumer' | 'prosumer'; // Ruolo nella CER
+  memberType: 'consumer' | 'prosumer' | 'producer'; // Ruolo nella CER
   
   // Dati personali/aziendali
   name: string; // Nome completo o ragione sociale
@@ -45,6 +45,6 @@ export interface MemberListItem {
   email: string;
   type: string;
   status: string;
-  memberType: 'consumer' | 'prosumer';
+  memberType: 'consumer' | 'prosumer' | 'producer';
   isActive: boolean;
 }

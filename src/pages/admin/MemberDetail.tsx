@@ -5,7 +5,7 @@ import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Edit, UserCog, Zap, ZapOff } from 'lucide-react';
+import { ArrowLeft, Edit, UserCog, Zap, ZapOff, Battery } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { toast } from '@/hooks/use-toast';
@@ -21,7 +21,7 @@ const getMemberById = (id: number): MemberListItem | undefined => {
       email: 'mario.rossi@example.com', 
       type: 'Domestico', 
       status: 'Attivo',
-      memberType: 'consumer',
+      memberType: 'consumer' as const,
       isActive: true,
     },
     { 
@@ -30,7 +30,7 @@ const getMemberById = (id: number): MemberListItem | undefined => {
       email: 'laura.bianchi@example.com', 
       type: 'Commerciale', 
       status: 'Attivo',
-      memberType: 'prosumer',
+      memberType: 'prosumer' as const,
       isActive: true,
     },
     { 
@@ -39,7 +39,7 @@ const getMemberById = (id: number): MemberListItem | undefined => {
       email: 'giuseppe.verdi@example.com', 
       type: 'Domestico', 
       status: 'In attesa',
-      memberType: 'consumer',
+      memberType: 'consumer' as const,
       isActive: false,
     },
     { 
@@ -48,7 +48,16 @@ const getMemberById = (id: number): MemberListItem | undefined => {
       email: 'francesca.neri@example.com', 
       type: 'Industriale', 
       status: 'Attivo',
-      memberType: 'prosumer',
+      memberType: 'prosumer' as const,
+      isActive: true,
+    },
+    { 
+      id: 5, 
+      name: 'Energia Sole srl', 
+      email: 'info@energiasole.it', 
+      type: 'Industriale', 
+      status: 'Attivo',
+      memberType: 'producer' as const,
       isActive: true,
     },
   ];
@@ -61,7 +70,7 @@ const getMemberDetails = (id: number) => {
   return {
     id,
     fiscalCode: 'RSSMRA80A01H501Z',
-    vatNumber: '',
+    vatNumber: id === 5 ? '12345678901' : '',
     idType: 'Carta d\'identità',
     idNumber: 'CA12345XY',
     legalAddress: 'Via Roma 123, Roma',
@@ -70,21 +79,21 @@ const getMemberDetails = (id: number) => {
     username: `user${id}`,
     password: 'password123',
     registrationDate: '01/01/2023',
-    consumptionData: [
+    consumptionData: id !== 5 ? [
       { month: 'Gen', value: 120 },
       { month: 'Feb', value: 100 },
       { month: 'Mar', value: 140 },
       { month: 'Apr', value: 135 },
       { month: 'Mag', value: 160 },
       { month: 'Giu', value: 180 },
-    ],
-    productionData: id === 2 || id === 4 ? [
-      { month: 'Gen', value: 50 },
-      { month: 'Feb', value: 60 },
-      { month: 'Mar', value: 80 },
-      { month: 'Apr', value: 100 },
-      { month: 'Mag', value: 120 },
-      { month: 'Giu', value: 140 },
+    ] : [],
+    productionData: id === 2 || id === 4 || id === 5 ? [
+      { month: 'Gen', value: id === 5 ? 250 : 50 },
+      { month: 'Feb', value: id === 5 ? 280 : 60 },
+      { month: 'Mar', value: id === 5 ? 320 : 80 },
+      { month: 'Apr', value: id === 5 ? 380 : 100 },
+      { month: 'Mag', value: id === 5 ? 420 : 120 },
+      { month: 'Giu', value: id === 5 ? 450 : 140 },
     ] : []
   };
 };
@@ -162,6 +171,11 @@ export default function MemberDetail() {
                 <Badge className="bg-purple-600">
                   <Zap className="mr-1 h-4 w-4" />
                   Prosumer
+                </Badge>
+              ) : member.memberType === 'producer' ? (
+                <Badge className="bg-green-600">
+                  <Battery className="mr-1 h-4 w-4" />
+                  Producer
                 </Badge>
               ) : (
                 <Badge className="bg-blue-600">
@@ -316,17 +330,19 @@ export default function MemberDetail() {
                       </div>
                     </div>
 
-                    <div>
-                      <h3 className="text-lg font-medium mb-2">Dati di Consumo</h3>
-                      <div className="h-60">
-                        {/* Qui andrebbe un grafico dei consumi */}
-                        <div className="bg-slate-100 h-full rounded-md flex items-center justify-center">
-                          Grafico dei consumi (ultimi 6 mesi)
+                    {(member.memberType === 'consumer' || member.memberType === 'prosumer') && (
+                      <div>
+                        <h3 className="text-lg font-medium mb-2">Dati di Consumo</h3>
+                        <div className="h-60">
+                          {/* Qui andrebbe un grafico dei consumi */}
+                          <div className="bg-slate-100 h-full rounded-md flex items-center justify-center">
+                            Grafico dei consumi (ultimi 6 mesi)
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    )}
 
-                    {member.memberType === 'prosumer' && (
+                    {(member.memberType === 'producer' || member.memberType === 'prosumer') && (
                       <div>
                         <h3 className="text-lg font-medium mb-2">Dati di Produzione</h3>
                         <div className="h-60">

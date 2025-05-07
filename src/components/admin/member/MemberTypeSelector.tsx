@@ -29,6 +29,10 @@ const MemberTypeSelector = ({ control }: MemberTypeSelectorProps) => {
                 <Label htmlFor="consumer" className="cursor-pointer">Consumer (solo utilizzo energia)</Label>
               </div>
               <div className="flex items-center space-x-2">
+                <RadioGroupItem value="producer" id="producer" />
+                <Label htmlFor="producer" className="cursor-pointer">Producer (solo produzione energia)</Label>
+              </div>
+              <div className="flex items-center space-x-2">
                 <RadioGroupItem value="prosumer" id="prosumer" />
                 <Label htmlFor="prosumer" className="cursor-pointer">Prosumer (produzione e utilizzo energia)</Label>
               </div>
