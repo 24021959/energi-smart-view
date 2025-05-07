@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -23,6 +24,7 @@ const loginSchema = z.object({
   })
 });
 type LoginFormData = z.infer<typeof loginSchema>;
+
 export default function Login() {
   const {
     authState,
@@ -50,6 +52,17 @@ export default function Login() {
       password: ''
     }
   });
+
+  // Funzione per precompilare il form con credenziali demo
+  const fillDemoCredentials = () => {
+    if (loginType === 'user') {
+      form.setValue('email', 'utente@utente.it');
+      form.setValue('password', 'utente');
+    } else {
+      form.setValue('email', 'gestore@gestore.it');
+      form.setValue('password', 'gestore');
+    }
+  };
 
   // Gestione del submit del form
   const onSubmit = async (data: LoginFormData) => {
@@ -81,6 +94,7 @@ export default function Login() {
       setIsSubmitting(false);
     }
   };
+  
   return <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-secondary/20 to-background p-4">
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="space-y-1 text-center">
@@ -111,6 +125,9 @@ export default function Login() {
                 <p className="text-sm text-blue-700">
                   Accedi per visualizzare i tuoi dati energetici personali
                 </p>
+                <p className="text-xs text-blue-600 mt-2 font-mono">
+                  Demo: utente@utente.it / utente
+                </p>
               </div>
             </TabsContent>
             
@@ -119,6 +136,9 @@ export default function Login() {
                 <h3 className="font-medium text-purple-800">Accesso Gestore CER</h3>
                 <p className="text-sm text-purple-700">
                   Accedi come gestore della Comunità Energetica Rinnovabile
+                </p>
+                <p className="text-xs text-purple-600 mt-2 font-mono">
+                  Demo: gestore@gestore.it / gestore
                 </p>
               </div>
             </TabsContent>
@@ -149,9 +169,24 @@ export default function Login() {
                       <FormMessage />
                     </FormItem>} />
 
-                <Button type="submit" className={`w-full ${loginType === 'cer_manager' ? 'bg-purple-600 hover:bg-purple-700' : ''}`} disabled={isSubmitting}>
-                  {isSubmitting ? "Accesso in corso..." : "Accedi"}
-                </Button>
+                <div className="flex flex-col space-y-2">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    className="text-xs" 
+                    onClick={fillDemoCredentials}
+                  >
+                    Compila credenziali demo
+                  </Button>
+                  
+                  <Button 
+                    type="submit" 
+                    className={`w-full ${loginType === 'cer_manager' ? 'bg-purple-600 hover:bg-purple-700' : ''}`} 
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? "Accesso in corso..." : "Accedi"}
+                  </Button>
+                </div>
               </form>
             </Form>
           </Tabs>

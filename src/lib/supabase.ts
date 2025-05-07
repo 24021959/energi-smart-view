@@ -16,10 +16,48 @@ if (import.meta.env.VITE_SUPABASE_ANON_KEY) {
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
+// Utenti demo per test
+const demoUsers = {
+  "utente@utente.it": {
+    id: "user-123",
+    email: "utente@utente.it",
+    password: "utente",
+    role: "user",
+    created_at: new Date().toISOString()
+  },
+  "gestore@gestore.it": {
+    id: "manager-456",
+    email: "gestore@gestore.it",
+    password: "gestore",
+    role: "cer_manager",
+    created_at: new Date().toISOString()
+  }
+};
+
 // Funzione per il login
 export async function loginUser(email: string, password: string) {
   try {
     console.log("Tentativo di login per:", email);
+    
+    // Verifica se è un utente demo
+    const demoUser = demoUsers[email.toLowerCase()];
+    if (demoUser && demoUser.password === password) {
+      console.log("Login demo riuscito per:", email);
+      return {
+        data: {
+          user: {
+            id: demoUser.id,
+            email: demoUser.email,
+            role: demoUser.role,
+            created_at: demoUser.created_at
+          },
+          session: { access_token: "demo-token" }
+        },
+        error: null
+      };
+    }
+    
+    // Se non è un utente demo o le credenziali sono errate, prova con Supabase
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -56,8 +94,15 @@ export async function getUserRole() {
     
     console.log("Utente trovato:", user);
     
-    // Per test, restituisci un ruolo fittizio
-    // In ambiente di produzione, dovresti recuperare il ruolo dal database
+    // Controlla se è uno dei nostri utenti demo basandosi sull'email
+    if (user.email) {
+      const demoUser = demoUsers[user.email.toLowerCase()];
+      if (demoUser) {
+        return demoUser.role;
+      }
+    }
+    
+    // Per test, restituisci un ruolo fittizio se non è un utente demo
     return 'user'; // oppure 'cer_manager' per testare accessi admin
     
     /* Codice per recuperare il ruolo dal profilo - da implementare quando la tabella sarà creata
