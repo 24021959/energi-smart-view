@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { UserPlus, Search, Zap, ZapOff, Eye, Check, X, Battery } from 'lucide-react';
+import { UserPlus, Search, Zap, ZapOff, Eye, Check, X, Battery, Filter } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
@@ -15,6 +15,13 @@ import { toast } from '@/hooks/use-toast';
 import { MemberListItem } from '@/types/member';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 // Dati di esempio aggiornati con il tipo di membro CER
 const membersData: MemberListItem[] = [
@@ -73,11 +80,18 @@ export default function Members() {
   const [members, setMembers] = useState<MemberListItem[]>(membersData);
   const [selectedMember, setSelectedMember] = useState<MemberListItem | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [memberTypeFilter, setMemberTypeFilter] = useState<string>('all');
 
-  // Filtra membri in base al termine di ricerca
+  // Filtra membri in base al termine di ricerca e al tipo di membro
   const filteredMembers = members.filter(
-    member => member.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-              member.email.toLowerCase().includes(searchTerm.toLowerCase())
+    member => {
+      const matchesSearch = member.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                            member.email.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      const matchesType = memberTypeFilter === 'all' || member.memberType === memberTypeFilter;
+      
+      return matchesSearch && matchesType;
+    }
   );
 
   // Funzione per attivare/disattivare un membro
@@ -136,14 +150,35 @@ export default function Members() {
               <CardDescription>
                 Gestisci tutti i membri della comunità energetica rinnovabile.
               </CardDescription>
-              <div className="mt-4 relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Cerca membri..."
-                  className="pl-10"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
+              <div className="mt-4 flex flex-col md:flex-row gap-4">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Cerca membri..."
+                    className="pl-10"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
+                <div className="w-full md:w-64">
+                  <Select
+                    value={memberTypeFilter}
+                    onValueChange={setMemberTypeFilter}
+                  >
+                    <SelectTrigger className="w-full">
+                      <div className="flex items-center gap-2">
+                        <Filter size={16} />
+                        <SelectValue placeholder="Filtra per ruolo" />
+                      </div>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Tutti i membri</SelectItem>
+                      <SelectItem value="consumer">Consumer</SelectItem>
+                      <SelectItem value="prosumer">Prosumer</SelectItem>
+                      <SelectItem value="producer">Producer</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </CardHeader>
             <CardContent>
@@ -160,78 +195,86 @@ export default function Members() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredMembers.map((member) => (
-                    <TableRow key={member.id}>
-                      <TableCell className="font-medium">{member.name}</TableCell>
-                      <TableCell>{member.email}</TableCell>
-                      <TableCell>{member.type}</TableCell>
-                      <TableCell>
-                        {member.memberType === 'prosumer' ? (
-                          <Badge className="bg-purple-600 hover:bg-purple-700 flex w-fit gap-1 items-center">
-                            <Zap size={14} />
-                            Prosumer
-                          </Badge>
-                        ) : member.memberType === 'producer' ? (
-                          <Badge className="bg-green-600 hover:bg-green-700 flex w-fit gap-1 items-center">
-                            <Battery size={14} />
-                            Producer
-                          </Badge>
-                        ) : (
-                          <Badge className="bg-blue-600 hover:bg-blue-700 flex w-fit gap-1 items-center">
-                            <ZapOff size={14} />
-                            Consumer
-                          </Badge>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <span className={`px-2 py-1 rounded-full text-xs ${
-                          member.status === 'Attivo' 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-yellow-100 text-yellow-800'
-                        }`}>
-                          {member.status}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center space-x-2">
-                          <Switch 
-                            checked={member.isActive} 
-                            onCheckedChange={(checked) => toggleMemberStatus(member.id, checked)}
-                          />
-                          <HoverCard>
-                            <HoverCardTrigger asChild>
-                              <span>{member.isActive ? 
-                                <Check size={18} className="text-green-500" /> : 
-                                <X size={18} className="text-red-500" />}
-                              </span>
-                            </HoverCardTrigger>
-                            <HoverCardContent>
-                              {member.isActive ? 
-                                "Membro attivo: può accedere al sistema" : 
-                                "Membro disattivato: non può accedere al sistema"}
-                            </HoverCardContent>
-                          </HoverCard>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex space-x-2">
-                          <Button variant="outline" size="sm" onClick={() => showMemberDetails(member)}>
-                            <Eye size={16} className="mr-1" />
-                            Dettagli
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            asChild
-                          >
-                            <Link to={`/admin/members/${member.id}`}>
-                              Scheda
-                            </Link>
-                          </Button>
-                        </div>
+                  {filteredMembers.length > 0 ? (
+                    filteredMembers.map((member) => (
+                      <TableRow key={member.id}>
+                        <TableCell className="font-medium">{member.name}</TableCell>
+                        <TableCell>{member.email}</TableCell>
+                        <TableCell>{member.type}</TableCell>
+                        <TableCell>
+                          {member.memberType === 'prosumer' ? (
+                            <Badge className="bg-purple-600 hover:bg-purple-700 flex w-fit gap-1 items-center">
+                              <Zap size={14} />
+                              Prosumer
+                            </Badge>
+                          ) : member.memberType === 'producer' ? (
+                            <Badge className="bg-green-600 hover:bg-green-700 flex w-fit gap-1 items-center">
+                              <Battery size={14} />
+                              Producer
+                            </Badge>
+                          ) : (
+                            <Badge className="bg-blue-600 hover:bg-blue-700 flex w-fit gap-1 items-center">
+                              <ZapOff size={14} />
+                              Consumer
+                            </Badge>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <span className={`px-2 py-1 rounded-full text-xs ${
+                            member.status === 'Attivo' 
+                              ? 'bg-green-100 text-green-800' 
+                              : 'bg-yellow-100 text-yellow-800'
+                          }`}>
+                            {member.status}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center space-x-2">
+                            <Switch 
+                              checked={member.isActive} 
+                              onCheckedChange={(checked) => toggleMemberStatus(member.id, checked)}
+                            />
+                            <HoverCard>
+                              <HoverCardTrigger asChild>
+                                <span>{member.isActive ? 
+                                  <Check size={18} className="text-green-500" /> : 
+                                  <X size={18} className="text-red-500" />}
+                                </span>
+                              </HoverCardTrigger>
+                              <HoverCardContent>
+                                {member.isActive ? 
+                                  "Membro attivo: può accedere al sistema" : 
+                                  "Membro disattivato: non può accedere al sistema"}
+                              </HoverCardContent>
+                            </HoverCard>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex space-x-2">
+                            <Button variant="outline" size="sm" onClick={() => showMemberDetails(member)}>
+                              <Eye size={16} className="mr-1" />
+                              Dettagli
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              asChild
+                            >
+                              <Link to={`/admin/members/${member.id}`}>
+                                Scheda
+                              </Link>
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center py-4 text-muted-foreground">
+                        Nessun membro trovato con i filtri selezionati
                       </TableCell>
                     </TableRow>
-                  ))}
+                  )}
                 </TableBody>
               </Table>
             </CardContent>
