@@ -8,7 +8,8 @@ import {
   ChevronLeft,
   Settings,
   ChartBar,
-  FileText
+  FileText,
+  Zap
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Logo } from '@/components/Logo';
@@ -30,6 +31,11 @@ const navItems = [
     title: 'Membri CER',
     href: '/admin/members',
     icon: Users,
+  },
+  {
+    title: 'Impianti',
+    href: '/admin/plants',
+    icon: Zap,
   },
   {
     title: 'Dati Energetici',
