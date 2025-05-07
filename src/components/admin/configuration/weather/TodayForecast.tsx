@@ -8,9 +8,14 @@ interface TodayForecastProps {
 }
 
 export function TodayForecast({ forecast }: TodayForecastProps) {
+  // Get the current date
+  const today = new Date();
+  const formattedDate = `${today.getDate().toString().padStart(2, '0')}/${(today.getMonth() + 1).toString().padStart(2, '0')}/${today.getFullYear()}`;
+  
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div className="md:col-span-1 bg-white rounded-lg shadow-sm p-4 flex flex-col items-center justify-center">
+        <div className="text-sm text-gray-500 mb-2">{formattedDate}</div>
         <WeatherIcon 
           icon={forecast.icon}
           className="w-24 h-24 mb-2"
@@ -41,7 +46,10 @@ export function TodayForecast({ forecast }: TodayForecastProps) {
             </div>
             <div>
               <p className="text-sm text-gray-500">Vento</p>
-              <p className="font-medium">{forecast.wind} km/h {forecast.wind > 0 ? `(${getWindDirectionText(0)})` : ''}</p>
+              <p className="font-medium">
+                {forecast.wind} km/h 
+                {forecast.windDirection !== undefined ? ` (${getWindDirectionText(forecast.windDirection)})` : ''}
+              </p>
             </div>
           </div>
           
@@ -52,7 +60,9 @@ export function TodayForecast({ forecast }: TodayForecastProps) {
             </div>
             <div>
               <p className="text-sm text-gray-500">Precipitazioni</p>
-              <p className="font-medium">0%</p>
+              <p className="font-medium">
+                {forecast.icon.includes('09') || forecast.icon.includes('10') ? '30%' : '0%'}
+              </p>
             </div>
           </div>
           
@@ -63,7 +73,12 @@ export function TodayForecast({ forecast }: TodayForecastProps) {
             </div>
             <div>
               <p className="text-sm text-gray-500">Nuvolosità</p>
-              <p className="font-medium">0%</p>
+              <p className="font-medium">
+                {forecast.icon.includes('01') ? '0%' : 
+                 forecast.icon.includes('02') ? '25%' : 
+                 forecast.icon.includes('03') ? '50%' : 
+                 forecast.icon.includes('04') ? '85%' : '0%'}
+              </p>
             </div>
           </div>
         </div>

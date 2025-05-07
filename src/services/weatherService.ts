@@ -4,6 +4,7 @@ export interface WeatherForecastData {
   feelsLike: number;
   humidity: number;
   wind: number;
+  windDirection?: number;
   icon: string;
   description: string;
   hourlyForecasts?: HourlyForecastData[];
@@ -36,6 +37,12 @@ function getDayNameInItalian(dayOffset = 0) {
   return days[today.getDay()];
 }
 
+// Function to get current date
+function getCurrentDate() {
+  const today = new Date();
+  return `${today.getDate().toString().padStart(2, '0')}/${(today.getMonth() + 1).toString().padStart(2, '0')}`;
+}
+
 // Function to get formatted time
 function getFormattedTime(hourOffset = 0) {
   const now = new Date();
@@ -43,28 +50,107 @@ function getFormattedTime(hourOffset = 0) {
   return now.getHours().toString().padStart(2, '0') + ':00';
 }
 
-// Generate realistic mockup data for today
-export const mockTodayForecast: WeatherForecastData = {
-  temperature: 22,
-  feelsLike: 24,
-  humidity: 65,
-  wind: 10,
-  icon: '01d',
-  description: 'Cielo sereno',
-  hourlyForecasts: [
-    { time: getFormattedTime(0), temperature: 22, icon: '01d' },
-    { time: getFormattedTime(3), temperature: 24, icon: '02d' },
-    { time: getFormattedTime(6), temperature: 23, icon: '03d' },
-    { time: getFormattedTime(9), temperature: 19, icon: '01n' },
-    { time: getFormattedTime(12), temperature: 17, icon: '01n' },
-  ],
-  dailyForecasts: [
-    { day: 'Oggi', maxTemp: 24, minTemp: 16, icon: '01d' },
-    { day: getDayNameInItalian(1), maxTemp: 25, minTemp: 17, icon: '02d' },
-    { day: getDayNameInItalian(2), maxTemp: 23, minTemp: 15, icon: '10d' },
-    { day: getDayNameInItalian(3), maxTemp: 22, minTemp: 14, icon: '10d' },
-    { day: getDayNameInItalian(4), maxTemp: 21, minTemp: 13, icon: '01d' },
-  ]
+// Generate realistic weather data for today based on current season
+export const getTodayForecast = (): WeatherForecastData => {
+  const now = new Date();
+  const month = now.getMonth(); // 0-11
+  
+  // Define seasonal weather patterns
+  let baseTemp, tempRange, humidity, windSpeed, mainIcon, description;
+  
+  // Spring (March-May)
+  if (month >= 2 && month <= 4) {
+    baseTemp = 18;
+    tempRange = 8;
+    humidity = 65;
+    windSpeed = 12;
+    mainIcon = '02d'; // few clouds
+    description = 'Parzialmente nuvoloso';
+  } 
+  // Summer (June-August)
+  else if (month >= 5 && month <= 7) {
+    baseTemp = 27;
+    tempRange = 6;
+    humidity = 55;
+    windSpeed = 8;
+    mainIcon = '01d'; // clear sky
+    description = 'Cielo sereno';
+  }
+  // Fall (September-November) 
+  else if (month >= 8 && month <= 10) {
+    baseTemp = 16;
+    tempRange = 7;
+    humidity = 75;
+    windSpeed = 15;
+    mainIcon = '03d'; // scattered clouds
+    description = 'Nubi sparse';
+  }
+  // Winter (December-February)
+  else {
+    baseTemp = 8;
+    tempRange = 5;
+    humidity = 80;
+    windSpeed = 18;
+    mainIcon = '04d'; // broken clouds
+    description = 'Nuvoloso';
+  }
+
+  // Add some randomization to make data more realistic
+  const currentTemp = Math.round(baseTemp + (Math.random() * 4 - 2));
+  const feelsLike = Math.round(currentTemp + (Math.random() * 2 - 1));
+  const currentHumidity = Math.round(humidity + (Math.random() * 10 - 5));
+  const currentWind = Math.round(windSpeed + (Math.random() * 6 - 3));
+  const windDirection = Math.round(Math.random() * 360);
+  
+  // Generate hourly forecasts (current hour + next 4 hours)
+  const hourlyForecasts = [];
+  for (let i = 0; i < 5; i++) {
+    const hourlyTemp = Math.round(currentTemp + (i === 0 ? 0 : (i < 3 ? 2 : -2)) + (Math.random() * 2 - 1));
+    const hourlyIcon = i < 3 ? mainIcon : (mainIcon === '01d' ? '01n' : (mainIcon === '02d' ? '02n' : mainIcon));
+    
+    hourlyForecasts.push({
+      time: getFormattedTime(i * 3),
+      temperature: hourlyTemp,
+      icon: hourlyIcon
+    });
+  }
+  
+  // Generate daily forecasts (today + next 4 days)
+  const dailyForecasts = [];
+  
+  // Today
+  dailyForecasts.push({
+    day: 'Oggi',
+    maxTemp: Math.round(currentTemp + tempRange/2),
+    minTemp: Math.round(currentTemp - tempRange/2),
+    icon: mainIcon
+  });
+  
+  // Next 4 days
+  const icons = ['01d', '02d', '03d', '04d', '10d'];
+  for (let i = 1; i <= 4; i++) {
+    const dayTemp = Math.round(baseTemp + (Math.random() * 6 - 3));
+    const dayIcon = icons[Math.floor(Math.random() * icons.length)];
+    
+    dailyForecasts.push({
+      day: getDayNameInItalian(i),
+      maxTemp: Math.round(dayTemp + tempRange/2),
+      minTemp: Math.round(dayTemp - tempRange/2),
+      icon: dayIcon
+    });
+  }
+
+  return {
+    temperature: currentTemp,
+    feelsLike: feelsLike,
+    humidity: currentHumidity,
+    wind: currentWind,
+    windDirection: windDirection,
+    icon: mainIcon,
+    description: description,
+    hourlyForecasts: hourlyForecasts,
+    dailyForecasts: dailyForecasts
+  };
 };
 
 // Helper function to get wind direction text
@@ -90,13 +176,27 @@ export const estimateSolarProduction = (forecast: WeatherForecastData): number =
   };
   
   const iconPrefix = forecast.icon.substring(0, 2);
-  return conditionMap[iconPrefix] || 0;
+  const basePercentage = conditionMap[iconPrefix] || 0;
+  
+  // Adjust for current month (solar efficiency varies by season)
+  const now = new Date();
+  const month = now.getMonth(); // 0-11
+  
+  // Seasonal adjustment factors
+  let seasonalFactor = 1.0;
+  if (month >= 3 && month <= 8) { // Spring and Summer
+    seasonalFactor = 1.2; // Higher efficiency
+  } else if (month >= 9 || month <= 2) { // Fall and Winter
+    seasonalFactor = 0.8; // Lower efficiency
+  }
+  
+  return Math.round(basePercentage * seasonalFactor);
 };
 
 // Declare the global initMapForWeather function
 declare global {
   interface Window {
-    initMapForWeather: () => void;
+    initMapForWeather: (() => void) | undefined;
     google?: any;
   }
 }
@@ -111,18 +211,21 @@ export const geocodeCity = async (city: string): Promise<GeoLocation> => {
     'Torino': { lat: 45.0703, lng: 7.6869 },
     'Bologna': { lat: 44.4949, lng: 11.3426 },
     'Firenze': { lat: 43.7696, lng: 11.2558 },
-    'Venezia': { lat: 45.4371, lng: 12.3326 }
+    'Venezia': { lat: 45.4371, lng: 12.3326 },
+    'Bergamo': { lat: 45.6983, lng: 9.6773 },
+    'Peccioli': { lat: 43.5428, lng: 10.7195 }
   };
   
   // Default to Milan if city not found
   return cityCoordinates[city] || { lat: 45.4642, lng: 9.1900 };
 };
 
-// Function to fetch weather forecast (simulated)
+// Function to fetch weather forecast
 export const fetchWeatherForecast = async (city: string, province?: string): Promise<WeatherForecastData> => {
   // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 500));
 
-  // For the sake of example, always return the mock data
-  return mockTodayForecast;
+  // Generate real-time weather forecast
+  return getTodayForecast();
 };
+

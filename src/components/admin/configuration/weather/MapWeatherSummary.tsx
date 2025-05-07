@@ -12,6 +12,20 @@ interface MapWeatherSummaryProps {
 export function MapWeatherSummary({ forecast, city, province }: MapWeatherSummaryProps) {
   const productionPercentage = estimateSolarProduction(forecast);
   
+  // Calculate estimated production in kWh based on weather conditions
+  // Assuming a standard 6kW system
+  const systemCapacity = 6;
+  const peakSunHours = forecast.icon.includes('01') ? 5 : 
+                       forecast.icon.includes('02') ? 4 : 
+                       forecast.icon.includes('03') ? 3 : 
+                       forecast.icon.includes('04') ? 2 : 1.5;
+                       
+  const estimatedProduction = ((systemCapacity * peakSunHours) * (productionPercentage / 100)).toFixed(1);
+  
+  // Get current date
+  const today = new Date();
+  const formattedDate = `${today.getDate().toString().padStart(2, '0')}/${(today.getMonth() + 1).toString().padStart(2, '0')}/${today.getFullYear()}`;
+  
   return (
     <div className="mt-4 bg-white rounded-lg p-4 flex flex-col md:flex-row items-center justify-between">
       <div className="flex items-center mb-4 md:mb-0">
@@ -19,6 +33,7 @@ export function MapWeatherSummary({ forecast, city, province }: MapWeatherSummar
         <div>
           <h3 className="font-medium">{city}, {province}</h3>
           <p className="text-sm text-gray-500">{forecast.description}, {forecast.temperature}°C</p>
+          <p className="text-xs text-gray-400">{formattedDate}</p>
         </div>
       </div>
       
@@ -44,7 +59,7 @@ export function MapWeatherSummary({ forecast, city, province }: MapWeatherSummar
             <Gauge className="h-5 w-5 text-blue-500 mr-1" />
             <span className="font-medium">Stima</span>
           </div>
-          <p className="text-sm">6.2 kWh</p>
+          <p className="text-sm">{estimatedProduction} kWh</p>
         </div>
       </div>
     </div>

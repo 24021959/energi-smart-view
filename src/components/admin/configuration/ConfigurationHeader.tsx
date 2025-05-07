@@ -1,3 +1,4 @@
+
 import { Configuration, ConfigurationType } from "@/types/configuration";
 import { Badge } from "@/components/ui/badge";
 import { Sun, Zap, Car } from "lucide-react";
@@ -37,8 +38,6 @@ export function ConfigurationHeader({
           <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200">
             {typeLabels[configuration.type]}
           </Badge>
-          
-          
           
           <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-200">
             {statusLabels[configuration.status]}
