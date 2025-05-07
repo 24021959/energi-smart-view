@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sun, Cloud, CloudRain, CloudSnow, Wind, Thermometer, Droplets, ArrowDown, ArrowUp, Map } from "lucide-react";
@@ -9,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 declare global {
   interface Window {
     google: any;
+    initMap: () => void;
   }
 }
 
@@ -31,6 +33,7 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
   const marker = useRef<any>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [googleScriptLoaded, setGoogleScriptLoaded] = useState(false);
+  const scriptRef = useRef<HTMLScriptElement | null>(null);
 
   useEffect(() => {
     const loadWeatherData = async () => {
@@ -67,18 +70,20 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
           }
           
           console.log("Loading Google Maps API script...");
+          
+          // Define the callback function that will be called when script loads
+          window.initMap = () => {
+            console.log("Google Maps script loaded successfully");
+            setGoogleScriptLoaded(true);
+          };
+          
           const script = document.createElement('script');
           script.id = 'google-maps-script';
           script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&callback=initMap`;
           script.async = true;
           script.defer = true;
           
-          // Create a global callback that will be called when script loads
-          window.initMap = () => {
-            console.log("Google Maps script loaded successfully");
-            setGoogleScriptLoaded(true);
-          };
-          
+          scriptRef.current = script;
           document.head.appendChild(script);
         } catch (error) {
           console.error("Error loading Google Maps script:", error);
@@ -87,6 +92,16 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
       };
       
       loadGoogleMapsScript();
+      
+      return () => {
+        // Clean up only if we're switching away from the map tab
+        if (currentTab !== "map" && scriptRef.current && scriptRef.current.parentNode) {
+          scriptRef.current.parentNode.removeChild(scriptRef.current);
+          scriptRef.current = null;
+          // Reset the load state if the script is removed
+          setGoogleScriptLoaded(false);
+        }
+      };
     }
   }, [currentTab, googleScriptLoaded]);
   
@@ -98,6 +113,12 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
     
     try {
       console.log("Initializing map for location:", location);
+      
+      if (!window.google || !window.google.maps) {
+        console.error("Google Maps API not loaded");
+        setMapError("Google Maps API non caricata correttamente");
+        return;
+      }
       
       // Initialize map
       const position = { lat: location.lat, lng: location.lon };
@@ -129,16 +150,29 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
       setMapLoaded(false);
       setMapError("Errore nell'inizializzazione della mappa: " + (error instanceof Error ? error.message : "Errore sconosciuto"));
     }
-    
-    // Clean up on unmount or when tab changes
+  }, [location, currentTab, city, googleScriptLoaded]);
+  
+  // Reset map state when changing tabs
+  useEffect(() => {
+    if (currentTab !== "map") {
+      setMapLoaded(false);
+    }
+  }, [currentTab]);
+  
+  // Clean up on unmount
+  useEffect(() => {
     return () => {
-      if (map.current) {
-        // Just remove references
-        map.current = null;
-        marker.current = null;
+      if (scriptRef.current && scriptRef.current.parentNode) {
+        scriptRef.current.parentNode.removeChild(scriptRef.current);
+      }
+      
+      // Remove the global callback to avoid memory leaks
+      if (window.initMap) {
+        // @ts-ignore - Just set to undefined instead of delete to avoid TypeScript errors
+        window.initMap = undefined;
       }
     };
-  }, [location, currentTab, city, googleScriptLoaded]);
+  }, []);
   
   // Helper function to get weather icon
   const getWeatherIcon = (iconCode: string, size: "sm" | "md" | "lg" = "md") => {
@@ -407,7 +441,7 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
                   </div>
                 )}
 
-                {location && !mapLoaded && !mapError && (
+                {location && !mapLoaded && !mapError && currentTab === "map" && (
                   <div className="absolute inset-0 flex items-center justify-center bg-gray-100 z-20">
                     <div className="flex flex-col items-center">
                       <div className="w-10 h-10 border-4 border-t-blue-500 border-blue-200 rounded-full animate-spin mb-2"></div>
