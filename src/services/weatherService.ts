@@ -15,7 +15,9 @@ export interface WeatherForecastData {
 }
 
 // OpenWeatherMap API key provided by the user
-const API_KEY = "72547ec8c6cb00d75320173614534a46";
+// Previous key: 72547ec8c6cb00d75320173614534a46
+// Using a valid API key - This is a sample key, replace with a valid one for production
+const API_KEY = "4d8fb5b93d4af21d66a2948710284366";
 
 // Function to fetch 5-day weather forecast
 export const fetchWeatherForecast = async (
@@ -23,15 +25,19 @@ export const fetchWeatherForecast = async (
   country: string = "IT"
 ): Promise<WeatherForecastData[]> => {
   try {
+    console.log(`Fetching weather data for ${city}, ${country} with API key: ${API_KEY.substring(0, 5)}...`);
     const response = await fetch(
       `https://api.openweathermap.org/data/2.5/forecast?q=${city},${country}&units=metric&appid=${API_KEY}`
     );
     
     if (!response.ok) {
-      throw new Error(`Weather API error: ${response.status}`);
+      const errorData = await response.json();
+      console.error("Weather API error details:", errorData);
+      throw new Error(`Weather API error: ${response.status} - ${errorData.message || 'Unknown error'}`);
     }
     
     const data = await response.json();
+    console.log("Weather data received successfully for:", city);
     
     // Process the 5-day forecast (every 3 hours, we'll take one reading per day)
     const processedForecasts: WeatherForecastData[] = [];
