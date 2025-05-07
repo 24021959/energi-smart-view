@@ -8,8 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
+import { Loader } from "@googlemaps/js-api-loader";
 
 interface WeatherForecastProps {
   city: string;
@@ -21,12 +20,12 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [currentTab, setCurrentTab] = useState("forecast");
   const [location, setLocation] = useState<GeoLocation | null>(null);
-  const [mapboxToken, setMapboxToken] = useState<string>(localStorage.getItem('mapbox_token') || "");
+  const [googleApiKey, setGoogleApiKey] = useState<string>(localStorage.getItem('google_maps_key') || "");
   const [tokenDialogOpen, setTokenDialogOpen] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
   const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
-  const marker = useRef<mapboxgl.Marker | null>(null);
+  const map = useRef<google.maps.Map | null>(null);
+  const marker = useRef<google.maps.Marker | null>(null);
 
   useEffect(() => {
     const loadWeatherData = async () => {
@@ -50,70 +49,68 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
     loadWeatherData();
   }, [city]);
   
-  // Initialize map once we have location and a token
+  // Initialize map once we have location and an API key
   useEffect(() => {
-    if (!location || !mapContainer.current || currentTab !== "map" || !mapboxToken) {
+    if (!location || !mapContainer.current || currentTab !== "map" || !googleApiKey) {
       return;
     }
 
-    // Clean up previous map instance if it exists
-    if (map.current) {
-      map.current.remove();
-      map.current = null;
-    }
+    const initMap = async () => {
+      try {
+        // Load Google Maps
+        const loader = new Loader({
+          apiKey: googleApiKey,
+          version: "weekly",
+        });
 
-    // Set Mapbox token
-    mapboxgl.accessToken = mapboxToken;
+        await loader.load();
+        
+        // Initialize map
+        const position = { lat: location.lat, lng: location.lon };
+        
+        map.current = new google.maps.Map(mapContainer.current, {
+          center: position,
+          zoom: 10,
+          mapTypeId: google.maps.MapTypeId.ROADMAP
+        });
+        
+        // Add a marker for the city
+        marker.current = new google.maps.Marker({
+          position,
+          map: map.current,
+          title: city
+        });
+        
+        // Reset error if previously set
+        setMapError(null);
+      } catch (error) {
+        console.error("Map initialization error:", error);
+        setMapError("Errore nell'inizializzazione della mappa: chiave API non valida o scaduta");
+      }
+    };
     
-    try {
-      // Initialize map
-      map.current = new mapboxgl.Map({
-        container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/streets-v12',
-        center: [location.lon, location.lat],
-        zoom: 10
-      });
-      
-      map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
-      
-      // Add a marker for the city
-      marker.current = new mapboxgl.Marker({ color: "#FF0000" })
-        .setLngLat([location.lon, location.lat])
-        .addTo(map.current);
-      
-      // Reset error if previously set
-      setMapError(null);
-
-      // Handle map error events
-      map.current.on('error', (e) => {
-        console.error('Mapbox error:', e);
-        setMapError("Errore nel caricamento della mappa: token non valido o scaduto");
-      });
-      
-      // Clean up on unmount
-      return () => {
-        if (map.current) {
-          map.current.remove();
-          map.current = null;
-        }
-      };
-    } catch (error) {
-      console.error("Map initialization error:", error);
-      setMapError("Errore nell'inizializzazione della mappa");
-    }
-  }, [location, currentTab, mapboxToken]);
+    initMap();
+    
+    // Clean up on unmount
+    return () => {
+      if (map.current) {
+        // No explicit cleanup needed for Google Maps
+        map.current = null;
+      }
+    };
+  }, [location, currentTab, googleApiKey, city]);
 
   // Open token dialog when tab changes to map and no token is available
   useEffect(() => {
-    if (currentTab === "map" && !mapboxToken) {
+    if (currentTab === "map" && !googleApiKey) {
       setTokenDialogOpen(true);
     }
-  }, [currentTab, mapboxToken]);
+  }, [currentTab, googleApiKey]);
 
   const handleTokenSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (mapboxToken) {
-      localStorage.setItem('mapbox_token', mapboxToken);
+    if (googleApiKey) {
+      localStorage.setItem('google_maps_key', googleApiKey);
       setTokenDialogOpen(false);
     }
   };
@@ -176,25 +173,25 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
       <Dialog open={tokenDialogOpen} onOpenChange={setTokenDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Inserisci il tuo token Mapbox</DialogTitle>
+            <DialogTitle>Inserisci la tua API Key di Google Maps</DialogTitle>
             <DialogDescription>
-              Per visualizzare la mappa, è necessario inserire un token Mapbox valido.
-              Puoi ottenerlo registrandoti su <a href="https://www.mapbox.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">mapbox.com</a> e copiando il tuo token pubblico.
+              Per visualizzare la mappa, è necessario inserire una API Key di Google Maps valida.
+              Puoi ottenerla registrandoti su <a href="https://developers.google.com/maps/documentation/javascript/get-api-key" target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">Google Cloud Platform</a> e creando la tua API Key.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleTokenSubmit} className="space-y-4">
             <div className="flex items-center space-x-2">
               <Key className="h-4 w-4 text-gray-500" />
               <Input
-                placeholder="Inserisci il tuo token Mapbox"
-                value={mapboxToken}
-                onChange={(e) => setMapboxToken(e.target.value)}
+                placeholder="Inserisci la tua API Key di Google Maps"
+                value={googleApiKey}
+                onChange={(e) => setGoogleApiKey(e.target.value)}
                 className="flex-1"
               />
             </div>
             <div className="flex justify-end">
-              <Button type="submit" disabled={!mapboxToken}>
-                Salva token
+              <Button type="submit" disabled={!googleApiKey}>
+                Salva API Key
               </Button>
             </div>
           </form>
@@ -401,7 +398,7 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
                   onClick={() => setTokenDialogOpen(true)}
                 >
                   <Key className="h-4 w-4" />
-                  <span>Cambia token Mapbox</span>
+                  <span>Cambia API Key di Google Maps</span>
                 </Button>
                 
                 <Button 
@@ -410,11 +407,8 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
                   className="flex items-center gap-2"
                   onClick={() => {
                     if (map.current && location) {
-                      map.current.flyTo({
-                        center: [location.lon, location.lat],
-                        zoom: 10,
-                        essential: true
-                      });
+                      map.current.setCenter({ lat: location.lat, lng: location.lon });
+                      map.current.setZoom(10);
                     }
                   }}
                 >
@@ -439,20 +433,20 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
                       size="sm" 
                       onClick={() => setTokenDialogOpen(true)}
                     >
-                      Inserisci un token valido
+                      Inserisci una API Key valida
                     </Button>
                   </div>
                 )}
 
-                {!mapboxToken && (
+                {!googleApiKey && (
                   <div className="absolute inset-0 flex items-center justify-center flex-col bg-gray-100 p-4">
-                    <p className="mb-2">Per visualizzare la mappa è necessario inserire un token Mapbox</p>
+                    <p className="mb-2">Per visualizzare la mappa è necessario inserire una API Key di Google Maps</p>
                     <Button 
                       variant="outline" 
                       size="sm" 
                       onClick={() => setTokenDialogOpen(true)}
                     >
-                      Inserisci token
+                      Inserisci API Key
                     </Button>
                   </div>
                 )}
