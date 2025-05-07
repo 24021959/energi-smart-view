@@ -31,6 +31,9 @@ export interface MemberFormValues {
   // POD e dati energetici
   podCode: string; // Codice POD
   
+  // Configurazione associata
+  configurationId: string; // ID della configurazione a cui il membro è associato
+  
   // Accettazione termini
   termsAccepted: boolean;
   

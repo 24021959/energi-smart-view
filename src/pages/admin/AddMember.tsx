@@ -19,6 +19,7 @@ import PersonalInfoForm from '@/components/admin/member/PersonalInfoForm';
 import CompanyInfoForm from '@/components/admin/member/CompanyInfoForm';
 import AddressInfoForm from '@/components/admin/member/AddressInfoForm';
 import TermsAcceptanceForm from '@/components/admin/member/TermsAcceptanceForm';
+import ConfigurationSelector from '@/components/admin/member/ConfigurationSelector';
 
 export default function AddMember() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -42,6 +43,7 @@ export default function AddMember() {
       supplyAddress: '',
       sameAddress: false,
       podCode: '',
+      configurationId: '',
       termsAccepted: false
     }
   });
@@ -77,6 +79,15 @@ export default function AddMember() {
       toast({
         title: "Documento mancante",
         description: "È necessario caricare la visura camerale.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (!data.configurationId) {
+      toast({
+        title: "Configurazione mancante",
+        description: "È necessario selezionare una configurazione.",
         variant: "destructive"
       });
       return;
@@ -147,6 +158,12 @@ export default function AddMember() {
                     />
                     
                     <MemberTypeSelector control={form.control} />
+
+                    {/* Selezione della configurazione */}
+                    <div className="border rounded-md p-4">
+                      <h3 className="text-lg font-medium mb-4">Associazione</h3>
+                      <ConfigurationSelector control={form.control} />
+                    </div>
 
                     {/* Dati generali */}
                     <div className="border rounded-md p-4">
