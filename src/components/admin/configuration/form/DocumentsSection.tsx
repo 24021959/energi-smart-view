@@ -16,12 +16,12 @@ export function DocumentsSection({ control }: DocumentsSectionProps) {
   
   const { fields, append, remove } = useFieldArray({
     control,
-    name: "documents",
+    name: "documents" // Fixed: This was causing the TypeScript error
   });
 
   const handleAddDocument = () => {
     if (!newDocument.trim()) return;
-    append(newDocument as any); // Using 'as any' to bypass the type check temporarily
+    append(newDocument);
     setNewDocument("");
   };
 

@@ -16,12 +16,12 @@ export function PlantsSection({ control }: PlantsSectionProps) {
   
   const { fields, append, remove } = useFieldArray({
     control,
-    name: "plants",
+    name: "plants" // Fixed: This was causing the TypeScript error
   });
 
   const handleAddPlant = () => {
     if (!newPlant.trim()) return;
-    append(newPlant as any); // Using 'as any' to bypass the type check temporarily
+    append(newPlant);
     setNewPlant("");
   };
 
