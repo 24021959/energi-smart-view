@@ -4,11 +4,11 @@ import { NavLink } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Users, 
-  ChartBar, 
-  FileText,
-  Settings, 
   ChevronRight,
-  ChevronLeft
+  ChevronLeft,
+  Settings,
+  ChartBar,
+  FileText
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Logo } from '@/components/Logo';
