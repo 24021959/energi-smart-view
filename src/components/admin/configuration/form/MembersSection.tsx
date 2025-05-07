@@ -1,12 +1,13 @@
 
 import { FormField, FormItem, FormControl, FormMessage } from "@/components/ui/form";
-import { Control } from "react-hook-form";
+import { Control, useFieldArray } from "react-hook-form";
 import { ConfigurationFormData, ConfigurationMember } from "@/types/configuration";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface MembersSectionProps {
   control: Control<ConfigurationFormData>;
@@ -14,60 +15,66 @@ interface MembersSectionProps {
 
 export function MembersSection({ control }: MembersSectionProps) {
   const [newMember, setNewMember] = useState<ConfigurationMember>({
-    id: "",
-    role: "consumer",
-    pod: "",
-    quota: ""
+    id: '',
+    role: 'consumer',
+    pod: '',
+    quota: ''
+  });
+  
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "members",
   });
 
-  // Get the form methods from the control
-  const { setValue, getValues } = control._formState.controllerRef?.current?.instance || {};
-
   const handleAddMember = () => {
-    if (!newMember.id.trim() || !newMember.pod.trim() || !setValue || !getValues) return;
-    
-    const currentMembers = getValues("members") || [];
-    setValue("members", [...currentMembers, newMember]);
-    setNewMember({ id: "", role: "consumer", pod: "", quota: "" });
-  };
-
-  const handleRemoveMember = (index: number) => {
-    if (!setValue || !getValues) return;
-    
-    const currentMembers = getValues("members") || [];
-    setValue("members", currentMembers.filter((_, i) => i !== index));
+    if (!newMember.id.trim() || !newMember.pod.trim() || !newMember.quota.trim()) return;
+    append(newMember);
+    setNewMember({
+      id: '',
+      role: 'consumer',
+      pod: '',
+      quota: ''
+    });
   };
 
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-medium">Membri</h3>
       
-      <div className="space-y-2">
+      <div className="space-y-4">
         <FormField
           control={control}
           name="members"
           render={({ field }) => (
             <FormItem>
-              <div className="space-y-2">
-                {field.value?.map((member, index) => (
-                  <div key={index} className="flex flex-col md:flex-row gap-2 p-3 border rounded-md">
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">ID: {member.id}</p>
-                      <p className="text-sm">Ruolo: {member.role === "consumer" ? "Consumatore" : "Produttore"}</p>
-                      <p className="text-sm">POD: {member.pod}</p>
-                      <p className="text-sm">Quota: {member.quota}</p>
-                    </div>
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      size="icon" 
-                      onClick={() => handleRemoveMember(index)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+              <div className="flex flex-col space-y-2">
+                {fields.map((item, index) => (
+                  <Card key={item.id} className="overflow-hidden">
+                    <CardContent className="p-4 flex items-center gap-2 justify-between">
+                      <div className="flex flex-col flex-grow">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">ID: {field.value?.[index]?.id}</span>
+                          <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
+                            {field.value?.[index]?.role === 'consumer' ? 'Consumatore' : 'Produttore'}
+                          </span>
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          POD: {field.value?.[index]?.pod} | Quota: {field.value?.[index]?.quota}
+                        </div>
+                      </div>
+                      <Button 
+                        type="button" 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => remove(index)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </CardContent>
+                  </Card>
                 ))}
-                {(field.value?.length || 0) === 0 && (
+                
+                {(fields.length === 0) && (
                   <p className="text-sm text-muted-foreground">Nessun membro aggiunto</p>
                 )}
                 <FormMessage />
@@ -76,43 +83,44 @@ export function MembersSection({ control }: MembersSectionProps) {
           )}
         />
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 mt-4">
-          <Input
-            placeholder="ID Utente"
-            value={newMember.id}
-            onChange={(e) => setNewMember({...newMember, id: e.target.value})}
-          />
-          
-          <Select
-            value={newMember.role}
-            onValueChange={(value: 'consumer' | 'producer') => setNewMember({...newMember, role: value})}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Ruolo" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="consumer">Consumatore</SelectItem>
-              <SelectItem value="producer">Produttore</SelectItem>
-            </SelectContent>
-          </Select>
-          
-          <Input
-            placeholder="POD"
-            value={newMember.pod}
-            onChange={(e) => setNewMember({...newMember, pod: e.target.value})}
-          />
-          
-          <Input
-            placeholder="Quota (es. 25%)"
-            value={newMember.quota}
-            onChange={(e) => setNewMember({...newMember, quota: e.target.value})}
-          />
-        </div>
-        
-        <Button type="button" onClick={handleAddMember} variant="outline" className="mt-2">
-          <Plus className="h-4 w-4 mr-1" />
-          Aggiungi Membro
-        </Button>
+        <Card className="p-4">
+          <h4 className="text-sm font-medium mb-3">Aggiungi nuovo membro</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <Input
+              placeholder="ID Membro"
+              value={newMember.id}
+              onChange={(e) => setNewMember({...newMember, id: e.target.value})}
+            />
+            <Select
+              value={newMember.role}
+              onValueChange={(value: 'consumer' | 'producer') => setNewMember({...newMember, role: value})}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Ruolo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="consumer">Consumatore</SelectItem>
+                <SelectItem value="producer">Produttore</SelectItem>
+              </SelectContent>
+            </Select>
+            <Input
+              placeholder="POD"
+              value={newMember.pod}
+              onChange={(e) => setNewMember({...newMember, pod: e.target.value})}
+            />
+            <Input
+              placeholder="Quota (es. 25%)"
+              value={newMember.quota}
+              onChange={(e) => setNewMember({...newMember, quota: e.target.value})}
+            />
+          </div>
+          <div className="mt-3 flex justify-end">
+            <Button type="button" onClick={handleAddMember} variant="outline">
+              <Plus className="h-4 w-4 mr-1" />
+              Aggiungi
+            </Button>
+          </div>
+        </Card>
       </div>
     </div>
   );

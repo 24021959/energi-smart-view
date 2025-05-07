@@ -1,6 +1,6 @@
 
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Control } from "react-hook-form";
+import { Control, useFieldArray } from "react-hook-form";
 import { ConfigurationFormData } from "@/types/configuration";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,23 +13,16 @@ interface PlantsSectionProps {
 
 export function PlantsSection({ control }: PlantsSectionProps) {
   const [newPlant, setNewPlant] = useState("");
-
-  // Get the form methods from the control
-  const { setValue, getValues } = control._formState.controllerRef?.current?.instance || {};
+  
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "plants",
+  });
 
   const handleAddPlant = () => {
-    if (!newPlant.trim() || !setValue || !getValues) return;
-    
-    const currentPlants = getValues("plants") || [];
-    setValue("plants", [...currentPlants, newPlant]);
+    if (!newPlant.trim()) return;
+    append(newPlant);
     setNewPlant("");
-  };
-
-  const handleRemovePlant = (index: number) => {
-    if (!setValue || !getValues) return;
-    
-    const currentPlants = getValues("plants") || [];
-    setValue("plants", currentPlants.filter((_, i) => i !== index));
   };
 
   return (
@@ -43,20 +36,24 @@ export function PlantsSection({ control }: PlantsSectionProps) {
           render={({ field }) => (
             <FormItem>
               <div className="flex flex-col space-y-2">
-                {field.value?.map((plant, index) => (
-                  <div key={index} className="flex items-center gap-2">
-                    <Input value={plant} readOnly className="flex-1" />
+                {fields.map((item, index) => (
+                  <div key={item.id} className="flex items-center gap-2">
+                    <Input 
+                      value={field.value?.[index] || ''} 
+                      readOnly 
+                      className="flex-1" 
+                    />
                     <Button 
                       type="button" 
                       variant="outline" 
                       size="icon" 
-                      onClick={() => handleRemovePlant(index)}
+                      onClick={() => remove(index)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 ))}
-                {(field.value?.length || 0) === 0 && (
+                {(fields.length === 0) && (
                   <p className="text-sm text-muted-foreground">Nessun impianto aggiunto</p>
                 )}
                 <FormMessage />

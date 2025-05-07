@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { Form } from '@/components/ui/form';
 import { toast } from '@/hooks/use-toast';
-import { ConfigurationFormData } from '@/types/configuration';
+import { Configuration, ConfigurationFormData } from '@/types/configuration';
 import { BasicInfoFields } from './form/BasicInfoFields';
 import { AddressFields } from './form/AddressFields';
 import { StatusSelector } from './form/StatusSelector';
@@ -13,52 +13,78 @@ import { MembersSection } from './form/MembersSection';
 import { PlantsSection } from './form/PlantsSection';
 import { DocumentsSection } from './form/DocumentsSection';
 
-export function ConfigurationForm() {
+interface ConfigurationFormProps {
+  isEditing?: boolean;
+  initialData?: Configuration;
+  onSubmit?: (data: ConfigurationFormData) => Promise<void>;
+}
+
+export function ConfigurationForm({ 
+  isEditing = false, 
+  initialData,
+  onSubmit
+}: ConfigurationFormProps) {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   
+  const defaultValues: ConfigurationFormData = {
+    name: '',
+    type: 'cer',
+    description: '',
+    address: '',
+    city: '',
+    postalCode: '',
+    province: '',
+    status: 'planning',
+    startDate: '',
+    plants: [],
+    members: [],
+    documents: []
+  };
+  
   const form = useForm<ConfigurationFormData>({
-    defaultValues: {
-      name: 'CER Quartiere Verde',
-      type: 'cer',
-      description: 'Comunità energetica per famiglie e una scuola',
-      address: 'Via dei Fiori 12',
-      city: 'Massa',
-      postalCode: '54100',
-      province: 'MS',
-      status: 'planning',
-      plants: ['impianto_001', 'impianto_004'],
-      members: [
-        { id: 'utente_001', role: 'consumer', pod: 'IT001...', quota: '25%' },
-        { id: 'utente_002', role: 'producer', pod: 'IT002...', quota: '50%' }
-      ],
-      startDate: '2025-06-01',
-      documents: ['statuto.pdf', 'mappa.jpg']
-    }
+    defaultValues: initialData ? {
+      name: initialData.name,
+      type: initialData.type,
+      description: initialData.description,
+      address: initialData.address,
+      city: initialData.city,
+      postalCode: initialData.postalCode,
+      province: initialData.province,
+      status: initialData.status,
+      startDate: initialData.startDate || '',
+      plants: initialData.plants || [],
+      members: initialData.members || [],
+      documents: initialData.documents || []
+    } : defaultValues
   });
   
-  const onSubmit = async (data: ConfigurationFormData) => {
+  const handleFormSubmit = async (data: ConfigurationFormData) => {
     setIsSubmitting(true);
     
     try {
-      // Qui andrebbe la logica per inviare i dati al backend
-      console.log('Dati configurazione:', data);
-      
-      // Simuliamo un'attesa per l'invio dati
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      toast({
-        title: "Configurazione creata",
-        description: "La configurazione è stata creata con successo"
-      });
-      
-      navigate('/admin/configurations');
+      if (onSubmit) {
+        await onSubmit(data);
+      } else {
+        // Default implementation for new configuration creation
+        console.log('Dati configurazione:', data);
+        
+        // Simuliamo un'attesa per l'invio dati
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        toast({
+          title: "Configurazione creata",
+          description: "La configurazione è stata creata con successo"
+        });
+        
+        navigate('/admin/configurations');
+      }
     } catch (error) {
-      console.error('Errore durante la creazione della configurazione:', error);
+      console.error('Errore durante la gestione della configurazione:', error);
       toast({
         variant: "destructive",
         title: "Errore",
-        description: "Si è verificato un errore durante la creazione della configurazione"
+        description: `Si è verificato un errore durante la ${isEditing ? 'modifica' : 'creazione'} della configurazione`
       });
     } finally {
       setIsSubmitting(false);
@@ -69,7 +95,7 @@ export function ConfigurationForm() {
   
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
         <BasicInfoFields control={form.control} />
         
         <AddressFields control={form.control} />
@@ -84,7 +110,12 @@ export function ConfigurationForm() {
         
         <DocumentsSection control={form.control} />
         
-        <FormActions isSubmitting={isSubmitting} onCancel={handleCancel} />
+        <FormActions 
+          isSubmitting={isSubmitting} 
+          onCancel={handleCancel}
+          actionText={isEditing ? 'Aggiorna Configurazione' : 'Salva Configurazione'}
+          loadingText={isEditing ? 'Aggiornamento in corso...' : 'Creazione in corso...'}
+        />
       </form>
     </Form>
   );

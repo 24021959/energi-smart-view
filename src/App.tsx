@@ -22,6 +22,7 @@ import PlantDetail from "./pages/admin/PlantDetail";
 import Configurations from "./pages/admin/Configurations";
 import AddConfiguration from "./pages/admin/AddConfiguration";
 import ConfigurationDetail from "./pages/admin/ConfigurationDetail";
+import EditConfiguration from "./pages/admin/EditConfiguration";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ const adminRoutes = [
   { path: "/admin/configurations", element: <Configurations /> },
   { path: "/admin/configurations/add", element: <AddConfiguration /> },
   { path: "/admin/configurations/:id", element: <ConfigurationDetail /> },
+  { path: "/admin/configurations/edit/:id", element: <EditConfiguration /> },
   { path: "/admin/energy", element: <EnergyData /> },
   { path: "/admin/reports", element: <Reports /> },
   { path: "/admin/settings", element: <Settings /> },

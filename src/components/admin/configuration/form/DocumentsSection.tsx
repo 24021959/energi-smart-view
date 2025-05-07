@@ -1,6 +1,6 @@
 
 import { FormField, FormItem, FormControl, FormMessage } from "@/components/ui/form";
-import { Control } from "react-hook-form";
+import { Control, useFieldArray } from "react-hook-form";
 import { ConfigurationFormData } from "@/types/configuration";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,23 +13,16 @@ interface DocumentsSectionProps {
 
 export function DocumentsSection({ control }: DocumentsSectionProps) {
   const [newDocument, setNewDocument] = useState("");
-
-  // Get the form methods from the control
-  const { setValue, getValues } = control._formState.controllerRef?.current?.instance || {};
+  
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "documents",
+  });
 
   const handleAddDocument = () => {
-    if (!newDocument.trim() || !setValue || !getValues) return;
-    
-    const currentDocuments = getValues("documents") || [];
-    setValue("documents", [...currentDocuments, newDocument]);
+    if (!newDocument.trim()) return;
+    append(newDocument);
     setNewDocument("");
-  };
-
-  const handleRemoveDocument = (index: number) => {
-    if (!setValue || !getValues) return;
-    
-    const currentDocuments = getValues("documents") || [];
-    setValue("documents", currentDocuments.filter((_, i) => i !== index));
   };
 
   return (
@@ -43,20 +36,24 @@ export function DocumentsSection({ control }: DocumentsSectionProps) {
           render={({ field }) => (
             <FormItem>
               <div className="flex flex-col space-y-2">
-                {field.value?.map((document, index) => (
-                  <div key={index} className="flex items-center gap-2">
-                    <Input value={document} readOnly className="flex-1" />
+                {fields.map((item, index) => (
+                  <div key={item.id} className="flex items-center gap-2">
+                    <Input 
+                      value={field.value?.[index] || ''} 
+                      readOnly 
+                      className="flex-1" 
+                    />
                     <Button 
                       type="button" 
                       variant="outline" 
                       size="icon" 
-                      onClick={() => handleRemoveDocument(index)}
+                      onClick={() => remove(index)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 ))}
-                {(field.value?.length || 0) === 0 && (
+                {(fields.length === 0) && (
                   <p className="text-sm text-muted-foreground">Nessun documento aggiunto</p>
                 )}
                 <FormMessage />

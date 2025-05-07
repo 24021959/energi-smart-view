@@ -1,5 +1,5 @@
 
-import { useParams } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { AdminLayout } from '@/layouts/AdminLayout';
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,15 @@ import { Configuration } from "@/types/configuration";
 import { MemberListItem } from "@/types/member";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ArrowLeft } from "lucide-react";
-import { Link } from "react-router-dom";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogFooter,
+  DialogTrigger
+} from "@/components/ui/dialog";
+import { AddMemberToConfigDialog } from "@/components/admin/configuration/AddMemberToConfigDialog";
 
 // Dati di esempio
 const mockConfigurations: Configuration[] = [
@@ -123,8 +131,10 @@ const StatusBadge = ({ status }: { status: string }) => {
 
 const ConfigurationDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [configuration, setConfiguration] = useState<Configuration | null>(null);
   const [members, setMembers] = useState<MemberListItem[]>([]);
+  const [showAddMemberDialog, setShowAddMemberDialog] = useState(false);
 
   useEffect(() => {
     // In un'app reale, qui ci sarebbe una chiamata API
@@ -135,6 +145,12 @@ const ConfigurationDetail = () => {
       setMembers(mockMembers);
     }
   }, [id]);
+
+  const handleEditConfiguration = () => {
+    if (configuration) {
+      navigate(`/admin/configurations/edit/${configuration.id}`);
+    }
+  };
 
   if (!configuration) {
     return (
@@ -158,7 +174,7 @@ const ConfigurationDetail = () => {
           </Link>
           <h1 className="text-2xl font-bold text-purple-900">{configuration.name}</h1>
           <div className="ml-auto space-x-2">
-            <Button variant="outline">Modifica</Button>
+            <Button variant="outline" onClick={handleEditConfiguration}>Modifica</Button>
             <Button variant="destructive">Elimina</Button>
           </div>
         </div>
@@ -227,7 +243,7 @@ const ConfigurationDetail = () => {
                   <CardHeader className="pb-2">
                     <div className="flex justify-between items-center">
                       <CardTitle>Partecipanti</CardTitle>
-                      <Button size="sm">Aggiungi Partecipante</Button>
+                      <AddMemberToConfigDialog configId={configuration.id} />
                     </div>
                   </CardHeader>
                   <CardContent>
