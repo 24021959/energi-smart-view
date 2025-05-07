@@ -1,4 +1,3 @@
-import { mockConfigurations } from "./configurationService";
 
 export interface WeatherForecastData {
   temperature: number;
@@ -7,6 +6,8 @@ export interface WeatherForecastData {
   wind: number;
   icon: string;
   description: string;
+  hourlyForecasts?: HourlyForecastData[];
+  dailyForecasts?: DailyForecastData[];
 }
 
 export interface HourlyForecastData {
@@ -22,31 +23,41 @@ export interface DailyForecastData {
   icon: string;
 }
 
+export interface GeoLocation {
+  lat: number;
+  lng: number;
+}
+
 // Mock data for weather forecast
-export const mockTodayForecast = {
+export const mockTodayForecast: WeatherForecastData = {
   temperature: 22,
   feelsLike: 24,
   humidity: 65,
   wind: 10,
   icon: '01d',
-  description: 'Cielo sereno'
+  description: 'Cielo sereno',
+  hourlyForecasts: [
+    { time: '09:00', temperature: 18, icon: '01d' },
+    { time: '12:00', temperature: 22, icon: '01d' },
+    { time: '15:00', temperature: 24, icon: '02d' },
+    { time: '18:00', temperature: 22, icon: '03d' },
+    { time: '21:00', temperature: 19, icon: '01n' },
+  ],
+  dailyForecasts: [
+    { day: 'Oggi', maxTemp: 24, minTemp: 16, icon: '01d' },
+    { day: 'Domani', maxTemp: 25, minTemp: 17, icon: '02d' },
+    { day: 'Mer', maxTemp: 23, minTemp: 15, icon: '10d' },
+    { day: 'Gio', maxTemp: 22, minTemp: 14, icon: '10d' },
+    { day: 'Ven', maxTemp: 21, minTemp: 13, icon: '01d' },
+  ]
 };
 
-export const mockHourlyForecast = [
-  { time: '09:00', temperature: 18, icon: '01d' },
-  { time: '12:00', temperature: 22, icon: '01d' },
-  { time: '15:00', temperature: 24, icon: '02d' },
-  { time: '18:00', temperature: 22, icon: '03d' },
-  { time: '21:00', temperature: 19, icon: '01n' },
-];
-
-export const mockDailyForecast = [
-  { day: 'Oggi', maxTemp: 24, minTemp: 16, icon: '01d' },
-  { day: 'Domani', maxTemp: 25, minTemp: 17, icon: '02d' },
-  { day: 'Mer', maxTemp: 23, minTemp: 15, icon: '10d' },
-  { day: 'Gio', maxTemp: 22, minTemp: 14, icon: '10d' },
-  { day: 'Ven', maxTemp: 21, minTemp: 13, icon: '01d' },
-];
+// Helper function to get wind direction text
+export const getWindDirectionText = (degrees: number): string => {
+  const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+  const index = Math.round(((degrees % 360) / 45)) % 8;
+  return directions[index];
+};
 
 // Helper function to estimate solar production based on weather
 export const estimateSolarProduction = (forecast: WeatherForecastData): number => {
@@ -71,11 +82,18 @@ export const estimateSolarProduction = (forecast: WeatherForecastData): number =
 declare global {
   interface Window {
     initMapForWeather: () => void;
+    google?: any;
   }
 }
 
+// Function to geocode city name to coordinates
+export const geocodeCity = async (city: string): Promise<GeoLocation> => {
+  // For the sake of example, return mock coordinates
+  return { lat: 45.4642, lng: 9.1900 }; // Milan coordinates
+};
+
 // Function to fetch weather forecast (simulated)
-export const fetchWeatherForecast = async (city: string, province: string): Promise<WeatherForecastData> => {
+export const fetchWeatherForecast = async (city: string, province?: string): Promise<WeatherForecastData> => {
   // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 500));
 

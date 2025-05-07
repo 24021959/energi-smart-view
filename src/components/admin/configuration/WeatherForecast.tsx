@@ -17,7 +17,7 @@ interface WeatherForecastProps {
 }
 
 export function WeatherForecast({ city, province }: WeatherForecastProps) {
-  const [forecasts, setForecasts] = useState<WeatherForecastData[]>([]);
+  const [forecast, setForecast] = useState<WeatherForecastData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [currentTab, setCurrentTab] = useState("forecast");
   const [location, setLocation] = useState<GeoLocation | null>(null);
@@ -33,8 +33,8 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
           setLocation(locationData);
           
           // Then get forecast
-          const data = await fetchWeatherForecast(city);
-          setForecasts(data);
+          const data = await fetchWeatherForecast(city, province);
+          setForecast(data);
         } catch (error) {
           console.error("Error in weather data loading:", error);
         }
@@ -43,7 +43,7 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
     };
 
     loadWeatherData();
-  }, [city]);
+  }, [city, province]);
 
   // Clean up on tab change
   useEffect(() => {
@@ -86,7 +86,7 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
     );
   }
 
-  if (forecasts.length === 0) {
+  if (!forecast) {
     return (
       <Card className="border shadow-sm">
         <CardHeader>
@@ -130,28 +130,27 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
             
             <TabsContent value="forecast" className="space-y-4">
               {/* Today's weather details card */}
-              {forecasts[0] && <TodayForecast forecast={forecasts[0]} />}
+              <TodayForecast forecast={forecast} />
               
               {/* Hourly forecast scrollable section */}
-              {forecasts[0]?.hourlyForecasts && 
-                <HourlyForecast hourlyForecasts={forecasts[0].hourlyForecasts} />}
+              {forecast.hourlyForecasts && 
+                <HourlyForecast hourlyForecasts={forecast.hourlyForecasts} />}
               
               {/* 5-day forecast */}
-              <DailyForecast forecasts={forecasts} />
+              {forecast.dailyForecasts && 
+                <DailyForecast forecasts={forecast.dailyForecasts} />}
             </TabsContent>
             
             <TabsContent value="map">
               {/* Google Map */}
-              <GoogleMap city={city} location={location} />
+              {location && <GoogleMap city={city} location={location} />}
               
               {/* Weather summary below map */}
-              {forecasts[0] && (
-                <MapWeatherSummary 
-                  forecast={forecasts[0]} 
-                  city={city} 
-                  province={province}
-                />
-              )}
+              <MapWeatherSummary 
+                forecast={forecast} 
+                city={city} 
+                province={province}
+              />
             </TabsContent>
           </Tabs>
           

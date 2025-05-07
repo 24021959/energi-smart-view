@@ -14,13 +14,15 @@ import { EnergyProductionConsumption } from '@/components/admin/configuration/En
 import { FinancialBenefits } from '@/components/admin/configuration/FinancialBenefits';
 import { ConfigMembersExpander } from '@/components/admin/configuration/ConfigMembersExpander';
 import { WeatherForecast } from '@/components/admin/configuration/WeatherForecast';
-import { ChevronRight, ArrowLeft, Users } from "lucide-react";
+import { ChevronRight, ArrowLeft, Users, ChevronDown } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 const ConfigurationDetail = () => {
   const { id } = useParams();
   const [configuration, setConfiguration] = useState<Configuration | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isComponentsOpen, setIsComponentsOpen] = useState(false);
 
   useEffect(() => {
     // In a real app, this would be a call to fetch configuration data
@@ -68,23 +70,33 @@ const ConfigurationDetail = () => {
         
         {/* Section for configuration components */}
         <Card className="border shadow-sm">
-          <CardContent className="p-4">
-            <div className="flex items-center mb-4">
-              <ChevronRight className="h-5 w-5 text-gray-500" />
-              <h3 className="ml-2 text-lg font-medium">Componenti Configurazione Energetica</h3>
-            </div>
-            <Tabs defaultValue="participants" className="w-full">
-              <TabsList className="mb-4">
-                <TabsTrigger value="participants" className="flex items-center gap-2">
-                  <Users className="h-4 w-4" />
-                  Partecipanti ({configuration.participants || 0})
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent value="participants">
+          <Collapsible
+            open={isComponentsOpen}
+            onOpenChange={setIsComponentsOpen}
+            className="w-full"
+          >
+            <CollapsibleTrigger asChild>
+              <div className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50">
+                <div className="flex items-center">
+                  {isComponentsOpen ? (
+                    <ChevronDown className="h-5 w-5 text-gray-500" />
+                  ) : (
+                    <ChevronRight className="h-5 w-5 text-gray-500" />
+                  )}
+                  <h3 className="ml-2 text-lg font-medium">Componenti Configurazione Energetica</h3>
+                </div>
+                <div className="flex items-center text-sm text-gray-500">
+                  <Users className="h-4 w-4 mr-1" />
+                  <span>Partecipanti ({configuration.participants || 0})</span>
+                </div>
+              </div>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <CardContent className="border-t">
                 <ConfigMembersExpander configuration={configuration} />
-              </TabsContent>
-            </Tabs>
-          </CardContent>
+              </CardContent>
+            </CollapsibleContent>
+          </Collapsible>
         </Card>
 
         {/* Energy stats section */}

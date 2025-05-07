@@ -1,6 +1,6 @@
 
 import { WeatherForecastData, getWindDirectionText } from "@/services/weatherService";
-import { Droplets, Wind, CloudRain, Cloud, ArrowUp, ArrowDown } from "lucide-react";
+import { Droplets, Wind, CloudRain, Cloud } from "lucide-react";
 import { WeatherIcon } from "./WeatherIcon";
 
 interface TodayForecastProps {
@@ -9,75 +9,61 @@ interface TodayForecastProps {
 
 export function TodayForecast({ forecast }: TodayForecastProps) {
   return (
-    <div className="mb-6">
-      <h3 className="text-lg font-medium mb-2">Oggi: {forecast.date}</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 flex items-center">
-          <div className="mr-4">
-            <WeatherIcon iconCode={forecast.icon} size="lg" />
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="md:col-span-1 bg-white rounded-lg shadow-sm p-4 flex flex-col items-center justify-center">
+        <WeatherIcon 
+          icon={forecast.icon}
+          className="w-24 h-24 mb-2"
+        />
+        <h3 className="text-xl font-bold">{forecast.temperature}°C</h3>
+        <p className="text-gray-500">{forecast.description}</p>
+        <p className="text-sm text-gray-500 mt-1">Percepita: {forecast.feelsLike}°C</p>
+      </div>
+      
+      <div className="md:col-span-2 bg-white rounded-lg shadow-sm p-4">
+        <h3 className="font-medium mb-3">Dettagli Meteo</h3>
+        <div className="grid grid-cols-2 gap-4">
+          {/* Humidity */}
+          <div className="flex items-center">
+            <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+              <Droplets className="h-6 w-6 text-blue-600" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Umidità</p>
+              <p className="font-medium">{forecast.humidity}%</p>
+            </div>
           </div>
-          <div>
-            <div className="text-3xl font-bold">{forecast.temperature}°C</div>
-            <div className="text-gray-600 capitalize">{forecast.description}</div>
-            <div className="text-sm text-gray-500">Percepita: {forecast.feelsLike}°C</div>
+          
+          {/* Wind */}
+          <div className="flex items-center">
+            <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+              <Wind className="h-6 w-6 text-blue-600" />
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Vento</p>
+              <p className="font-medium">{forecast.wind} km/h {forecast.wind > 0 ? `(${getWindDirectionText(0)})` : ''}</p>
+            </div>
           </div>
-        </div>
-        
-        <div className="bg-gray-50 rounded-lg p-4">
-          <div className="grid grid-cols-2 gap-3">
-            <div className="flex items-center">
-              <Droplets className="h-5 w-5 mr-2 text-blue-500" />
-              <div>
-                <div className="text-sm text-gray-500">Umidità</div>
-                <div className="font-medium">{forecast.humidity}%</div>
-              </div>
+          
+          {/* Precipitation */}
+          <div className="flex items-center">
+            <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+              <CloudRain className="h-6 w-6 text-blue-600" />
             </div>
-            
-            <div className="flex items-center">
-              <Wind className="h-5 w-5 mr-2 text-gray-500" />
-              <div>
-                <div className="text-sm text-gray-500">Vento</div>
-                <div className="font-medium">
-                  {forecast.windSpeed} km/h 
-                  {forecast.windDirection && (
-                    <span className="ml-1">
-                      {getWindDirectionText(forecast.windDirection)}
-                    </span>
-                  )}
-                </div>
-              </div>
+            <div>
+              <p className="text-sm text-gray-500">Precipitazioni</p>
+              <p className="font-medium">0%</p>
             </div>
-            
-            <div className="flex items-center">
-              <CloudRain className="h-5 w-5 mr-2 text-blue-400" />
-              <div>
-                <div className="text-sm text-gray-500">Prob. pioggia</div>
-                <div className="font-medium">{forecast.rainProbability}%</div>
-              </div>
+          </div>
+          
+          {/* Cloudiness */}
+          <div className="flex items-center">
+            <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+              <Cloud className="h-6 w-6 text-blue-600" />
             </div>
-            
-            <div className="flex items-center">
-              <Cloud className="h-5 w-5 mr-2 text-gray-400" />
-              <div>
-                <div className="text-sm text-gray-500">Nuvolosità</div>
-                <div className="font-medium">{forecast.cloudiness}%</div>
-              </div>
-            </div>
-            
-            <div className="flex items-center">
-              <ArrowUp className="h-5 w-5 mr-2 text-yellow-500" />
-              <div>
-                <div className="text-sm text-gray-500">Alba</div>
-                <div className="font-medium">{forecast.sunriseTime}</div>
-              </div>
-            </div>
-            
-            <div className="flex items-center">
-              <ArrowDown className="h-5 w-5 mr-2 text-orange-500" />
-              <div>
-                <div className="text-sm text-gray-500">Tramonto</div>
-                <div className="font-medium">{forecast.sunsetTime}</div>
-              </div>
+            <div>
+              <p className="text-sm text-gray-500">Nuvolosità</p>
+              <p className="font-medium">0%</p>
             </div>
           </div>
         </div>
