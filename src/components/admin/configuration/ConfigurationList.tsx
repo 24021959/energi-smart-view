@@ -19,6 +19,7 @@ const mockConfigurations: Configuration[] = [
     address: 'Via Carlo Serassi, 21',
     city: 'Bergamo',
     postalCode: '24124',
+    province: 'BG',
     participants: 5,
     status: 'active',
     imageUrl: '/lovable-uploads/24090a5a-717a-4091-908c-f28d226e8f71.png',
@@ -32,6 +33,7 @@ const mockConfigurations: Configuration[] = [
     address: 'Via Roma, 123',
     city: 'Roma',
     postalCode: '00100',
+    province: 'RM',
     participants: 16,
     status: 'pending',
     createdAt: '2023-02-20T14:15:00Z'
@@ -44,6 +46,7 @@ const mockConfigurations: Configuration[] = [
     address: 'Via Energia, 45',
     city: 'Milano',
     postalCode: '20100',
+    province: 'MI',
     participants: 8,
     status: 'active',
     imageUrl: '/lovable-uploads/24090a5a-717a-4091-908c-f28d226e8f71.png',
@@ -57,11 +60,22 @@ const mockConfigurations: Configuration[] = [
     address: 'Via Immaginetta, 28',
     city: 'Pisa',
     postalCode: '56100',
+    province: 'PI',
     participants: 1,
     status: 'active',
     createdAt: '2023-04-05T16:20:00Z'
   },
 ];
+
+// Card background colors based on configuration type
+const cardBackgrounds: Record<ConfigurationType, string> = {
+  'cer': 'bg-gradient-to-br from-green-50 to-green-100 border-green-200',
+  'gac': 'bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200',
+  'aid': 'bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200',
+  'cs': 'bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200',
+  'msu': 'bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200',
+  'edificio': 'bg-gradient-to-br from-gray-50 to-gray-100 border-gray-200',
+};
 
 // Badge per visualizzare il tipo di configurazione
 const TypeBadge = ({ type }: { type: ConfigurationType }) => {
@@ -102,8 +116,11 @@ const StatusBadge = ({ status }: { status: 'active' | 'pending' | 'planning' }) 
   );
 };
 
-export function ConfigurationList() {
-  const [configurations] = useState<Configuration[]>(mockConfigurations);
+export function ConfigurationList({ filterType }: { filterType?: ConfigurationType }) {
+  // Filter configurations based on type if filter is provided
+  const filteredConfigurations = filterType 
+    ? mockConfigurations.filter(config => config.type === filterType) 
+    : mockConfigurations;
 
   return (
     <div className="space-y-6">
@@ -122,9 +139,9 @@ export function ConfigurationList() {
         </Link>
         
         {/* Card per ogni configurazione esistente */}
-        {configurations.map((config) => (
+        {filteredConfigurations.map((config) => (
           <Link to={`/admin/configurations/${config.id}`} key={config.id}>
-            <Card className="h-full hover:shadow-md transition-shadow">
+            <Card className={`h-full hover:shadow-md transition-shadow ${cardBackgrounds[config.type]}`}>
               <CardContent className="p-4">
                 <div className="flex justify-end space-x-2 mb-3">
                   <TypeBadge type={config.type} />
@@ -132,7 +149,7 @@ export function ConfigurationList() {
                 </div>
                 
                 <div className="flex items-center mb-4">
-                  <div className="w-16 h-16 bg-gray-200 rounded-full overflow-hidden flex items-center justify-center mr-4">
+                  <div className="w-16 h-16 bg-white rounded-full overflow-hidden flex items-center justify-center mr-4 border border-gray-200">
                     {config.imageUrl ? (
                       <img src={config.imageUrl} alt={config.name} className="w-full h-full object-cover" />
                     ) : (
@@ -146,7 +163,7 @@ export function ConfigurationList() {
                 </div>
                 
                 <div className="text-sm text-gray-600 mb-1">
-                  {config.address}, {config.postalCode} {config.city}
+                  {config.address}, {config.postalCode} {config.city} ({config.province})
                 </div>
                 
                 <div className="flex items-center justify-end mt-4">
