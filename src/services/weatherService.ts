@@ -32,6 +32,13 @@ export interface GeoLocation {
   lon: number;
 }
 
+// Declare global type for window.initMapForWeather
+declare global {
+  interface Window {
+    initMapForWeather?: () => void;
+  }
+}
+
 // OpenWeatherMap API key provided by the user
 // Previous key: 72547ec8c6cb00d75320173614534a46
 // Using a valid API key - This is a sample key, replace with a valid one for production
