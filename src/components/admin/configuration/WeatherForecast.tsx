@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sun, Cloud, CloudRain, CloudSnow, Wind, Thermometer, Droplets, Waves, ArrowDown, ArrowUp, Navigation, Map, Key } from "lucide-react";
@@ -10,18 +9,26 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Loader } from "@googlemaps/js-api-loader";
 
+// Add Google Maps type declaration
+declare global {
+  interface Window {
+    google: any;
+  }
+}
+
 interface WeatherForecastProps {
   city: string;
   province: string;
 }
+
+// Fixed Google Maps API key
+const GOOGLE_MAPS_API_KEY = "AIzaSyCvR92r28e114VivIzlQHWlLomEJ_gqzJg";
 
 export function WeatherForecast({ city, province }: WeatherForecastProps) {
   const [forecasts, setForecasts] = useState<WeatherForecastData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentTab, setCurrentTab] = useState("forecast");
   const [location, setLocation] = useState<GeoLocation | null>(null);
-  const [googleApiKey, setGoogleApiKey] = useState<string>(localStorage.getItem('google_maps_key') || "");
-  const [tokenDialogOpen, setTokenDialogOpen] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<google.maps.Map | null>(null);
@@ -49,17 +56,17 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
     loadWeatherData();
   }, [city]);
   
-  // Initialize map once we have location and an API key
+  // Initialize map once we have location
   useEffect(() => {
-    if (!location || !mapContainer.current || currentTab !== "map" || !googleApiKey) {
+    if (!location || !mapContainer.current || currentTab !== "map") {
       return;
     }
 
     const initMap = async () => {
       try {
-        // Load Google Maps
+        // Load Google Maps with fixed API key
         const loader = new Loader({
-          apiKey: googleApiKey,
+          apiKey: GOOGLE_MAPS_API_KEY,
           version: "weekly",
         });
 
@@ -68,14 +75,14 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
         // Initialize map
         const position = { lat: location.lat, lng: location.lon };
         
-        map.current = new google.maps.Map(mapContainer.current, {
+        map.current = new window.google.maps.Map(mapContainer.current, {
           center: position,
           zoom: 10,
-          mapTypeId: google.maps.MapTypeId.ROADMAP
+          mapTypeId: window.google.maps.MapTypeId.ROADMAP
         });
         
         // Add a marker for the city
-        marker.current = new google.maps.Marker({
+        marker.current = new window.google.maps.Marker({
           position,
           map: map.current,
           title: city
@@ -85,7 +92,7 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
         setMapError(null);
       } catch (error) {
         console.error("Map initialization error:", error);
-        setMapError("Errore nell'inizializzazione della mappa: chiave API non valida o scaduta");
+        setMapError("Errore nell'inizializzazione della mappa. Per favore riprova più tardi.");
       }
     };
     
@@ -98,22 +105,7 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
         map.current = null;
       }
     };
-  }, [location, currentTab, googleApiKey, city]);
-
-  // Open token dialog when tab changes to map and no token is available
-  useEffect(() => {
-    if (currentTab === "map" && !googleApiKey) {
-      setTokenDialogOpen(true);
-    }
-  }, [currentTab, googleApiKey]);
-
-  const handleTokenSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (googleApiKey) {
-      localStorage.setItem('google_maps_key', googleApiKey);
-      setTokenDialogOpen(false);
-    }
-  };
+  }, [location, currentTab, city]);
 
   const getWeatherIcon = (iconCode: string, size: "sm" | "md" | "lg" = "md") => {
     const sizeMap = {
@@ -170,34 +162,6 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
 
   return (
     <>
-      <Dialog open={tokenDialogOpen} onOpenChange={setTokenDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Inserisci la tua API Key di Google Maps</DialogTitle>
-            <DialogDescription>
-              Per visualizzare la mappa, è necessario inserire una API Key di Google Maps valida.
-              Puoi ottenerla registrandoti su <a href="https://developers.google.com/maps/documentation/javascript/get-api-key" target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">Google Cloud Platform</a> e creando la tua API Key.
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleTokenSubmit} className="space-y-4">
-            <div className="flex items-center space-x-2">
-              <Key className="h-4 w-4 text-gray-500" />
-              <Input
-                placeholder="Inserisci la tua API Key di Google Maps"
-                value={googleApiKey}
-                onChange={(e) => setGoogleApiKey(e.target.value)}
-                className="flex-1"
-              />
-            </div>
-            <div className="flex justify-end">
-              <Button type="submit" disabled={!googleApiKey}>
-                Salva API Key
-              </Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
-
       <Card className="border shadow-sm">
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
@@ -390,32 +354,6 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
             </TabsContent>
             
             <TabsContent value="map">
-              <div className="mb-4 flex justify-between">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="flex items-center gap-2"
-                  onClick={() => setTokenDialogOpen(true)}
-                >
-                  <Key className="h-4 w-4" />
-                  <span>Cambia API Key di Google Maps</span>
-                </Button>
-                
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="flex items-center gap-2"
-                  onClick={() => {
-                    if (map.current && location) {
-                      map.current.setCenter({ lat: location.lat, lng: location.lon });
-                      map.current.setZoom(10);
-                    }
-                  }}
-                >
-                  <Navigation className="h-4 w-4" />
-                  <span>Centra mappa</span>
-                </Button>
-              </div>
               <div className="relative w-full h-[400px] rounded-lg overflow-hidden border border-gray-200">
                 <div ref={mapContainer} className="absolute inset-0" />
                 
@@ -428,26 +366,6 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
                 {mapError && (
                   <div className="absolute inset-0 flex items-center justify-center flex-col bg-gray-100 p-4">
                     <p className="text-red-500 mb-2">{mapError}</p>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={() => setTokenDialogOpen(true)}
-                    >
-                      Inserisci una API Key valida
-                    </Button>
-                  </div>
-                )}
-
-                {!googleApiKey && (
-                  <div className="absolute inset-0 flex items-center justify-center flex-col bg-gray-100 p-4">
-                    <p className="mb-2">Per visualizzare la mappa è necessario inserire una API Key di Google Maps</p>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={() => setTokenDialogOpen(true)}
-                    >
-                      Inserisci API Key
-                    </Button>
                   </div>
                 )}
               </div>
