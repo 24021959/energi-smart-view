@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -11,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Logo } from '@/components/Logo';
 
 // Schema di validazione del form
 const loginSchema = z.object({
@@ -21,7 +23,9 @@ const loginSchema = z.object({
     message: 'Password deve contenere almeno 6 caratteri'
   })
 });
+
 type LoginFormData = z.infer<typeof loginSchema>;
+
 export default function Login() {
   const {
     authState,
@@ -80,9 +84,13 @@ export default function Login() {
       setIsSubmitting(false);
     }
   };
+  
   return <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-secondary/20 to-background p-4">
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="space-y-1 text-center">
+          <div className="flex justify-center mb-2">
+            <Logo size="md" />
+          </div>
           <CardTitle className="text-3xl font-bold">Energy Smart</CardTitle>
           <CardDescription>
             Accedi alla piattaforma di gestione energetica
