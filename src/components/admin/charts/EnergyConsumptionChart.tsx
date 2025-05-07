@@ -39,39 +39,42 @@ const chartConfig = {
 export function EnergyConsumptionChart() {
   return (
     <ChartContainer config={chartConfig} className="aspect-[4/3]">
-      <AreaChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-        <defs>
-          <linearGradient id="colorProduzione" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#22c55e" stopOpacity={0.8}/>
-            <stop offset="95%" stopColor="#22c55e" stopOpacity={0}/>
-          </linearGradient>
-          <linearGradient id="colorConsumo" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#7c3aed" stopOpacity={0.8}/>
-            <stop offset="95%" stopColor="#7c3aed" stopOpacity={0}/>
-          </linearGradient>
-        </defs>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="name" />
-        <YAxis unit=" kWh" />
-        <ChartTooltip content={<ChartTooltipContent />} />
-        <Area 
-          type="monotone" 
-          dataKey="produzione" 
-          stroke="#22c55e" 
-          fillOpacity={1} 
-          fill="url(#colorProduzione)" 
-          strokeWidth={2}
-        />
-        <Area 
-          type="monotone" 
-          dataKey="consumo" 
-          stroke="#7c3aed" 
-          fillOpacity={1} 
-          fill="url(#colorConsumo)" 
-          strokeWidth={2}
-        />
-      </AreaChart>
-      <ChartLegend content={<ChartLegendContent />} />
+      {/* Wrapping in a single React fragment to fix the type error */}
+      <>
+        <AreaChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+          <defs>
+            <linearGradient id="colorProduzione" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#22c55e" stopOpacity={0.8}/>
+              <stop offset="95%" stopColor="#22c55e" stopOpacity={0}/>
+            </linearGradient>
+            <linearGradient id="colorConsumo" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#7c3aed" stopOpacity={0.8}/>
+              <stop offset="95%" stopColor="#7c3aed" stopOpacity={0}/>
+            </linearGradient>
+          </defs>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="name" />
+          <YAxis unit=" kWh" />
+          <ChartTooltip content={<ChartTooltipContent />} />
+          <Area 
+            type="monotone" 
+            dataKey="produzione" 
+            stroke="#22c55e" 
+            fillOpacity={1} 
+            fill="url(#colorProduzione)" 
+            strokeWidth={2}
+          />
+          <Area 
+            type="monotone" 
+            dataKey="consumo" 
+            stroke="#7c3aed" 
+            fillOpacity={1} 
+            fill="url(#colorConsumo)" 
+            strokeWidth={2}
+          />
+        </AreaChart>
+        <ChartLegend content={<ChartLegendContent />} />
+      </>
     </ChartContainer>
   );
 }
