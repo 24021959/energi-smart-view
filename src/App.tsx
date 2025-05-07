@@ -9,6 +9,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
+import AdminDashboard from "./pages/admin/AdminDashboard";
 
 const queryClient = new QueryClient();
 
@@ -30,7 +31,7 @@ const App = () => (
 
             {/* Rotte protette per gestori CER */}
             <Route element={<ProtectedRoute allowedRoles={['cer_manager']} />}>
-              <Route path="/admin" element={<Index />} /> {/* Sostituire con la pagina amministratore quando sarà creata */}
+              <Route path="/admin" element={<AdminDashboard />} />
             </Route>
 
             {/* Rotta non trovata */}
