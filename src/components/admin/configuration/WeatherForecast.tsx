@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sun, Cloud, CloudRain, CloudSnow, Wind, Thermometer } from "lucide-react";
-import { fetchWeatherForecast, estimateSolarProduction, WeatherForecast } from "@/services/weatherService";
+import { fetchWeatherForecast, estimateSolarProduction, WeatherForecastData } from "@/services/weatherService";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface WeatherForecastProps {
@@ -11,7 +11,7 @@ interface WeatherForecastProps {
 }
 
 export function WeatherForecast({ city, province }: WeatherForecastProps) {
-  const [forecasts, setForecasts] = useState<WeatherForecast[]>([]);
+  const [forecasts, setForecasts] = useState<WeatherForecastData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {

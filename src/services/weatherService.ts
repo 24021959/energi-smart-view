@@ -1,7 +1,7 @@
 
 import { toast } from '@/hooks/use-toast';
 
-export interface WeatherForecast {
+export interface WeatherForecastData {
   date: string;
   icon: string;
   description: string;
@@ -14,14 +14,14 @@ export interface WeatherForecast {
   sunsetTime: string;
 }
 
-// Note: In a production app, you would store this in environment variables
-const API_KEY = "YOUR_OPENWEATHERMAP_API_KEY"; // Replace with your actual API key
+// OpenWeatherMap API key provided by the user
+const API_KEY = "72547ec8c6cb00d75320173614534a46";
 
 // Function to fetch 5-day weather forecast
 export const fetchWeatherForecast = async (
   city: string, 
   country: string = "IT"
-): Promise<WeatherForecast[]> => {
+): Promise<WeatherForecastData[]> => {
   try {
     const response = await fetch(
       `https://api.openweathermap.org/data/2.5/forecast?q=${city},${country}&units=metric&appid=${API_KEY}`
@@ -34,7 +34,7 @@ export const fetchWeatherForecast = async (
     const data = await response.json();
     
     // Process the 5-day forecast (every 3 hours, we'll take one reading per day)
-    const processedForecasts: WeatherForecast[] = [];
+    const processedForecasts: WeatherForecastData[] = [];
     const dailyForecasts: {[key: string]: boolean} = {};
     
     data.list.forEach((forecast: any) => {
@@ -83,7 +83,7 @@ export const fetchWeatherForecast = async (
 };
 
 // Function to estimate solar production based on weather conditions
-export const estimateSolarProduction = (forecast: WeatherForecast): number => {
+export const estimateSolarProduction = (forecast: WeatherForecastData): number => {
   // Simple solar production estimation based on cloudiness and time of day
   // 100% - cloudiness percentage gives a basic estimate
   // In a real application, this would be much more sophisticated
