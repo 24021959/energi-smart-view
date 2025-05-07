@@ -119,15 +119,7 @@ export default function Login() {
             </TabsContent>
             
             <TabsContent value="cer_manager" className="mt-0">
-              <div className={`p-4 rounded-md mb-4 bg-purple-50 border border-purple-100`}>
-                <h3 className="font-medium text-purple-800">Accesso Gestore CER</h3>
-                <p className="text-sm text-purple-700">
-                  Accedi come gestore della Comunità Energetica Rinnovabile
-                </p>
-                <p className="text-xs text-purple-600 mt-2 font-mono">
-                  Demo: gestore@gestore.it / gestore
-                </p>
-              </div>
+              
             </TabsContent>
 
             <Form {...form}>
