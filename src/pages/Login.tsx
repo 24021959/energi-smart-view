@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -23,6 +24,7 @@ const loginSchema = z.object({
   })
 });
 type LoginFormData = z.infer<typeof loginSchema>;
+
 export default function Login() {
   const {
     authState,
@@ -92,14 +94,17 @@ export default function Login() {
       setIsSubmitting(false);
     }
   };
+  
   return <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-secondary/20 to-background p-4">
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="space-y-1 text-center">
           <div className="flex justify-center mb-2">
             <Logo size="md" />
           </div>
-          <CardTitle className="text-3xl font-bold text-purple-900">Energy Smart</CardTitle>
-          
+          <CardTitle className="text-3xl font-bold text-slate-900">Energy Smart</CardTitle>
+          <CardDescription>
+            Accedi alla piattaforma di gestione energetica
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="user" value={loginType} onValueChange={value => setLoginType(value as 'user' | 'cer_manager')} className="w-full">
@@ -115,7 +120,15 @@ export default function Login() {
             </TabsList>
             
             <TabsContent value="user" className="mt-0">
-              
+              <div className={`p-4 rounded-md mb-4 bg-blue-50 border border-blue-100`}>
+                <h3 className="font-medium text-blue-800">Accesso Utente</h3>
+                <p className="text-sm text-blue-700">
+                  Accedi per visualizzare i tuoi dati energetici personali
+                </p>
+                <p className="text-xs text-blue-600 mt-2 font-mono">
+                  Demo: utente@utente.it / utente
+                </p>
+              </div>
             </TabsContent>
             
             <TabsContent value="cer_manager" className="mt-0">
@@ -157,9 +170,20 @@ export default function Login() {
                     </FormItem>} />
 
                 <div className="flex flex-col space-y-2">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    className="text-xs" 
+                    onClick={fillDemoCredentials}
+                  >
+                    Compila credenziali demo
+                  </Button>
                   
-                  
-                  <Button type="submit" className={`w-full ${loginType === 'cer_manager' ? 'bg-purple-600 hover:bg-purple-700' : ''}`} disabled={isSubmitting}>
+                  <Button 
+                    type="submit" 
+                    className={`w-full ${loginType === 'cer_manager' ? 'bg-purple-600 hover:bg-purple-700' : ''}`} 
+                    disabled={isSubmitting}
+                  >
                     {isSubmitting ? "Accesso in corso..." : "Accedi"}
                   </Button>
                 </div>
@@ -167,7 +191,11 @@ export default function Login() {
             </Form>
           </Tabs>
         </CardContent>
-        
+        <CardFooter className="flex flex-col space-y-2">
+          <p className="text-sm text-center text-muted-foreground">
+            Per assistenza contattare il supporto tecnico
+          </p>
+        </CardFooter>
       </Card>
     </div>;
 }
