@@ -20,7 +20,7 @@ type AdminSidebarProps = {
   setIsOpen: (isOpen: boolean) => void;
 }
 
-// Dati di navigazione
+// Dati di navigazione riordinati
 const navItems = [
   {
     title: 'Dashboard',
@@ -28,9 +28,9 @@ const navItems = [
     icon: LayoutDashboard,
   },
   {
-    title: 'Membri CER',
-    href: '/admin/members',
-    icon: Users,
+    title: 'Configurazioni',
+    href: '/admin/configurations',
+    icon: List,
   },
   {
     title: 'Impianti',
@@ -38,9 +38,9 @@ const navItems = [
     icon: Zap,
   },
   {
-    title: 'Configurazioni',
-    href: '/admin/configurations',
-    icon: List,
+    title: 'Membri CER',
+    href: '/admin/members',
+    icon: Users,
   },
   {
     title: 'Dati Energetici',
