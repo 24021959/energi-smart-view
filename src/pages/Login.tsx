@@ -7,7 +7,7 @@ import * as z from 'zod';
 import { Eye, EyeOff, User, Users } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuthContext';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -23,8 +23,10 @@ const loginSchema = z.object({
     message: 'Password deve contenere almeno 6 caratteri'
   })
 });
+
 type LoginFormData = z.infer<typeof loginSchema>;
 
+// Componente principale Login
 export default function Login() {
   const { authState, login } = useAuth();
   const navigate = useNavigate();
@@ -42,8 +44,6 @@ export default function Login() {
   });
 
   // Se l'utente è già autenticato, reindirizza
-  // IMPORTANTE: Questo return condizionale era prima dei hook, causando errori
-  // Lo spostiamo dopo tutti gli hook e gli useState
   if (authState.user) {
     console.log("Utente autenticato:", authState.user);
     // Reindirizza in base al ruolo
@@ -123,65 +123,95 @@ export default function Login() {
             <TabsContent value="user" className="mt-0"></TabsContent>
             <TabsContent value="cer_manager" className="mt-0"></TabsContent>
 
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField 
-                  control={form.control} 
-                  name="email" 
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input placeholder="email@example.com" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )} 
-                />
-                
-                <FormField 
-                  control={form.control} 
-                  name="password" 
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Password</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <Input 
-                            type={showPassword ? "text" : "password"} 
-                            placeholder="••••••••" 
-                            {...field} 
-                          />
-                          <Button 
-                            type="button" 
-                            variant="ghost" 
-                            size="icon" 
-                            className="absolute right-0 top-0 h-full px-3" 
-                            onClick={() => setShowPassword(!showPassword)}
-                          >
-                            {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                          </Button>
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )} 
-                />
-
-                <div className="flex flex-col space-y-2">
-                  <Button 
-                    type="submit" 
-                    className={`w-full ${loginType === 'cer_manager' ? 'bg-purple-600 hover:bg-purple-700' : ''}`} 
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? "Accesso in corso..." : "Accedi"}
-                  </Button>
-                </div>
-              </form>
-            </Form>
+            <LoginForm 
+              form={form} 
+              onSubmit={onSubmit} 
+              showPassword={showPassword}
+              setShowPassword={setShowPassword}
+              isSubmitting={isSubmitting}
+              loginType={loginType}
+            />
           </Tabs>
         </CardContent>
       </Card>
     </div>
   );
 }
+
+// Componente separato per il form di login
+interface LoginFormProps {
+  form: any;
+  onSubmit: (data: LoginFormData) => Promise<void>;
+  showPassword: boolean;
+  setShowPassword: (show: boolean) => void;
+  isSubmitting: boolean;
+  loginType: 'user' | 'cer_manager';
+}
+
+const LoginForm = ({ 
+  form, 
+  onSubmit, 
+  showPassword, 
+  setShowPassword, 
+  isSubmitting,
+  loginType
+}: LoginFormProps) => {
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField 
+          control={form.control} 
+          name="email" 
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input placeholder="email@example.com" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )} 
+        />
+        
+        <FormField 
+          control={form.control} 
+          name="password" 
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Password</FormLabel>
+              <FormControl>
+                <div className="relative">
+                  <Input 
+                    type={showPassword ? "text" : "password"} 
+                    placeholder="••••••••" 
+                    {...field} 
+                  />
+                  <Button 
+                    type="button" 
+                    variant="ghost" 
+                    size="icon" 
+                    className="absolute right-0 top-0 h-full px-3" 
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </Button>
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )} 
+        />
+
+        <div className="flex flex-col space-y-2">
+          <Button 
+            type="submit" 
+            className={`w-full ${loginType === 'cer_manager' ? 'bg-purple-600 hover:bg-purple-700' : ''}`} 
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Accesso in corso..." : "Accedi"}
+          </Button>
+        </div>
+      </form>
+    </Form>
+  );
+};

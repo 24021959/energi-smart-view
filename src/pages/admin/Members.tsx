@@ -1,27 +1,17 @@
 
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { UserPlus } from 'lucide-react';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { useAuth } from '@/hooks/useAuthContext';
-import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { UserPlus, Search, Zap, ZapOff, Eye, Check, X, Battery, Filter } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Link } from 'react-router-dom';
-import { Switch } from '@/components/ui/switch';
 import { toast } from '@/hooks/use-toast';
 import { MemberListItem } from '@/types/member';
-import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import MemberTable from '@/components/admin/member/MemberTable';
+import MemberDetailsDialog from '@/components/admin/member/MemberDetailsDialog';
+import MemberFilterBar from '@/components/admin/member/MemberFilterBar';
 
 // Dati di esempio aggiornati con il tipo di membro CER
 const membersData: MemberListItem[] = [
@@ -75,7 +65,6 @@ const membersData: MemberListItem[] = [
 export default function Members() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const { authState } = useAuth();
-  const { user } = authState;
   const [searchTerm, setSearchTerm] = useState('');
   const [members, setMembers] = useState<MemberListItem[]>(membersData);
   const [selectedMember, setSelectedMember] = useState<MemberListItem | null>(null);
@@ -150,191 +139,30 @@ export default function Members() {
               <CardDescription>
                 Gestisci tutti i membri della comunità energetica rinnovabile.
               </CardDescription>
-              <div className="mt-4 flex flex-col md:flex-row gap-4">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Cerca membri..."
-                    className="pl-10"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
-                <div className="w-full md:w-64">
-                  <Select
-                    value={memberTypeFilter}
-                    onValueChange={setMemberTypeFilter}
-                  >
-                    <SelectTrigger className="w-full">
-                      <div className="flex items-center gap-2">
-                        <Filter size={16} />
-                        <SelectValue placeholder="Filtra per ruolo" />
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Tutti i membri</SelectItem>
-                      <SelectItem value="consumer">Consumer</SelectItem>
-                      <SelectItem value="prosumer">Prosumer</SelectItem>
-                      <SelectItem value="producer">Producer</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+              <MemberFilterBar 
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+                memberTypeFilter={memberTypeFilter}
+                onFilterChange={setMemberTypeFilter}
+              />
             </CardHeader>
             <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Nome</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Tipo</TableHead>
-                    <TableHead>Ruolo CER</TableHead>
-                    <TableHead>Stato</TableHead>
-                    <TableHead>Attivo</TableHead>
-                    <TableHead>Azioni</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredMembers.length > 0 ? (
-                    filteredMembers.map((member) => (
-                      <TableRow key={member.id}>
-                        <TableCell className="font-medium">{member.name}</TableCell>
-                        <TableCell>{member.email}</TableCell>
-                        <TableCell>{member.type}</TableCell>
-                        <TableCell>
-                          {member.memberType === 'prosumer' ? (
-                            <Badge className="bg-purple-600 hover:bg-purple-700 flex w-fit gap-1 items-center">
-                              <Zap size={14} />
-                              Prosumer
-                            </Badge>
-                          ) : member.memberType === 'producer' ? (
-                            <Badge className="bg-green-600 hover:bg-green-700 flex w-fit gap-1 items-center">
-                              <Battery size={14} />
-                              Producer
-                            </Badge>
-                          ) : (
-                            <Badge className="bg-blue-600 hover:bg-blue-700 flex w-fit gap-1 items-center">
-                              <ZapOff size={14} />
-                              Consumer
-                            </Badge>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <span className={`px-2 py-1 rounded-full text-xs ${
-                            member.status === 'Attivo' 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-yellow-100 text-yellow-800'
-                          }`}>
-                            {member.status}
-                          </span>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex items-center space-x-2">
-                            <Switch 
-                              checked={member.isActive} 
-                              onCheckedChange={(checked) => toggleMemberStatus(member.id, checked)}
-                            />
-                            <HoverCard>
-                              <HoverCardTrigger asChild>
-                                <span>{member.isActive ? 
-                                  <Check size={18} className="text-green-500" /> : 
-                                  <X size={18} className="text-red-500" />}
-                                </span>
-                              </HoverCardTrigger>
-                              <HoverCardContent>
-                                {member.isActive ? 
-                                  "Membro attivo: può accedere al sistema" : 
-                                  "Membro disattivato: non può accedere al sistema"}
-                              </HoverCardContent>
-                            </HoverCard>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex space-x-2">
-                            <Button variant="outline" size="sm" onClick={() => showMemberDetails(member)}>
-                              <Eye size={16} className="mr-1" />
-                              Dettagli
-                            </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              asChild
-                            >
-                              <Link to={`/admin/members/${member.id}`}>
-                                Scheda
-                              </Link>
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={7} className="text-center py-4 text-muted-foreground">
-                        Nessun membro trovato con i filtri selezionati
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+              <MemberTable 
+                members={filteredMembers} 
+                onToggleStatus={toggleMemberStatus}
+                onShowDetails={showMemberDetails}
+              />
             </CardContent>
           </Card>
         </main>
       </div>
 
       {/* Dialog per i dettagli del membro */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Dettagli Membro</DialogTitle>
-            <DialogDescription>
-              Informazioni sul membro selezionato
-            </DialogDescription>
-          </DialogHeader>
-          {selectedMember && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-2">
-                <div className="font-semibold">Nome:</div>
-                <div>{selectedMember.name}</div>
-                
-                <div className="font-semibold">Email:</div>
-                <div>{selectedMember.email}</div>
-                
-                <div className="font-semibold">Tipo:</div>
-                <div>{selectedMember.type}</div>
-                
-                <div className="font-semibold">Ruolo CER:</div>
-                <div>
-                  {selectedMember.memberType === 'prosumer' ? 'Prosumer' : 
-                   selectedMember.memberType === 'producer' ? 'Producer' : 'Consumer'}
-                </div>
-                
-                <div className="font-semibold">Stato:</div>
-                <div>{selectedMember.status}</div>
-                
-                <div className="font-semibold">Attivo:</div>
-                <div>{selectedMember.isActive ? 'Sì' : 'No'}</div>
-              </div>
-              
-              <div className="flex justify-end space-x-2 pt-4">
-                <Button 
-                  variant="outline" 
-                  onClick={() => setIsDialogOpen(false)}
-                >
-                  Chiudi
-                </Button>
-                <Button 
-                  asChild
-                >
-                  <Link to={`/admin/members/${selectedMember.id}`}>
-                    Vai alla Scheda
-                  </Link>
-                </Button>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+      <MemberDetailsDialog 
+        isOpen={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        member={selectedMember}
+      />
     </div>
   );
 }
