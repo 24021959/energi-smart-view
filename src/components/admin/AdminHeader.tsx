@@ -20,18 +20,19 @@ export function AdminHeader({ isSidebarOpen, setIsSidebarOpen, title = 'Dashboar
 
   return (
     <header className="bg-white border-b px-4 py-5 flex items-center relative h-20">
-      <div className="flex items-center">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="md:hidden mr-4"
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        >
-          <Menu size={20} />
-          <span className="sr-only">Toggle sidebar</span>
-        </Button>
-        
-        {/* Logo positioned on the left */}
+      {/* Menu toggle button on the left */}
+      <Button
+        variant="ghost"
+        size="icon"
+        className="md:hidden"
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+      >
+        <Menu size={20} />
+        <span className="sr-only">Toggle sidebar</span>
+      </Button>
+      
+      {/* Logo centered */}
+      <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
         <Logo size="md" className="transform scale-150" />
       </div>
 
