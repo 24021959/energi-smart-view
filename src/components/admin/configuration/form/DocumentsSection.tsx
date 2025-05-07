@@ -1,6 +1,6 @@
 
-import { FormField, FormItem, FormControl, FormMessage } from "@/components/ui/form";
-import { Control, useFieldArray } from "react-hook-form";
+import { FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { Control } from "react-hook-form";
 import { ConfigurationFormData } from "@/types/configuration";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -14,15 +14,19 @@ interface DocumentsSectionProps {
 export function DocumentsSection({ control }: DocumentsSectionProps) {
   const [newDocument, setNewDocument] = useState("");
   
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "documents" // Fixed: This was causing the TypeScript error
-  });
+  // Create a custom field array management since we're dealing with string arrays
+  const [documents, setDocuments] = useState<string[]>([]);
 
   const handleAddDocument = () => {
     if (!newDocument.trim()) return;
-    append(newDocument);
+    setDocuments([...documents, newDocument]);
     setNewDocument("");
+  };
+
+  const handleRemoveDocument = (index: number) => {
+    const updatedDocuments = [...documents];
+    updatedDocuments.splice(index, 1);
+    setDocuments(updatedDocuments);
   };
 
   return (
@@ -33,13 +37,13 @@ export function DocumentsSection({ control }: DocumentsSectionProps) {
         <FormField
           control={control}
           name="documents"
-          render={({ field }) => (
+          render={() => (
             <FormItem>
               <div className="flex flex-col space-y-2">
-                {fields.map((item, index) => (
-                  <div key={item.id} className="flex items-center gap-2">
+                {documents.map((doc, index) => (
+                  <div key={index} className="flex items-center gap-2">
                     <Input 
-                      value={field.value?.[index] || ''} 
+                      value={doc} 
                       readOnly 
                       className="flex-1" 
                     />
@@ -47,13 +51,13 @@ export function DocumentsSection({ control }: DocumentsSectionProps) {
                       type="button" 
                       variant="outline" 
                       size="icon" 
-                      onClick={() => remove(index)}
+                      onClick={() => handleRemoveDocument(index)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 ))}
-                {(fields.length === 0) && (
+                {(documents.length === 0) && (
                   <p className="text-sm text-muted-foreground">Nessun documento aggiunto</p>
                 )}
                 <FormMessage />

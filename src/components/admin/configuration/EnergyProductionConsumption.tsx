@@ -1,6 +1,6 @@
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Solar, LightbulbOff } from "lucide-react";
+import { Sun, LightbulbOff } from "lucide-react";
 
 interface EnergyData {
   label: string;
@@ -26,7 +26,7 @@ export function EnergyProductionConsumption({
         <div className="flex items-start">
           <div className="mr-4 mt-1">
             {type === "production" ? (
-              <Solar className="h-12 w-12 text-gray-700" />
+              <Sun className="h-12 w-12 text-gray-700" />
             ) : (
               <LightbulbOff className="h-12 w-12 text-gray-700" />
             )}

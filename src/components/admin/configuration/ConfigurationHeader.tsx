@@ -1,7 +1,7 @@
 
 import { Configuration, ConfigurationType } from "@/types/configuration";
 import { Badge } from "@/components/ui/badge";
-import { Solar, Zap, Car } from "lucide-react";
+import { Sun, Zap, Car } from "lucide-react";
 
 // Type mapping for badges
 const typeLabels: Record<ConfigurationType, string> = {
@@ -29,7 +29,7 @@ export function ConfigurationHeader({ configuration }: ConfigurationHeaderProps)
     <div className="flex items-center gap-6">
       {/* Icon circle */}
       <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-        <Solar className="h-10 w-10 text-green-600" />
+        <Sun className="h-10 w-10 text-green-600" />
       </div>
       
       {/* Configuration info */}
@@ -53,7 +53,7 @@ export function ConfigurationHeader({ configuration }: ConfigurationHeaderProps)
       {/* Energy statistics */}
       <div className="hidden lg:flex items-center gap-8">
         <div className="flex flex-col items-center">
-          <Solar className="h-8 w-8 text-gray-700" />
+          <Sun className="h-8 w-8 text-gray-700" />
           <p className="mt-1 font-semibold">250kW</p>
         </div>
         <div className="flex flex-col items-center">

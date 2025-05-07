@@ -1,6 +1,6 @@
 
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Control, useFieldArray } from "react-hook-form";
+import { FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { Control } from "react-hook-form";
 import { ConfigurationFormData } from "@/types/configuration";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -14,15 +14,19 @@ interface PlantsSectionProps {
 export function PlantsSection({ control }: PlantsSectionProps) {
   const [newPlant, setNewPlant] = useState("");
   
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "plants" // Fixed: This was causing the TypeScript error
-  });
+  // Create a custom field array management since we're dealing with string arrays
+  const [plants, setPlants] = useState<string[]>([]);
 
   const handleAddPlant = () => {
     if (!newPlant.trim()) return;
-    append(newPlant);
+    setPlants([...plants, newPlant]);
     setNewPlant("");
+  };
+
+  const handleRemovePlant = (index: number) => {
+    const updatedPlants = [...plants];
+    updatedPlants.splice(index, 1);
+    setPlants(updatedPlants);
   };
 
   return (
@@ -33,13 +37,13 @@ export function PlantsSection({ control }: PlantsSectionProps) {
         <FormField
           control={control}
           name="plants"
-          render={({ field }) => (
+          render={() => (
             <FormItem>
               <div className="flex flex-col space-y-2">
-                {fields.map((item, index) => (
-                  <div key={item.id} className="flex items-center gap-2">
+                {plants.map((plant, index) => (
+                  <div key={index} className="flex items-center gap-2">
                     <Input 
-                      value={field.value?.[index] || ''} 
+                      value={plant} 
                       readOnly 
                       className="flex-1" 
                     />
@@ -47,13 +51,13 @@ export function PlantsSection({ control }: PlantsSectionProps) {
                       type="button" 
                       variant="outline" 
                       size="icon" 
-                      onClick={() => remove(index)}
+                      onClick={() => handleRemovePlant(index)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 ))}
-                {(fields.length === 0) && (
+                {(plants.length === 0) && (
                   <p className="text-sm text-muted-foreground">Nessun impianto aggiunto</p>
                 )}
                 <FormMessage />
