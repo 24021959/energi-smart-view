@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -7,42 +6,27 @@ import * as z from 'zod';
 import { Eye, EyeOff, User, Users } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuthContext';
-
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabs';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 // Schema di validazione del form
 const loginSchema = z.object({
-  email: z.string().email({ message: 'Email non valida' }),
-  password: z.string().min(6, { message: 'Password deve contenere almeno 6 caratteri' }),
+  email: z.string().email({
+    message: 'Email non valida'
+  }),
+  password: z.string().min(6, {
+    message: 'Password deve contenere almeno 6 caratteri'
+  })
 });
-
 type LoginFormData = z.infer<typeof loginSchema>;
-
 export default function Login() {
-  const { authState, login } = useAuth();
+  const {
+    authState,
+    login
+  } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [loginType, setLoginType] = useState<'user' | 'cer_manager'>('user');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -62,55 +46,50 @@ export default function Login() {
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: '',
-      password: '',
-    },
+      password: ''
+    }
   });
 
   // Gestione del submit del form
   const onSubmit = async (data: LoginFormData) => {
     setIsSubmitting(true);
     try {
-      const { success, error } = await login(data.email, data.password);
-
+      const {
+        success,
+        error
+      } = await login(data.email, data.password);
       if (success) {
         toast({
           title: "Accesso effettuato",
-          description: `Benvenuto nel sistema EnergiSmart`,
+          description: `Benvenuto nel sistema EnergiSmart`
         });
       } else {
         toast({
           variant: "destructive",
           title: "Errore di accesso",
-          description: error || "Credenziali non valide",
+          description: error || "Credenziali non valide"
         });
       }
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Errore",
-        description: "Si è verificato un errore durante il login",
+        description: "Si è verificato un errore durante il login"
       });
     } finally {
       setIsSubmitting(false);
     }
   };
-
-  return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-secondary/20 to-background p-4">
+  return <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-secondary/20 to-background p-4">
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-3xl font-bold">EnergiSmart</CardTitle>
+          <CardTitle className="text-3xl font-bold">Energy Smart</CardTitle>
           <CardDescription>
             Accedi alla piattaforma di gestione energetica
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs 
-            defaultValue="user" 
-            value={loginType} 
-            onValueChange={(value) => setLoginType(value as 'user' | 'cer_manager')}
-            className="w-full"
-          >
+          <Tabs defaultValue="user" value={loginType} onValueChange={value => setLoginType(value as 'user' | 'cer_manager')} className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-6">
               <TabsTrigger value="user" className="flex items-center gap-2">
                 <User size={16} />
@@ -142,53 +121,31 @@ export default function Login() {
 
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
+                <FormField control={form.control} name="email" render={({
+                field
+              }) => <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
                         <Input placeholder="email@example.com" {...field} />
                       </FormControl>
                       <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
+                    </FormItem>} />
+                <FormField control={form.control} name="password" render={({
+                field
+              }) => <FormItem>
                       <FormLabel>Password</FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <Input 
-                            type={showPassword ? "text" : "password"}
-                            placeholder="••••••••" 
-                            {...field} 
-                          />
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            className="absolute right-0 top-0 h-full px-3"
-                            onClick={() => setShowPassword(!showPassword)}
-                          >
+                          <Input type={showPassword ? "text" : "password"} placeholder="••••••••" {...field} />
+                          <Button type="button" variant="ghost" size="icon" className="absolute right-0 top-0 h-full px-3" onClick={() => setShowPassword(!showPassword)}>
                             {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                           </Button>
                         </div>
                       </FormControl>
                       <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                    </FormItem>} />
 
-                <Button 
-                  type="submit" 
-                  className={`w-full ${loginType === 'cer_manager' ? 'bg-purple-600 hover:bg-purple-700' : ''}`}
-                  disabled={isSubmitting}
-                >
+                <Button type="submit" className={`w-full ${loginType === 'cer_manager' ? 'bg-purple-600 hover:bg-purple-700' : ''}`} disabled={isSubmitting}>
                   {isSubmitting ? "Accesso in corso..." : "Accedi"}
                 </Button>
               </form>
@@ -201,6 +158,5 @@ export default function Login() {
           </p>
         </CardFooter>
       </Card>
-    </div>
-  );
+    </div>;
 }
