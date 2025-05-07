@@ -23,7 +23,7 @@ export function ConfigMembersExpander({ configuration }: ConfigMembersExpanderPr
   const [members] = useState<MemberListItem[]>(mockMembers);
 
   return (
-    <div className="border-t pt-4">
+    <div className="mb-4">
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center">
           <Users className="h-5 w-5 mr-2" />

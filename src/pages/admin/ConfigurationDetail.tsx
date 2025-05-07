@@ -72,6 +72,9 @@ const ConfigurationDetail = () => {
             <h3 className="ml-2 text-lg font-medium">Componenti Configurazione Energetica</h3>
           </CardContent>
         </Card>
+        
+        {/* Config members expander - MOVED HERE */}
+        <ConfigMembersExpander configuration={configuration} />
 
         {/* Energy stats section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -167,9 +170,6 @@ const ConfigurationDetail = () => {
           <p>Ultimi flussi rilevati</p>
           <p>Ultimo aggiornamento: 22/07/2024 13:45</p>
         </div>
-
-        {/* Config members expander */}
-        <ConfigMembersExpander configuration={configuration} />
       </div>
     </AdminLayout>
   );
