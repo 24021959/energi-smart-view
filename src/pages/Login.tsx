@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -50,17 +51,6 @@ export default function Login() {
       password: ''
     }
   });
-
-  // Funzione per precompilare il form con credenziali demo
-  const fillDemoCredentials = () => {
-    if (loginType === 'user') {
-      form.setValue('email', 'utente@utente.it');
-      form.setValue('password', 'utente');
-    } else {
-      form.setValue('email', 'gestore@gestore.it');
-      form.setValue('password', 'gestore');
-    }
-  };
 
   // Gestione del submit del form
   const onSubmit = async (data: LoginFormData) => {
@@ -149,10 +139,6 @@ export default function Login() {
                     </FormItem>} />
 
                 <div className="flex flex-col space-y-2">
-                  <Button type="button" variant="outline" className="text-xs" onClick={fillDemoCredentials}>
-                    Compila credenziali demo
-                  </Button>
-                  
                   <Button type="submit" className={`w-full ${loginType === 'cer_manager' ? 'bg-purple-600 hover:bg-purple-700' : ''}`} disabled={isSubmitting}>
                     {isSubmitting ? "Accesso in corso..." : "Accedi"}
                   </Button>
