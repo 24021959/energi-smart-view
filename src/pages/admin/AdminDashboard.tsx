@@ -12,8 +12,8 @@ export default function AdminDashboard() {
   const { authState } = useAuth();
   const { user, isLoading, error } = authState;
   
+  // Questo useEffect è usato solo per debug
   useEffect(() => {
-    // Log per debug
     console.log("AdminDashboard - authState:", authState);
     console.log("AdminDashboard - user:", user);
     console.log("AdminDashboard - isLoading:", isLoading);
@@ -54,6 +54,7 @@ export default function AdminDashboard() {
     return <Navigate to="/" replace />;
   }
 
+  // Se l'utente è autenticato e ha il ruolo corretto, mostra la dashboard
   return (
     <div className="flex h-screen bg-background">
       {/* Sidebar */}

@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -23,17 +24,26 @@ const loginSchema = z.object({
   })
 });
 type LoginFormData = z.infer<typeof loginSchema>;
+
 export default function Login() {
-  const {
-    authState,
-    login
-  } = useAuth();
+  const { authState, login } = useAuth();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [loginType, setLoginType] = useState<'user' | 'cer_manager'>('user');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Se l'utente è gi�� autenticato, reindirizza
+  // Configurazione del form con react-hook-form
+  const form = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: ''
+    }
+  });
+
+  // Se l'utente è già autenticato, reindirizza
+  // IMPORTANTE: Questo return condizionale era prima dei hook, causando errori
+  // Lo spostiamo dopo tutti gli hook e gli useState
   if (authState.user) {
     console.log("Utente autenticato:", authState.user);
     // Reindirizza in base al ruolo
@@ -46,23 +56,11 @@ export default function Login() {
     }
   }
 
-  // Configurazione del form con react-hook-form
-  const form = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: '',
-      password: ''
-    }
-  });
-
   // Gestione del submit del form
   const onSubmit = async (data: LoginFormData) => {
     setIsSubmitting(true);
     try {
-      const {
-        success,
-        error
-      } = await login(data.email, data.password);
+      const { success, error } = await login(data.email, data.password);
       if (success) {
         toast({
           title: "Accesso effettuato",
@@ -94,17 +92,23 @@ export default function Login() {
       setIsSubmitting(false);
     }
   };
-  return <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-secondary/20 to-background p-4">
+
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-secondary/20 to-background p-4">
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="space-y-1 text-center">
           <div className="flex justify-center mb-2">
             <Logo size="md" />
           </div>
           <CardTitle className="text-3xl font-bold text-violet-900">Energy Smart</CardTitle>
-          
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="user" value={loginType} onValueChange={value => setLoginType(value as 'user' | 'cer_manager')} className="w-full">
+          <Tabs 
+            defaultValue="user" 
+            value={loginType} 
+            onValueChange={value => setLoginType(value as 'user' | 'cer_manager')} 
+            className="w-full"
+          >
             <TabsList className="grid w-full grid-cols-2 mb-6">
               <TabsTrigger value="user" className="flex items-center gap-2">
                 <User size={16} />
@@ -116,42 +120,60 @@ export default function Login() {
               </TabsTrigger>
             </TabsList>
             
-            <TabsContent value="user" className="mt-0">
-              
-            </TabsContent>
-            
-            <TabsContent value="cer_manager" className="mt-0">
-              
-            </TabsContent>
+            <TabsContent value="user" className="mt-0"></TabsContent>
+            <TabsContent value="cer_manager" className="mt-0"></TabsContent>
 
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField control={form.control} name="email" render={({
-                field
-              }) => <FormItem>
+                <FormField 
+                  control={form.control} 
+                  name="email" 
+                  render={({ field }) => (
+                    <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
                         <Input placeholder="email@example.com" {...field} />
                       </FormControl>
                       <FormMessage />
-                    </FormItem>} />
-                <FormField control={form.control} name="password" render={({
-                field
-              }) => <FormItem>
+                    </FormItem>
+                  )} 
+                />
+                
+                <FormField 
+                  control={form.control} 
+                  name="password" 
+                  render={({ field }) => (
+                    <FormItem>
                       <FormLabel>Password</FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <Input type={showPassword ? "text" : "password"} placeholder="••••••••" {...field} />
-                          <Button type="button" variant="ghost" size="icon" className="absolute right-0 top-0 h-full px-3" onClick={() => setShowPassword(!showPassword)}>
+                          <Input 
+                            type={showPassword ? "text" : "password"} 
+                            placeholder="••••••••" 
+                            {...field} 
+                          />
+                          <Button 
+                            type="button" 
+                            variant="ghost" 
+                            size="icon" 
+                            className="absolute right-0 top-0 h-full px-3" 
+                            onClick={() => setShowPassword(!showPassword)}
+                          >
                             {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                           </Button>
                         </div>
                       </FormControl>
                       <FormMessage />
-                    </FormItem>} />
+                    </FormItem>
+                  )} 
+                />
 
                 <div className="flex flex-col space-y-2">
-                  <Button type="submit" className={`w-full ${loginType === 'cer_manager' ? 'bg-purple-600 hover:bg-purple-700' : ''}`} disabled={isSubmitting}>
+                  <Button 
+                    type="submit" 
+                    className={`w-full ${loginType === 'cer_manager' ? 'bg-purple-600 hover:bg-purple-700' : ''}`} 
+                    disabled={isSubmitting}
+                  >
                     {isSubmitting ? "Accesso in corso..." : "Accedi"}
                   </Button>
                 </div>
@@ -159,7 +181,7 @@ export default function Login() {
             </Form>
           </Tabs>
         </CardContent>
-        
       </Card>
-    </div>;
+    </div>
+  );
 }
