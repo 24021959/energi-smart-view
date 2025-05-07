@@ -1,75 +1,74 @@
 
-import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
+import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
 
-// Dati di esempio per il grafico
+// Dati fittizi per il grafico
 const data = [
-  { name: 'Gen', produzione: 140, consumo: 240 },
-  { name: 'Feb', produzione: 180, consumo: 220 },
-  { name: 'Mar', produzione: 220, consumo: 240 },
-  { name: 'Apr', produzione: 280, consumo: 260 },
-  { name: 'Mag', produzione: 320, consumo: 280 },
-  { name: 'Giu', produzione: 400, consumo: 350 },
-  { name: 'Lug', produzione: 430, consumo: 410 },
-  { name: 'Ago', produzione: 410, consumo: 390 },
-  { name: 'Set', produzione: 350, consumo: 320 },
-  { name: 'Ott', produzione: 280, consumo: 290 },
-  { name: 'Nov', produzione: 200, consumo: 250 },
-  { name: 'Dic', produzione: 150, consumo: 260 },
+  { name: 'Gen', produzione: 24, consumo: 40 },
+  { name: 'Feb', produzione: 30, consumo: 45 },
+  { name: 'Mar', produzione: 42, consumo: 50 },
+  { name: 'Apr', produzione: 50, consumo: 52 },
+  { name: 'Mag', produzione: 65, consumo: 55 },
+  { name: 'Giu', produzione: 78, consumo: 70 },
+  { name: 'Lug', produzione: 82, consumo: 85 },
+  { name: 'Ago', produzione: 75, consumo: 80 },
+  { name: 'Set', produzione: 60, consumo: 65 },
+  { name: 'Ott', produzione: 48, consumo: 55 },
+  { name: 'Nov', produzione: 35, consumo: 45 },
+  { name: 'Dic', produzione: 30, consumo: 42 }
 ];
 
-// Configurazione colori per il grafico
+// Configurazione colori grafico
 const chartConfig = {
   produzione: {
-    label: 'Energia Prodotta',
+    label: "Produzione",
     theme: {
-      light: '#8B5CF6',
-      dark: '#A78BFA',
-    },
+      light: "#22c55e", // verde
+      dark: "#22c55e"
+    }
   },
   consumo: {
-    label: 'Energia Consumata',
+    label: "Consumo",
     theme: {
-      light: '#EC4899',
-      dark: '#F472B6',
-    },
-  },
+      light: "#7c3aed", // viola
+      dark: "#7c3aed"
+    }
+  }
 };
 
 export function EnergyConsumptionChart() {
   return (
-    <ChartContainer
-      config={chartConfig}
-      className="h-full"
-    >
+    <ChartContainer config={chartConfig} className="aspect-[4/3]">
       <AreaChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
         <defs>
           <linearGradient id="colorProduzione" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.8}/>
-            <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0}/>
+            <stop offset="5%" stopColor="#22c55e" stopOpacity={0.8}/>
+            <stop offset="95%" stopColor="#22c55e" stopOpacity={0}/>
           </linearGradient>
           <linearGradient id="colorConsumo" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#EC4899" stopOpacity={0.8}/>
-            <stop offset="95%" stopColor="#EC4899" stopOpacity={0}/>
+            <stop offset="5%" stopColor="#7c3aed" stopOpacity={0.8}/>
+            <stop offset="95%" stopColor="#7c3aed" stopOpacity={0}/>
           </linearGradient>
         </defs>
-        <XAxis dataKey="name" />
-        <YAxis />
         <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="name" />
+        <YAxis unit=" kWh" />
         <ChartTooltip content={<ChartTooltipContent />} />
         <Area 
           type="monotone" 
           dataKey="produzione" 
+          stroke="#22c55e" 
+          fillOpacity={1} 
           fill="url(#colorProduzione)" 
-          stroke="#8B5CF6"
-          fillOpacity={0.4}
+          strokeWidth={2}
         />
         <Area 
           type="monotone" 
           dataKey="consumo" 
+          stroke="#7c3aed" 
+          fillOpacity={1} 
           fill="url(#colorConsumo)" 
-          stroke="#EC4899"
-          fillOpacity={0.4}
+          strokeWidth={2}
         />
       </AreaChart>
       <ChartLegend content={<ChartLegendContent />} />

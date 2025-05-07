@@ -1,6 +1,6 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { supabase, getUserRole } from '@/lib/supabase';
+import { supabase, getUserRole, loginUser } from '@/lib/supabase';
 import { AuthState, UserProfile } from '@/types/auth';
 import { toast } from '@/hooks/use-toast';
 
@@ -96,10 +96,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       console.log("Attempting login for:", email);
       
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      const { data, error } = await loginUser(email, password);
 
       if (error) {
         console.error("Login error:", error);
