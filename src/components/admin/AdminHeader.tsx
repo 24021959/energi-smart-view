@@ -20,33 +20,36 @@ export function AdminHeader({ isSidebarOpen, setIsSidebarOpen, title = 'Dashboar
 
   return (
     <header className="bg-white border-b px-4 py-3 flex justify-between items-center relative">
-      <Button
-        variant="ghost"
-        size="icon"
-        className="md:hidden"
-        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-      >
-        <Menu size={20} />
-        <span className="sr-only">Toggle sidebar</span>
-      </Button>
-
-      {/* Centered logo */}
-      <div className="absolute left-1/2 transform -translate-x-1/2">
-        <Logo size="sm" />
-      </div>
-
       <div className="flex items-center gap-4">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="md:hidden"
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        >
+          <Menu size={20} />
+          <span className="sr-only">Toggle sidebar</span>
+        </Button>
+        
         {user && (
-          <>
-            <span className="text-sm text-muted-foreground hidden md:inline-block">
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">
               {user.email}
             </span>
             <Button variant="outline" size="sm" onClick={handleLogout}>
               Logout
             </Button>
-          </>
+          </div>
         )}
       </div>
+
+      {/* Centered logo with double size */}
+      <div className="absolute left-1/2 transform -translate-x-1/2">
+        <Logo size="md" className="transform scale-150" />
+      </div>
+
+      {/* Empty div to balance the layout */}
+      <div className="w-[150px]"></div>
     </header>
   );
 }

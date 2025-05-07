@@ -13,7 +13,6 @@ import {
   List
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Logo } from '@/components/Logo';
 import { Button } from '@/components/ui/button';
 
 type AdminSidebarProps = {
@@ -70,13 +69,12 @@ export function AdminSidebar({ isOpen, setIsOpen }: AdminSidebarProps) {
     >
       <div className={cn(
         "flex items-center p-4 mb-2",
-        isOpen ? "justify-between" : "justify-center"
+        isOpen ? "justify-end" : "justify-center"
       )}>
-        {isOpen && <Logo className="h-8" />}
         <Button 
           variant="ghost" 
           size="icon" 
-          className="text-white hover:bg-purple-800 ml-auto"
+          className="text-white hover:bg-purple-800"
           onClick={() => setIsOpen(!isOpen)}
         >
           {isOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
