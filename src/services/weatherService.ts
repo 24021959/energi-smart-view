@@ -28,7 +28,22 @@ export interface GeoLocation {
   lng: number;
 }
 
-// Mock data for weather forecast
+// Function to get current day name in Italian
+function getDayNameInItalian(dayOffset = 0) {
+  const days = ['Dom', 'Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab'];
+  const today = new Date();
+  today.setDate(today.getDate() + dayOffset);
+  return days[today.getDay()];
+}
+
+// Function to get formatted time
+function getFormattedTime(hourOffset = 0) {
+  const now = new Date();
+  now.setHours(now.getHours() + hourOffset);
+  return now.getHours().toString().padStart(2, '0') + ':00';
+}
+
+// Generate realistic mockup data for today
 export const mockTodayForecast: WeatherForecastData = {
   temperature: 22,
   feelsLike: 24,
@@ -37,18 +52,18 @@ export const mockTodayForecast: WeatherForecastData = {
   icon: '01d',
   description: 'Cielo sereno',
   hourlyForecasts: [
-    { time: '09:00', temperature: 18, icon: '01d' },
-    { time: '12:00', temperature: 22, icon: '01d' },
-    { time: '15:00', temperature: 24, icon: '02d' },
-    { time: '18:00', temperature: 22, icon: '03d' },
-    { time: '21:00', temperature: 19, icon: '01n' },
+    { time: getFormattedTime(0), temperature: 22, icon: '01d' },
+    { time: getFormattedTime(3), temperature: 24, icon: '02d' },
+    { time: getFormattedTime(6), temperature: 23, icon: '03d' },
+    { time: getFormattedTime(9), temperature: 19, icon: '01n' },
+    { time: getFormattedTime(12), temperature: 17, icon: '01n' },
   ],
   dailyForecasts: [
     { day: 'Oggi', maxTemp: 24, minTemp: 16, icon: '01d' },
-    { day: 'Domani', maxTemp: 25, minTemp: 17, icon: '02d' },
-    { day: 'Mer', maxTemp: 23, minTemp: 15, icon: '10d' },
-    { day: 'Gio', maxTemp: 22, minTemp: 14, icon: '10d' },
-    { day: 'Ven', maxTemp: 21, minTemp: 13, icon: '01d' },
+    { day: getDayNameInItalian(1), maxTemp: 25, minTemp: 17, icon: '02d' },
+    { day: getDayNameInItalian(2), maxTemp: 23, minTemp: 15, icon: '10d' },
+    { day: getDayNameInItalian(3), maxTemp: 22, minTemp: 14, icon: '10d' },
+    { day: getDayNameInItalian(4), maxTemp: 21, minTemp: 13, icon: '01d' },
   ]
 };
 
@@ -88,8 +103,19 @@ declare global {
 
 // Function to geocode city name to coordinates
 export const geocodeCity = async (city: string): Promise<GeoLocation> => {
-  // For the sake of example, return mock coordinates
-  return { lat: 45.4642, lng: 9.1900 }; // Milan coordinates
+  // For demo purposes, return coordinates based on common Italian cities
+  const cityCoordinates: {[key: string]: GeoLocation} = {
+    'Milano': { lat: 45.4642, lng: 9.1900 },
+    'Roma': { lat: 41.9028, lng: 12.4964 },
+    'Napoli': { lat: 40.8518, lng: 14.2681 },
+    'Torino': { lat: 45.0703, lng: 7.6869 },
+    'Bologna': { lat: 44.4949, lng: 11.3426 },
+    'Firenze': { lat: 43.7696, lng: 11.2558 },
+    'Venezia': { lat: 45.4371, lng: 12.3326 }
+  };
+  
+  // Default to Milan if city not found
+  return cityCoordinates[city] || { lat: 45.4642, lng: 9.1900 };
 };
 
 // Function to fetch weather forecast (simulated)
