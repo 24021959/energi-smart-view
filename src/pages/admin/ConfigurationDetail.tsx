@@ -13,6 +13,7 @@ import { EnergyStats } from '@/components/admin/configuration/EnergyStats';
 import { EnergyProductionConsumption } from '@/components/admin/configuration/EnergyProductionConsumption';
 import { FinancialBenefits } from '@/components/admin/configuration/FinancialBenefits';
 import { ConfigMembersExpander } from '@/components/admin/configuration/ConfigMembersExpander';
+import { WeatherForecast } from '@/components/admin/configuration/WeatherForecast';
 import { ChevronRight, ArrowLeft } from "lucide-react";
 
 const ConfigurationDetail = () => {
@@ -154,6 +155,12 @@ const ConfigurationDetail = () => {
             hasTooltip={true}
           />
         </div>
+
+        {/* Weather forecast section */}
+        <WeatherForecast 
+          city={configuration.city} 
+          province={configuration.province} 
+        />
 
         {/* Data update info */}
         <div className="text-sm text-gray-500 p-4">
