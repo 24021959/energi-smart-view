@@ -45,8 +45,6 @@ export function ConfigurationHeader({ configuration }: ConfigurationHeaderProps)
           <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-200">
             {statusLabels[configuration.status]}
           </Badge>
-          <span className="text-gray-500">•</span>
-          <span className="text-gray-600">Scadenza simulazione: 365 Giorni</span>
         </div>
       </div>
       

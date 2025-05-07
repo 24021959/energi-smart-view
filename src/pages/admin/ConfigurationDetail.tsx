@@ -14,7 +14,8 @@ import { EnergyProductionConsumption } from '@/components/admin/configuration/En
 import { FinancialBenefits } from '@/components/admin/configuration/FinancialBenefits';
 import { ConfigMembersExpander } from '@/components/admin/configuration/ConfigMembersExpander';
 import { WeatherForecast } from '@/components/admin/configuration/WeatherForecast';
-import { ChevronRight, ArrowLeft } from "lucide-react";
+import { ChevronRight, ArrowLeft, Users } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const ConfigurationDetail = () => {
   const { id } = useParams();
@@ -67,14 +68,24 @@ const ConfigurationDetail = () => {
         
         {/* Section for configuration components */}
         <Card className="border shadow-sm">
-          <CardContent className="p-4 flex items-center">
-            <ChevronRight className="h-5 w-5 text-gray-500" />
-            <h3 className="ml-2 text-lg font-medium">Componenti Configurazione Energetica</h3>
+          <CardContent className="p-4">
+            <div className="flex items-center mb-4">
+              <ChevronRight className="h-5 w-5 text-gray-500" />
+              <h3 className="ml-2 text-lg font-medium">Componenti Configurazione Energetica</h3>
+            </div>
+            <Tabs defaultValue="participants" className="w-full">
+              <TabsList className="mb-4">
+                <TabsTrigger value="participants" className="flex items-center gap-2">
+                  <Users className="h-4 w-4" />
+                  Partecipanti ({configuration.participants || 0})
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="participants">
+                <ConfigMembersExpander configuration={configuration} />
+              </TabsContent>
+            </Tabs>
           </CardContent>
         </Card>
-        
-        {/* Config members expander */}
-        <ConfigMembersExpander configuration={configuration} />
 
         {/* Energy stats section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
