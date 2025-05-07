@@ -6,20 +6,26 @@ import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { UserPlus, Search, Zap, ZapOff } from 'lucide-react';
+import { UserPlus, Search, Zap, ZapOff, Eye, Check, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
+import { Switch } from '@/components/ui/switch';
+import { toast } from '@/hooks/use-toast';
+import { MemberListItem } from '@/types/member';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 // Dati di esempio aggiornati con il tipo di membro CER
-const membersData = [
+const membersData: MemberListItem[] = [
   { 
     id: 1, 
     name: 'Mario Rossi', 
     email: 'mario.rossi@example.com', 
     type: 'Domestico', 
     status: 'Attivo',
-    memberType: 'consumer' // consumatore di energia
+    memberType: 'consumer', // consumatore di energia
+    isActive: true
   },
   { 
     id: 2, 
@@ -27,7 +33,8 @@ const membersData = [
     email: 'laura.bianchi@example.com', 
     type: 'Commerciale', 
     status: 'Attivo',
-    memberType: 'prosumer' // produttore e consumatore
+    memberType: 'prosumer', // produttore e consumatore
+    isActive: true
   },
   { 
     id: 3, 
@@ -35,7 +42,8 @@ const membersData = [
     email: 'giuseppe.verdi@example.com', 
     type: 'Domestico', 
     status: 'In attesa',
-    memberType: 'consumer'
+    memberType: 'consumer',
+    isActive: false
   },
   { 
     id: 4, 
@@ -43,7 +51,8 @@ const membersData = [
     email: 'francesca.neri@example.com', 
     type: 'Industriale', 
     status: 'Attivo',
-    memberType: 'prosumer'
+    memberType: 'prosumer',
+    isActive: true
   },
 ];
 
@@ -52,12 +61,46 @@ export default function Members() {
   const { authState } = useAuth();
   const { user } = authState;
   const [searchTerm, setSearchTerm] = useState('');
+  const [members, setMembers] = useState<MemberListItem[]>(membersData);
+  const [selectedMember, setSelectedMember] = useState<MemberListItem | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   // Filtra membri in base al termine di ricerca
-  const filteredMembers = membersData.filter(
+  const filteredMembers = members.filter(
     member => member.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
               member.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Funzione per attivare/disattivare un membro
+  const toggleMemberStatus = (id: number, isActive: boolean) => {
+    setMembers(prevMembers => 
+      prevMembers.map(member => 
+        member.id === id 
+          ? { 
+              ...member, 
+              isActive,
+              status: isActive ? 'Attivo' : 'In attesa'
+            } 
+          : member
+      )
+    );
+    
+    // Mostra notifica di conferma
+    const member = members.find(m => m.id === id);
+    if (member) {
+      toast({
+        title: isActive ? "Membro attivato" : "Membro disattivato",
+        description: `${member.name} è stato ${isActive ? 'attivato' : 'disattivato'} con successo.`,
+        variant: isActive ? "default" : "destructive",
+      });
+    }
+  };
+
+  // Funzione per visualizzare i dettagli di un membro
+  const showMemberDetails = (member: MemberListItem) => {
+    setSelectedMember(member);
+    setIsDialogOpen(true);
+  };
 
   return (
     <div className="flex h-screen bg-background">
@@ -103,6 +146,7 @@ export default function Members() {
                     <TableHead>Tipo</TableHead>
                     <TableHead>Ruolo CER</TableHead>
                     <TableHead>Stato</TableHead>
+                    <TableHead>Attivo</TableHead>
                     <TableHead>Azioni</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -135,7 +179,42 @@ export default function Members() {
                         </span>
                       </TableCell>
                       <TableCell>
-                        <Button variant="ghost" size="sm">Dettagli</Button>
+                        <div className="flex items-center space-x-2">
+                          <Switch 
+                            checked={member.isActive} 
+                            onCheckedChange={(checked) => toggleMemberStatus(member.id, checked)}
+                          />
+                          <HoverCard>
+                            <HoverCardTrigger asChild>
+                              <span>{member.isActive ? 
+                                <Check size={18} className="text-green-500" /> : 
+                                <X size={18} className="text-red-500" />}
+                              </span>
+                            </HoverCardTrigger>
+                            <HoverCardContent>
+                              {member.isActive ? 
+                                "Membro attivo: può accedere al sistema" : 
+                                "Membro disattivato: non può accedere al sistema"}
+                            </HoverCardContent>
+                          </HoverCard>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex space-x-2">
+                          <Button variant="outline" size="sm" onClick={() => showMemberDetails(member)}>
+                            <Eye size={16} className="mr-1" />
+                            Dettagli
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            asChild
+                          >
+                            <Link to={`/admin/members/${member.id}`}>
+                              Scheda
+                            </Link>
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -145,6 +224,57 @@ export default function Members() {
           </Card>
         </main>
       </div>
+
+      {/* Dialog per i dettagli del membro */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Dettagli Membro</DialogTitle>
+            <DialogDescription>
+              Informazioni sul membro selezionato
+            </DialogDescription>
+          </DialogHeader>
+          {selectedMember && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-2">
+                <div className="font-semibold">Nome:</div>
+                <div>{selectedMember.name}</div>
+                
+                <div className="font-semibold">Email:</div>
+                <div>{selectedMember.email}</div>
+                
+                <div className="font-semibold">Tipo:</div>
+                <div>{selectedMember.type}</div>
+                
+                <div className="font-semibold">Ruolo CER:</div>
+                <div>{selectedMember.memberType === 'prosumer' ? 'Prosumer' : 'Consumer'}</div>
+                
+                <div className="font-semibold">Stato:</div>
+                <div>{selectedMember.status}</div>
+                
+                <div className="font-semibold">Attivo:</div>
+                <div>{selectedMember.isActive ? 'Sì' : 'No'}</div>
+              </div>
+              
+              <div className="flex justify-end space-x-2 pt-4">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setIsDialogOpen(false)}
+                >
+                  Chiudi
+                </Button>
+                <Button 
+                  asChild
+                >
+                  <Link to={`/admin/members/${selectedMember.id}`}>
+                    Vai alla Scheda
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

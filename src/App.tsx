@@ -15,6 +15,7 @@ import AddMember from "./pages/admin/AddMember";
 import EnergyData from "./pages/admin/EnergyData";
 import Reports from "./pages/admin/Reports";
 import Settings from "./pages/admin/Settings";
+import MemberDetail from "./pages/admin/MemberDetail";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +60,16 @@ const App = () => (
               element={
                 <ProtectedRoute allowedRoles={['cer_manager']}>
                   <AddMember />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Nuova rotta per visualizzare i dettagli di un membro specifico */}
+            <Route 
+              path="/admin/members/:id" 
+              element={
+                <ProtectedRoute allowedRoles={['cer_manager']}>
+                  <MemberDetail />
                 </ProtectedRoute>
               } 
             />

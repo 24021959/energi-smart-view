@@ -10,6 +10,10 @@ export interface MemberFormValues {
   email: string;
   phone: string;
   
+  // Credenziali di accesso
+  username: string;
+  password: string;
+  
   // Per persone fisiche
   fiscalCode: string; // Codice fiscale
   idType: string; // Tipo documento
@@ -29,5 +33,18 @@ export interface MemberFormValues {
   
   // Accettazione termini
   termsAccepted: boolean;
+  
+  // Stato del membro
+  isActive: boolean; // Indica se il membro è attivo o no
 }
 
+// Tipo per la lista dei membri nella pagina di amministrazione
+export interface MemberListItem {
+  id: number;
+  name: string;
+  email: string;
+  type: string;
+  status: string;
+  memberType: 'consumer' | 'prosumer';
+  isActive: boolean;
+}
