@@ -19,37 +19,35 @@ export function AdminHeader({ isSidebarOpen, setIsSidebarOpen, title = 'Dashboar
   };
 
   return (
-    <header className="bg-white border-b px-4 py-3 flex justify-between items-center relative">
-      <div className="flex items-center gap-4">
+    <header className="bg-white border-b px-4 py-5 flex items-center relative h-20">
+      <div className="flex items-center">
         <Button
           variant="ghost"
           size="icon"
-          className="md:hidden"
+          className="md:hidden mr-4"
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
         >
           <Menu size={20} />
           <span className="sr-only">Toggle sidebar</span>
         </Button>
         
+        {/* Logo positioned on the left */}
+        <Logo size="md" className="transform scale-150" />
+      </div>
+
+      {/* User info and logout on the right */}
+      <div className="flex items-center gap-3 ml-auto">
         {user && (
-          <div className="flex items-center gap-2">
+          <>
             <span className="text-sm text-muted-foreground">
               {user.email}
             </span>
             <Button variant="outline" size="sm" onClick={handleLogout}>
               Logout
             </Button>
-          </div>
+          </>
         )}
       </div>
-
-      {/* Centered logo with double size */}
-      <div className="absolute left-1/2 transform -translate-x-1/2">
-        <Logo size="md" className="transform scale-150" />
-      </div>
-
-      {/* Empty div to balance the layout */}
-      <div className="w-[150px]"></div>
     </header>
   );
 }
