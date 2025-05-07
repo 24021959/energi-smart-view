@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Sun, Cloud, CloudRain, CloudSnow, Wind, Thermometer, Droplets, Waves, ArrowDown, ArrowUp, Navigation, Map } from "lucide-react";
+import { Sun, Cloud, CloudRain, CloudSnow, Wind, Thermometer, Droplets, ArrowDown, ArrowUp, Map } from "lucide-react";
 import { fetchWeatherForecast, geocodeCity, estimateSolarProduction, getWindDirectionText, WeatherForecastData, GeoLocation } from "@/services/weatherService";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -31,6 +31,7 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<any>(null);
   const marker = useRef<any>(null);
+  const [mapLoaded, setMapLoaded] = useState(false);
 
   useEffect(() => {
     const loadWeatherData = async () => {
@@ -59,6 +60,9 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
     if (!location || !mapContainer.current || currentTab !== "map") {
       return;
     }
+    
+    let googleMap: any = null;
+    let mapMarker: any = null;
 
     const initMap = async () => {
       try {
@@ -72,6 +76,7 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
 
         await loader.load();
         console.log("Google Maps API loaded successfully");
+        setMapLoaded(true);
         
         // Initialize map
         const position = { lat: location.lat, lng: location.lon };
@@ -82,18 +87,22 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
         }
         
         console.log("Creating map with position:", position);
-        map.current = new window.google.maps.Map(mapContainer.current, {
+        googleMap = new window.google.maps.Map(mapContainer.current, {
           center: position,
           zoom: 10,
           mapTypeId: window.google.maps.MapTypeId.ROADMAP
         });
         
         // Add a marker for the city
-        marker.current = new window.google.maps.Marker({
+        mapMarker = new window.google.maps.Marker({
           position,
-          map: map.current,
+          map: googleMap,
           title: city
         });
+        
+        // Store references for cleanup
+        map.current = googleMap;
+        marker.current = mapMarker;
         
         console.log("Map initialized successfully");
         
@@ -101,27 +110,24 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
         setMapError(null);
       } catch (error) {
         console.error("Map initialization error:", error);
+        setMapLoaded(false);
         setMapError("Errore nell'inizializzazione della mappa. Per favore riprova più tardi.");
       }
     };
     
-    // Clear previous map instance if it exists
-    if (map.current) {
-      map.current = null;
-      marker.current = null;
-    }
-    
     initMap();
     
-    // Clean up on unmount
+    // Clean up on unmount or when tab changes
     return () => {
-      if (map.current) {
-        // No explicit cleanup needed for Google Maps
+      if (googleMap) {
+        // Just remove references, Google will handle actual cleanup
         map.current = null;
+        marker.current = null;
       }
     };
   }, [location, currentTab, city]);
-
+  
+  // Helper function to get weather icon
   const getWeatherIcon = (iconCode: string, size: "sm" | "md" | "lg" = "md") => {
     const sizeMap = {
       sm: "h-6 w-6",
@@ -370,7 +376,11 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
             
             <TabsContent value="map">
               <div className="relative w-full h-[400px] rounded-lg overflow-hidden border border-gray-200">
-                <div ref={mapContainer} className="absolute inset-0" />
+                <div 
+                  ref={mapContainer} 
+                  className="absolute inset-0"
+                  id="google-map-container"
+                />
                 
                 {!location && (
                   <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
@@ -381,6 +391,12 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
                 {mapError && (
                   <div className="absolute inset-0 flex items-center justify-center flex-col bg-gray-100 p-4">
                     <p className="text-red-500 mb-2">{mapError}</p>
+                  </div>
+                )}
+
+                {location && !mapLoaded && !mapError && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                    <p>Caricamento della mappa in corso...</p>
                   </div>
                 )}
               </div>

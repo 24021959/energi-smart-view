@@ -73,7 +73,7 @@ const ConfigurationDetail = () => {
           </CardContent>
         </Card>
         
-        {/* Config members expander - MOVED HERE */}
+        {/* Config members expander */}
         <ConfigMembersExpander configuration={configuration} />
 
         {/* Energy stats section */}
