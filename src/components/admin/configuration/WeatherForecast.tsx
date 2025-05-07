@@ -1,13 +1,10 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Sun, Cloud, CloudRain, CloudSnow, Wind, Thermometer, Droplets, Waves, ArrowDown, ArrowUp, Navigation, Map, Key } from "lucide-react";
+import { Sun, Cloud, CloudRain, CloudSnow, Wind, Thermometer, Droplets, Waves, ArrowDown, ArrowUp, Navigation, Map } from "lucide-react";
 import { fetchWeatherForecast, geocodeCity, estimateSolarProduction, getWindDirectionText, WeatherForecastData, GeoLocation } from "@/services/weatherService";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Loader } from "@googlemaps/js-api-loader";
 
 // Add Google Maps type declaration
@@ -65,6 +62,8 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
 
     const initMap = async () => {
       try {
+        console.log("Initializing map for location:", location);
+        
         // Load Google Maps with fixed API key
         const loader = new Loader({
           apiKey: GOOGLE_MAPS_API_KEY,
@@ -72,10 +71,17 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
         });
 
         await loader.load();
+        console.log("Google Maps API loaded successfully");
         
         // Initialize map
         const position = { lat: location.lat, lng: location.lon };
         
+        if (!mapContainer.current) {
+          console.error("Map container ref is null");
+          return;
+        }
+        
+        console.log("Creating map with position:", position);
         map.current = new window.google.maps.Map(mapContainer.current, {
           center: position,
           zoom: 10,
@@ -89,6 +95,8 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
           title: city
         });
         
+        console.log("Map initialized successfully");
+        
         // Reset error if previously set
         setMapError(null);
       } catch (error) {
@@ -96,6 +104,12 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
         setMapError("Errore nell'inizializzazione della mappa. Per favore riprova più tardi.");
       }
     };
+    
+    // Clear previous map instance if it exists
+    if (map.current) {
+      map.current = null;
+      marker.current = null;
+    }
     
     initMap();
     
