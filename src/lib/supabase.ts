@@ -2,8 +2,8 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Valori fittizi per test
-const supabaseUrl = 'https://yoursupabaseurl.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlvdXJzdXBhYmFzZXVybCIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNjAwMDAwMDAwLCJleHAiOjE5MDAwMDAwMDB9.fittizio';
+let supabaseUrl = 'https://yoursupabaseurl.supabase.co';
+let supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlvdXJzdXBhYmFzZXVybCIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNjAwMDAwMDAwLCJleHAiOjE5MDAwMDAwMDB9.fittizio';
 
 // Se disponibili, usa le variabili d'ambiente
 if (import.meta.env.VITE_SUPABASE_URL) {
