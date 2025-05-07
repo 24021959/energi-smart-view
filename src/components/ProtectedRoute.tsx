@@ -8,9 +8,14 @@ import { toast } from '@/hooks/use-toast';
 interface ProtectedRouteProps {
   allowedRoles?: UserRole[];
   children?: ReactNode;
+  redirectPath?: string;
 }
 
-export const ProtectedRoute = ({ allowedRoles, children }: ProtectedRouteProps) => {
+export const ProtectedRoute = ({ 
+  allowedRoles, 
+  children, 
+  redirectPath = '/login' 
+}: ProtectedRouteProps) => {
   const { authState } = useAuth();
   const { user, isLoading, error } = authState;
 
@@ -23,11 +28,6 @@ export const ProtectedRoute = ({ allowedRoles, children }: ProtectedRouteProps) 
       });
     }
   }, [error]);
-  
-  // Log per debug
-  console.log("ProtectedRoute - user:", user);
-  console.log("ProtectedRoute - isLoading:", isLoading);
-  console.log("ProtectedRoute - allowedRoles:", allowedRoles);
 
   // Mostra un loader mentre verifica l'autenticazione
   if (isLoading) {
@@ -39,14 +39,9 @@ export const ProtectedRoute = ({ allowedRoles, children }: ProtectedRouteProps) 
     );
   }
 
-  // Se c'è un errore di autenticazione
-  if (error) {
-    return <Navigate to="/login" replace />;
-  }
-
-  // Se non c'è un utente, reindirizza al login
-  if (!user) {
-    return <Navigate to="/login" replace />;
+  // Se c'è un errore di autenticazione o non c'è un utente, reindirizza al login
+  if (error || !user) {
+    return <Navigate to={redirectPath} replace />;
   }
 
   // Se ci sono ruoli consentiti e l'utente non ha il ruolo adeguato

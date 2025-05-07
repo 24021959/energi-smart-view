@@ -10,6 +10,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+export type MemberType = 'all' | 'consumer' | 'prosumer' | 'producer';
+
 interface MemberFilterBarProps {
   searchTerm: string;
   onSearchChange: (value: string) => void;

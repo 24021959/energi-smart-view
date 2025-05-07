@@ -4,15 +4,14 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Eye, EyeOff, User, Users } from 'lucide-react';
+import { User, Users } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Logo } from '@/components/Logo';
+import { LoginFormData } from '@/types/auth';
+import LoginForm from '@/components/auth/LoginForm';
 
 // Schema di validazione del form
 const loginSchema = z.object({
@@ -24,13 +23,10 @@ const loginSchema = z.object({
   })
 });
 
-type LoginFormData = z.infer<typeof loginSchema>;
-
 // Componente principale Login
 export default function Login() {
   const { authState, login } = useAuth();
   const navigate = useNavigate();
-  const [showPassword, setShowPassword] = useState(false);
   const [loginType, setLoginType] = useState<'user' | 'cer_manager'>('user');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -123,11 +119,9 @@ export default function Login() {
             <TabsContent value="user" className="mt-0"></TabsContent>
             <TabsContent value="cer_manager" className="mt-0"></TabsContent>
 
-            <LoginForm 
-              form={form} 
-              onSubmit={onSubmit} 
-              showPassword={showPassword}
-              setShowPassword={setShowPassword}
+            <LoginForm
+              form={form}
+              onSubmit={onSubmit}
               isSubmitting={isSubmitting}
               loginType={loginType}
             />
@@ -137,81 +131,3 @@ export default function Login() {
     </div>
   );
 }
-
-// Componente separato per il form di login
-interface LoginFormProps {
-  form: any;
-  onSubmit: (data: LoginFormData) => Promise<void>;
-  showPassword: boolean;
-  setShowPassword: (show: boolean) => void;
-  isSubmitting: boolean;
-  loginType: 'user' | 'cer_manager';
-}
-
-const LoginForm = ({ 
-  form, 
-  onSubmit, 
-  showPassword, 
-  setShowPassword, 
-  isSubmitting,
-  loginType
-}: LoginFormProps) => {
-  return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField 
-          control={form.control} 
-          name="email" 
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input placeholder="email@example.com" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )} 
-        />
-        
-        <FormField 
-          control={form.control} 
-          name="password" 
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <div className="relative">
-                  <Input 
-                    type={showPassword ? "text" : "password"} 
-                    placeholder="••••••••" 
-                    {...field} 
-                  />
-                  <Button 
-                    type="button" 
-                    variant="ghost" 
-                    size="icon" 
-                    className="absolute right-0 top-0 h-full px-3" 
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </Button>
-                </div>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )} 
-        />
-
-        <div className="flex flex-col space-y-2">
-          <Button 
-            type="submit" 
-            className={`w-full ${loginType === 'cer_manager' ? 'bg-purple-600 hover:bg-purple-700' : ''}`} 
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? "Accesso in corso..." : "Accedi"}
-          </Button>
-        </div>
-      </form>
-    </Form>
-  );
-};

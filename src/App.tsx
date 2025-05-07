@@ -19,6 +19,17 @@ import MemberDetail from "./pages/admin/MemberDetail";
 
 const queryClient = new QueryClient();
 
+// Gruppo di route che richiedono il ruolo 'cer_manager'
+const adminRoutes = [
+  { path: "/admin", element: <AdminDashboard /> },
+  { path: "/admin/members", element: <Members /> },
+  { path: "/admin/members/add", element: <AddMember /> },
+  { path: "/admin/members/:id", element: <MemberDetail /> },
+  { path: "/admin/energy", element: <EnergyData /> },
+  { path: "/admin/reports", element: <Reports /> },
+  { path: "/admin/settings", element: <Settings /> },
+];
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
@@ -36,70 +47,17 @@ const App = () => (
             </Route>
 
             {/* Rotte protette per gestori CER */}
-            <Route 
-              path="/admin" 
-              element={
-                <ProtectedRoute allowedRoles={['cer_manager']}>
-                  <AdminDashboard />
-                </ProtectedRoute>
-              } 
-            />
-
-            <Route 
-              path="/admin/members" 
-              element={
-                <ProtectedRoute allowedRoles={['cer_manager']}>
-                  <Members />
-                </ProtectedRoute>
-              } 
-            />
-            
-            {/* Nuova rotta per l'aggiunta di membri */}
-            <Route 
-              path="/admin/members/add" 
-              element={
-                <ProtectedRoute allowedRoles={['cer_manager']}>
-                  <AddMember />
-                </ProtectedRoute>
-              } 
-            />
-            
-            {/* Nuova rotta per visualizzare i dettagli di un membro specifico */}
-            <Route 
-              path="/admin/members/:id" 
-              element={
-                <ProtectedRoute allowedRoles={['cer_manager']}>
-                  <MemberDetail />
-                </ProtectedRoute>
-              } 
-            />
-
-            <Route 
-              path="/admin/energy" 
-              element={
-                <ProtectedRoute allowedRoles={['cer_manager']}>
-                  <EnergyData />
-                </ProtectedRoute>
-              } 
-            />
-
-            <Route 
-              path="/admin/reports" 
-              element={
-                <ProtectedRoute allowedRoles={['cer_manager']}>
-                  <Reports />
-                </ProtectedRoute>
-              } 
-            />
-
-            <Route 
-              path="/admin/settings" 
-              element={
-                <ProtectedRoute allowedRoles={['cer_manager']}>
-                  <Settings />
-                </ProtectedRoute>
-              } 
-            />
+            {adminRoutes.map((route) => (
+              <Route
+                key={route.path}
+                path={route.path}
+                element={
+                  <ProtectedRoute allowedRoles={['cer_manager']}>
+                    {route.element}
+                  </ProtectedRoute>
+                }
+              />
+            ))}
 
             {/* Rotta non trovata */}
             <Route path="*" element={<NotFound />} />

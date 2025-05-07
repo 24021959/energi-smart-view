@@ -6,9 +6,10 @@ import { Menu } from 'lucide-react';
 type AdminHeaderProps = {
   isSidebarOpen: boolean;
   setIsSidebarOpen: (isOpen: boolean) => void;
+  title?: string;
 }
 
-export function AdminHeader({ isSidebarOpen, setIsSidebarOpen }: AdminHeaderProps) {
+export function AdminHeader({ isSidebarOpen, setIsSidebarOpen, title = 'Dashboard Gestore CER' }: AdminHeaderProps) {
   const { authState, logout } = useAuth();
   const user = authState.user;
 
@@ -28,7 +29,7 @@ export function AdminHeader({ isSidebarOpen, setIsSidebarOpen }: AdminHeaderProp
           <Menu size={20} />
           <span className="sr-only">Toggle sidebar</span>
         </Button>
-        <h1 className="text-xl font-bold text-purple-900">Dashboard Gestore CER</h1>
+        <h1 className="text-xl font-bold text-purple-900">{title}</h1>
       </div>
 
       <div className="flex items-center gap-4">

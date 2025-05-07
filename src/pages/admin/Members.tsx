@@ -2,16 +2,14 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { UserPlus } from 'lucide-react';
-import { AdminSidebar } from '@/components/admin/AdminSidebar';
-import { AdminHeader } from '@/components/admin/AdminHeader';
-import { useAuth } from '@/hooks/useAuthContext';
+import { AdminLayout } from '@/layouts/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
 import { MemberListItem } from '@/types/member';
 import MemberTable from '@/components/admin/member/MemberTable';
 import MemberDetailsDialog from '@/components/admin/member/MemberDetailsDialog';
-import MemberFilterBar from '@/components/admin/member/MemberFilterBar';
+import MemberFilterBar, { MemberType } from '@/components/admin/member/MemberFilterBar';
 
 // Dati di esempio aggiornati con il tipo di membro CER
 const membersData: MemberListItem[] = [
@@ -63,8 +61,6 @@ const membersData: MemberListItem[] = [
 ];
 
 export default function Members() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const { authState } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [members, setMembers] = useState<MemberListItem[]>(membersData);
   const [selectedMember, setSelectedMember] = useState<MemberListItem | null>(null);
@@ -115,47 +111,38 @@ export default function Members() {
   };
 
   return (
-    <div className="flex h-screen bg-background">
-      {/* Sidebar */}
-      <AdminSidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
-      
-      {/* Area principale */}
-      <div className="flex flex-col flex-1 overflow-hidden">
-        <AdminHeader isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
-        <main className="flex-1 overflow-y-auto p-4 md:p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold">Membri CER</h1>
-            <Button className="gap-2" asChild>
-              <Link to="/admin/members/add">
-                <UserPlus size={18} />
-                <span>Aggiungi Membro</span>
-              </Link>
-            </Button>
-          </div>
-          
-          <Card>
-            <CardHeader>
-              <CardTitle>Gestione Membri</CardTitle>
-              <CardDescription>
-                Gestisci tutti i membri della comunità energetica rinnovabile.
-              </CardDescription>
-              <MemberFilterBar 
-                searchTerm={searchTerm}
-                onSearchChange={setSearchTerm}
-                memberTypeFilter={memberTypeFilter}
-                onFilterChange={setMemberTypeFilter}
-              />
-            </CardHeader>
-            <CardContent>
-              <MemberTable 
-                members={filteredMembers} 
-                onToggleStatus={toggleMemberStatus}
-                onShowDetails={showMemberDetails}
-              />
-            </CardContent>
-          </Card>
-        </main>
+    <AdminLayout title="Membri CER">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Membri CER</h1>
+        <Button className="gap-2" asChild>
+          <Link to="/admin/members/add">
+            <UserPlus size={18} />
+            <span>Aggiungi Membro</span>
+          </Link>
+        </Button>
       </div>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle>Gestione Membri</CardTitle>
+          <CardDescription>
+            Gestisci tutti i membri della comunità energetica rinnovabile.
+          </CardDescription>
+          <MemberFilterBar 
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            memberTypeFilter={memberTypeFilter}
+            onFilterChange={setMemberTypeFilter}
+          />
+        </CardHeader>
+        <CardContent>
+          <MemberTable 
+            members={filteredMembers} 
+            onToggleStatus={toggleMemberStatus}
+            onShowDetails={showMemberDetails}
+          />
+        </CardContent>
+      </Card>
 
       {/* Dialog per i dettagli del membro */}
       <MemberDetailsDialog 
@@ -163,6 +150,6 @@ export default function Members() {
         onOpenChange={setIsDialogOpen}
         member={selectedMember}
       />
-    </div>
+    </AdminLayout>
   );
 }

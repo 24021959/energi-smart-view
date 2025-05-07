@@ -14,3 +14,8 @@ export interface AuthState {
   isLoading: boolean;
   error: string | null;
 }
+
+export interface LoginFormData {
+  email: string;
+  password: string;
+}
