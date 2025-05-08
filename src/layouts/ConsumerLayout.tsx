@@ -18,7 +18,7 @@ export function ConsumerLayout({ children, title = 'Dashboard Consumatore' }: Co
   return (
     <div className="flex h-screen bg-background">
       {/* Sidebar */}
-      <ConsumerSidebar isOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
+      <ConsumerSidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
       
       {/* Area principale */}
       <div className="flex flex-col flex-1 overflow-hidden">
