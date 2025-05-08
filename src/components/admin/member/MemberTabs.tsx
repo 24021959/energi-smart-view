@@ -33,7 +33,7 @@ const MemberTabs = ({ memberDetail, details }: MemberTabsProps) => {
             memberInfo={{
               email: memberDetail.email,
               phone: details.phone || 'Non specificato',
-              address: details.address,
+              address: details.legalAddress || details.supplyAddress || 'Non specificato',
               fiscalCode: details.fiscalCode || 'Non specificato',
               vatNumber: details.vatNumber || 'Non specificato'
             }}
@@ -54,14 +54,16 @@ const MemberTabs = ({ memberDetail, details }: MemberTabsProps) => {
         
         <TabsContent value="documents">
           <MemberDocuments 
-            documents={details.documents || []}
+            documentsList={details.documents || []}
             memberId={memberDetail.id}
           />
         </TabsContent>
         
         {memberDetail.type === 'owner' && (
           <TabsContent value="properties">
-            <PropertyList ownerId={memberDetail.id} />
+            <PropertyList 
+              propertyOwnerId={memberDetail.id} 
+            />
           </TabsContent>
         )}
       </Tabs>

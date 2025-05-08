@@ -3,21 +3,19 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
-interface MemberAddressProps {
-  legalAddress: string;
-  supplyAddress: string;
-}
-
-interface MemberCredentialsProps {
-  username: string;
+interface MemberInfoProps {
+  email: string;
+  phone: string;
+  address: string;
+  fiscalCode: string;
+  vatNumber: string;
 }
 
 interface MemberAddressCredentialsProps {
-  addresses: MemberAddressProps;
-  credentials: MemberCredentialsProps;
+  memberInfo: MemberInfoProps;
 }
 
-const MemberAddressCredentials = ({ addresses, credentials }: MemberAddressCredentialsProps) => {
+const MemberAddressCredentials = ({ memberInfo }: MemberAddressCredentialsProps) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <Card>
@@ -29,11 +27,7 @@ const MemberAddressCredentials = ({ addresses, credentials }: MemberAddressCrede
           <div className="space-y-3">
             <div>
               <div className="text-sm text-muted-foreground">Indirizzo di residenza/sede legale</div>
-              <div className="font-medium">{addresses.legalAddress}</div>
-            </div>
-            <div>
-              <div className="text-sm text-muted-foreground">Indirizzo di fornitura</div>
-              <div className="font-medium">{addresses.supplyAddress}</div>
+              <div className="font-medium">{memberInfo.address}</div>
             </div>
           </div>
         </CardContent>
@@ -47,13 +41,23 @@ const MemberAddressCredentials = ({ addresses, credentials }: MemberAddressCrede
         <CardContent>
           <div className="space-y-3">
             <div>
-              <div className="text-sm text-muted-foreground">Username</div>
-              <div className="font-medium">{credentials.username}</div>
+              <div className="text-sm text-muted-foreground">Email</div>
+              <div className="font-medium">{memberInfo.email}</div>
             </div>
             <div>
-              <div className="text-sm text-muted-foreground">Password</div>
-              <div className="font-medium">••••••••••</div>
+              <div className="text-sm text-muted-foreground">Telefono</div>
+              <div className="font-medium">{memberInfo.phone}</div>
             </div>
+            <div>
+              <div className="text-sm text-muted-foreground">Codice Fiscale</div>
+              <div className="font-medium">{memberInfo.fiscalCode}</div>
+            </div>
+            {memberInfo.vatNumber && (
+              <div>
+                <div className="text-sm text-muted-foreground">Partita IVA</div>
+                <div className="font-medium">{memberInfo.vatNumber}</div>
+              </div>
+            )}
             <Button variant="outline" size="sm">Reimposta Password</Button>
           </div>
         </CardContent>
