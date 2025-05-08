@@ -28,25 +28,38 @@ export function AdminLayout({ children, title = 'Dashboard Gestore CER' }: Admin
 
   // Verifica se l'utente è autenticato
   if (!user) {
+    console.log("Utente non autenticato, reindirizzamento al login");
     toast({
       variant: "destructive",
       title: "Accesso non autorizzato",
       description: "Effettua il login per accedere alla dashboard"
     });
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/energi-smart-view/login" replace />;
   }
 
   // Verifica se l'utente è un gestore CER
   if (user.role !== 'cer_manager') {
+    console.log(`Utente con ruolo ${user.role} non autorizzato, reindirizzamento`);
     toast({
       variant: "destructive",
       title: "Accesso non autorizzato",
       description: "Non hai i permessi necessari per accedere a questa pagina"
     });
-    return <Navigate to="/" replace />;
+    
+    // Reindirizza in base al ruolo con il basename corretto
+    if (user.role === 'consumer') {
+      return <Navigate to="/energi-smart-view/consumer" replace />;
+    } else if (user.role === 'producer') {
+      return <Navigate to="/energi-smart-view/producer" replace />;
+    } else if (user.role === 'prosumer') {
+      return <Navigate to="/energi-smart-view/prosumer" replace />;
+    } else {
+      return <Navigate to="/energi-smart-view/" replace />;
+    }
   }
 
   // Se l'utente è autenticato e ha il ruolo corretto, mostra il layout
+  console.log("AdminLayout renderizzato correttamente per", user.email);
   return (
     <div className="flex h-screen bg-background">
       {/* Sidebar */}

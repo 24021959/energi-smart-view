@@ -23,35 +23,35 @@ const Index = () => {
   if (!isLoading && user) {
     console.log("Reindirizzamento alla dashboard per il ruolo:", user.role);
     
-    // Reindirizza in base al ruolo
+    // Reindirizza in base al ruolo con il basename corretto
     switch(user.role) {
       case 'cer_manager':
         toast({
           title: "Benvenuto Gestore CER",
           description: "Accesso alla dashboard amministrativa"
         });
-        return <Navigate to="/admin" replace />;
+        return <Navigate to="/energi-smart-view/admin" replace />;
       
       case 'consumer':
         toast({
           title: "Benvenuto Consumatore",
           description: "Accesso alla dashboard consumatore"
         });
-        return <Navigate to="/consumer" replace />;
+        return <Navigate to="/energi-smart-view/consumer" replace />;
       
       case 'producer':
         toast({
           title: "Benvenuto Produttore",
           description: "Accesso alla dashboard produttore"
         });
-        return <Navigate to="/producer" replace />;
+        return <Navigate to="/energi-smart-view/producer" replace />;
       
       case 'prosumer':
         toast({
           title: "Benvenuto Prosumer",
           description: "Accesso alla dashboard prosumer"
         });
-        return <Navigate to="/prosumer" replace />;
+        return <Navigate to="/energi-smart-view/prosumer" replace />;
       
       default:
         console.log("Ruolo sconosciuto, reindirizzo alla pagina principale");

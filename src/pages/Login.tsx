@@ -39,23 +39,23 @@ export default function Login() {
   // Se l'utente è già autenticato, reindirizza
   if (authState.user) {
     console.log("Utente autenticato:", authState.user);
-    // Reindirizza in base al ruolo
+    // Reindirizza in base al ruolo con il basename corretto
     switch(authState.user.role) {
       case 'cer_manager':
-        console.log("Reindirizzamento a /admin");
-        return <Navigate to="/admin" replace />;
+        console.log("Reindirizzamento a /energi-smart-view/admin");
+        return <Navigate to="/energi-smart-view/admin" replace />;
       case 'consumer':
-        console.log("Reindirizzamento a /consumer");
-        return <Navigate to="/consumer" replace />;
+        console.log("Reindirizzamento a /energi-smart-view/consumer");
+        return <Navigate to="/energi-smart-view/consumer" replace />;
       case 'prosumer':
-        console.log("Reindirizzamento a /prosumer");
-        return <Navigate to="/prosumer" replace />;
+        console.log("Reindirizzamento a /energi-smart-view/prosumer");
+        return <Navigate to="/energi-smart-view/prosumer" replace />;
       case 'producer':
-        console.log("Reindirizzamento a /producer");
-        return <Navigate to="/producer" replace />;
+        console.log("Reindirizzamento a /energi-smart-view/producer");
+        return <Navigate to="/energi-smart-view/producer" replace />;
       default:
-        console.log("Reindirizzamento a /");
-        return <Navigate to="/" replace />;
+        console.log("Reindirizzamento a /energi-smart-view/");
+        return <Navigate to="/energi-smart-view/" replace />;
     }
   }
 
@@ -109,6 +109,34 @@ export default function Login() {
             onSubmit={onSubmit}
             isSubmitting={isSubmitting}
           />
+          
+          <div className="mt-4 text-center">
+            <p className="text-sm text-muted-foreground">Credenziali di test:</p>
+            <div className="mt-2 grid grid-cols-2 gap-2 text-xs text-muted-foreground">
+              <div>
+                <p><strong>Consumer:</strong></p>
+                <p>consumer@consumer.it</p>
+                <p>password: consumer</p>
+              </div>
+              <div>
+                <p><strong>Producer:</strong></p>
+                <p>producer@producer.it</p>
+                <p>password: producer</p>
+              </div>
+            </div>
+            <div className="mt-2 grid grid-cols-2 gap-2 text-xs text-muted-foreground">
+              <div>
+                <p><strong>Prosumer:</strong></p>
+                <p>prosumer@prosumer.it</p>
+                <p>password: prosumer</p>
+              </div>
+              <div>
+                <p><strong>Admin/CER:</strong></p>
+                <p>gestore@gestore.it</p>
+                <p>password: gestore</p>
+              </div>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>

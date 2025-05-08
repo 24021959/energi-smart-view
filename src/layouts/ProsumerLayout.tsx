@@ -28,32 +28,37 @@ export function ProsumerLayout({ children, title = 'Dashboard Prosumer' }: Prosu
 
   // Verifica se l'utente è autenticato
   if (!user) {
+    console.log("Utente non autenticato, reindirizzamento al login");
     toast({
       variant: "destructive",
       title: "Accesso non autorizzato",
       description: "Effettua il login per accedere alla dashboard"
     });
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/energi-smart-view/login" replace />;
   }
 
   // Verifica se l'utente è un prosumer
   if (user.role !== 'prosumer') {
+    console.log(`Utente con ruolo ${user.role} non autorizzato, reindirizzamento`);
     toast({
       variant: "destructive",
       title: "Accesso non autorizzato",
       description: "Non hai i permessi necessari per accedere a questa pagina"
     });
     
-    // Reindirizza in base al ruolo
+    // Reindirizza in base al ruolo con il basename corretto
     if (user.role === 'cer_manager') {
-      return <Navigate to="/admin" replace />;
+      return <Navigate to="/energi-smart-view/admin" replace />;
     } else if (user.role === 'consumer') {
-      return <Navigate to="/consumer" replace />;
+      return <Navigate to="/energi-smart-view/consumer" replace />;
+    } else if (user.role === 'producer') {
+      return <Navigate to="/energi-smart-view/producer" replace />;
     } else {
-      return <Navigate to="/" replace />;
+      return <Navigate to="/energi-smart-view/" replace />;
     }
   }
 
+  console.log("ProsumerLayout renderizzato correttamente per", user.email);
   return (
     <div className="flex h-screen bg-background">
       {/* Sidebar */}
