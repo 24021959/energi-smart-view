@@ -44,6 +44,20 @@ const adminRoutes = [
   { path: "/admin/settings", element: <Settings /> },
 ];
 
+// Placeholder pages per gli altri tipi di utenti
+// Nella realtà queste route punterebbero a componenti reali
+const producerRoutes = [
+  { path: "/producer", element: <div className="p-8"><h1 className="text-3xl font-bold">Dashboard Producer</h1></div> }
+];
+
+const consumerRoutes = [
+  { path: "/consumer", element: <div className="p-8"><h1 className="text-3xl font-bold">Dashboard Consumer</h1></div> }
+];
+
+const prosumerRoutes = [
+  { path: "/prosumer", element: <div className="p-8"><h1 className="text-3xl font-bold">Dashboard Prosumer</h1></div> }
+];
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
@@ -67,6 +81,45 @@ const App = () => (
                 path={route.path}
                 element={
                   <ProtectedRoute allowedRoles={['cer_manager']}>
+                    {route.element}
+                  </ProtectedRoute>
+                }
+              />
+            ))}
+            
+            {/* Rotte protette per producer */}
+            {producerRoutes.map((route) => (
+              <Route
+                key={route.path}
+                path={route.path}
+                element={
+                  <ProtectedRoute allowedRoles={['producer']}>
+                    {route.element}
+                  </ProtectedRoute>
+                }
+              />
+            ))}
+            
+            {/* Rotte protette per consumer */}
+            {consumerRoutes.map((route) => (
+              <Route
+                key={route.path}
+                path={route.path}
+                element={
+                  <ProtectedRoute allowedRoles={['consumer']}>
+                    {route.element}
+                  </ProtectedRoute>
+                }
+              />
+            ))}
+            
+            {/* Rotte protette per prosumer */}
+            {prosumerRoutes.map((route) => (
+              <Route
+                key={route.path}
+                path={route.path}
+                element={
+                  <ProtectedRoute allowedRoles={['prosumer']}>
                     {route.element}
                   </ProtectedRoute>
                 }

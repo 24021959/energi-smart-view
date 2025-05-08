@@ -16,7 +16,7 @@ if (import.meta.env.VITE_SUPABASE_ANON_KEY) {
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Utenti demo per test
+// Utenti demo per test con diversi ruoli
 const demoUsers = {
   "utente@utente.it": {
     id: "user-123",
@@ -31,6 +31,27 @@ const demoUsers = {
     password: "gestore",
     role: "cer_manager",
     created_at: new Date().toISOString()
+  },
+  "producer@producer.it": {
+    id: "producer-789",
+    email: "producer@producer.it",
+    password: "producer",
+    role: "producer",
+    created_at: new Date().toISOString()
+  },
+  "consumer@consumer.it": {
+    id: "consumer-012",
+    email: "consumer@consumer.it",
+    password: "consumer",
+    role: "consumer",
+    created_at: new Date().toISOString()
+  },
+  "prosumer@prosumer.it": {
+    id: "prosumer-345",
+    email: "prosumer@prosumer.it",
+    password: "prosumer",
+    role: "prosumer",
+    created_at: new Date().toISOString()
   }
 };
 
@@ -42,7 +63,7 @@ export async function loginUser(email: string, password: string) {
     // Verifica se è un utente demo
     const demoUser = demoUsers[email.toLowerCase()];
     if (demoUser && demoUser.password === password) {
-      console.log("Login demo riuscito per:", email);
+      console.log("Login demo riuscito per:", email, "con ruolo:", demoUser.role);
       return {
         data: {
           user: {

@@ -1,5 +1,5 @@
 
-export type UserRole = 'cer_manager' | 'user';
+export type UserRole = 'cer_manager' | 'user' | 'producer' | 'consumer' | 'prosumer';
 
 export interface UserProfile {
   id: string;

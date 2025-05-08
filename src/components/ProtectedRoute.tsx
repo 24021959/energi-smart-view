@@ -52,8 +52,28 @@ export const ProtectedRoute = ({
       title: "Accesso non autorizzato",
       description: "Non hai i permessi necessari per accedere a questa pagina",
     });
-    // Reindirizza alla home page
-    return <Navigate to="/" replace />;
+    
+    // Reindirizza alla dashboard appropriata in base al ruolo
+    let redirectTo = '/';
+    
+    switch(user.role) {
+      case 'cer_manager':
+        redirectTo = '/admin';
+        break;
+      case 'producer':
+        redirectTo = '/producer';
+        break;
+      case 'consumer':
+        redirectTo = '/consumer';
+        break;
+      case 'prosumer':
+        redirectTo = '/prosumer';
+        break;
+      default:
+        redirectTo = '/';
+    }
+    
+    return <Navigate to={redirectTo} replace />;
   }
 
   // Se è presente il children, renderizzalo, altrimenti usa Outlet

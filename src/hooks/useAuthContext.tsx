@@ -47,7 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               user: {
                 id: user.id,
                 email: user.email || '',
-                role: role as 'cer_manager' | 'user' || 'user', // Fallback al ruolo 'user' se non definito
+                role: role as 'cer_manager' | 'user' | 'producer' | 'consumer' | 'prosumer' || 'user', // Fallback al ruolo 'user' se non definito
                 created_at: user.created_at || new Date().toISOString(),
               },
               isLoading: false,

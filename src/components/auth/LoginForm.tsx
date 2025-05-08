@@ -11,14 +11,12 @@ interface LoginFormProps {
   form: ReturnType<typeof useForm<LoginFormData>>;
   onSubmit: (data: LoginFormData) => Promise<void>;
   isSubmitting: boolean;
-  loginType: 'user' | 'cer_manager';
 }
 
 const LoginForm = ({ 
   form, 
   onSubmit, 
-  isSubmitting,
-  loginType
+  isSubmitting
 }: LoginFormProps) => {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -71,7 +69,7 @@ const LoginForm = ({
         <div className="flex flex-col space-y-2">
           <Button 
             type="submit" 
-            className={`w-full ${loginType === 'cer_manager' ? 'bg-purple-600 hover:bg-purple-700' : ''}`} 
+            className="w-full" 
             disabled={isSubmitting}
           >
             {isSubmitting ? "Accesso in corso..." : "Accedi"}
