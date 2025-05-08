@@ -111,7 +111,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Aggiorno lo stato manualmente per garantire un reindirizzamento corretto
       if (data && data.user) {
         setAuthState({
-          user: data.user as UserProfile,
+          user: {
+            id: data.user.id,
+            email: data.user.email,
+            role: data.user.role,
+            created_at: data.user.created_at
+          },
           isLoading: false,
           error: null
         });

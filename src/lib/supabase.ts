@@ -66,13 +66,7 @@ export async function loginUser(email: string, password: string) {
       console.log("Login demo riuscito per:", email, "con ruolo:", demoUser.role);
       return {
         data: {
-          user: {
-            id: demoUser.id,
-            email: demoUser.email,
-            role: demoUser.role,
-            created_at: demoUser.created_at
-          },
-          session: { access_token: "demo-token" }
+          user: demoUser
         },
         error: null
       };
@@ -125,21 +119,6 @@ export async function getUserRole() {
     
     // Per test, restituisci un ruolo fittizio se non è un utente demo
     return 'user'; // oppure 'cer_manager' per testare accessi admin
-    
-    /* Codice per recuperare il ruolo dal profilo - da implementare quando la tabella sarà creata
-    // Ottieni il ruolo dell'utente dal profilo
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-    
-    if (error || !data) {
-      console.error("Error fetching user role:", error);
-      return null;
-    }
-    return data.role;
-    */
   } catch (err) {
     console.error("Error getting user role:", err);
     return null;

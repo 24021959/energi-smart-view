@@ -53,6 +53,7 @@ export default function Login() {
   const onSubmit = async (data: LoginFormData) => {
     setIsSubmitting(true);
     try {
+      console.log("Tentativo di login con:", data);
       const { success, error } = await login(data.email, data.password);
       if (success) {
         toast({
