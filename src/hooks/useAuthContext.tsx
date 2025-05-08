@@ -1,6 +1,6 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { supabase, getUserRole, loginUser } from '@/lib/supabase';
+import { supabase, getUserRole, loginUser, logoutUser } from '@/lib/supabase';
 import { AuthState, UserProfile } from '@/types/auth';
 import { toast } from '@/hooks/use-toast';
 
@@ -131,7 +131,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = async () => {
     try {
       console.log("Logging out...");
-      await supabase.auth.signOut();
+      await logoutUser();
       console.log("Logout successful");
       
       // Aggiorno lo stato manualmente
