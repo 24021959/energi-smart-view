@@ -8,19 +8,30 @@ export interface WeatherForecastData {
   description: string;
   hourlyForecasts?: HourlyForecastData[];
   dailyForecasts?: DailyForecastData[];
+  uv?: number;
+  pressure?: number;
+  windGust?: number;
 }
 
 export interface HourlyForecastData {
   time: string;
   temperature: number;
   icon: string;
+  windSpeed?: number;
+  windDirection?: number;
+  precipitation?: number;
 }
 
 export interface DailyForecastData {
   day: string;
+  date: string;
   maxTemp: number;
   minTemp: number;
   icon: string;
+  description?: string;
+  windSpeed?: number;
+  precipitation?: number;
+  humidity?: number;
 }
 
 export interface GeoLocation {
@@ -34,6 +45,11 @@ function getDayNameInItalian(dayOffset = 0) {
   const today = new Date();
   today.setDate(today.getDate() + dayOffset);
   return days[today.getDay()];
+}
+
+// Helper function to format date in Italian format
+export function formatDateInItalian(date: Date): string {
+  return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
 }
 
 // Helper function to get wind direction text
@@ -74,6 +90,33 @@ export const estimateSolarProduction = (forecast: WeatherForecastData): number =
   }
   
   return Math.round(basePercentage * seasonalFactor);
+};
+
+// Helper function to estimate wind energy production based on weather
+export const estimateWindProduction = (windSpeed: number): number => {
+  // Wind turbines typically start producing at 3-4 m/s and reach peak at around 12-15 m/s
+  // This is a simplified model for educational purposes
+  
+  const minWindSpeed = 3; // m/s - start producing
+  const optimalWindSpeed = 12; // m/s - peak production
+  const maxWindSpeed = 25; // m/s - cut-off for safety
+  
+  // Convert km/h to m/s if needed
+  const windSpeedMS = windSpeed / 3.6;
+  
+  // No production below minimum wind speed
+  if (windSpeedMS < minWindSpeed) return 0;
+  
+  // Safety cut-off above maximum wind speed
+  if (windSpeedMS > maxWindSpeed) return 0;
+  
+  // Linear scaling between minimum and optimal
+  if (windSpeedMS <= optimalWindSpeed) {
+    return Math.round((windSpeedMS - minWindSpeed) / (optimalWindSpeed - minWindSpeed) * 100);
+  }
+  
+  // Constant production at optimal and slight decrease after optimal
+  return Math.round(100 - ((windSpeedMS - optimalWindSpeed) / (maxWindSpeed - optimalWindSpeed) * 20));
 };
 
 // Function to geocode city name to coordinates
@@ -126,28 +169,39 @@ export const fetchWeatherForecast = async (city: string, province?: string): Pro
     
     // Fetch current weather using OneCall API 3.0
     const apiKey = '72547ec8c6cb00d75320173614534a46'; // API key fornita dall'utente
-    const response = await fetch(`https://api.openweathermap.org/data/3.0/onecall?lat=${location.lat}&lon=${location.lng}&units=metric&appid=${apiKey}`);
+    const response = await fetch(`https://api.openweathermap.org/data/3.0/onecall?lat=${location.lat}&lon=${location.lng}&units=metric&exclude=minutely&lang=it&appid=${apiKey}`);
     
     if (!response.ok) {
-      throw new Error('Weather API error');
+      throw new Error(`Weather API error: ${response.status}`);
     }
     
     const data = await response.json();
     
-    // Format hourly forecasts (next 5 3-hour periods)
-    const hourlyForecasts = data.hourly.slice(0, 5).map((hour: any, index: number) => ({
+    // Format hourly forecasts (next 24 hours, every 3 hours)
+    const hourlyForecasts = data.hourly.slice(0, 8).map((hour: any) => ({
       time: new Date(hour.dt * 1000).getHours().toString().padStart(2, '0') + ':00',
       temperature: Math.round(hour.temp),
-      icon: hour.weather[0].icon
+      icon: hour.weather[0].icon,
+      windSpeed: Math.round(hour.wind_speed * 3.6), // Convert m/s to km/h
+      windDirection: hour.wind_deg,
+      precipitation: hour.pop * 100 // Probability of precipitation in percentage
     }));
     
-    // Format daily forecasts (today + next 4 days)
-    const dailyForecasts = data.daily.slice(0, 5).map((day: any, index: number) => ({
-      day: index === 0 ? 'Oggi' : getDayNameInItalian(index),
-      maxTemp: Math.round(day.temp.max),
-      minTemp: Math.round(day.temp.min),
-      icon: day.weather[0].icon
-    }));
+    // Format daily forecasts (today + next 7 days)
+    const dailyForecasts = data.daily.slice(0, 8).map((day: any, index: number) => {
+      const date = new Date(day.dt * 1000);
+      return {
+        day: index === 0 ? 'Oggi' : getDayNameInItalian(index),
+        date: formatDateInItalian(date),
+        maxTemp: Math.round(day.temp.max),
+        minTemp: Math.round(day.temp.min),
+        icon: day.weather[0].icon,
+        description: day.weather[0].description,
+        windSpeed: Math.round(day.wind_speed * 3.6), // Convert m/s to km/h
+        precipitation: day.pop * 100, // Probability of precipitation in percentage
+        humidity: day.humidity
+      };
+    });
     
     // Current weather
     const current = data.current;
@@ -161,7 +215,10 @@ export const fetchWeatherForecast = async (city: string, province?: string): Pro
       icon: current.weather[0].icon,
       description: current.weather[0].description,
       hourlyForecasts,
-      dailyForecasts
+      dailyForecasts,
+      uv: current.uvi,
+      pressure: current.pressure,
+      windGust: current.wind_gust ? Math.round(current.wind_gust * 3.6) : undefined // Convert m/s to km/h if available
     };
   } catch (error) {
     console.error('Weather forecast error:', error);
@@ -236,7 +293,10 @@ function getSimulatedForecast(): WeatherForecastData {
     hourlyForecasts.push({
       time: hour.toString().padStart(2, '0') + ':00',
       temperature: hourlyTemp,
-      icon: hourlyIcon
+      icon: hourlyIcon,
+      windSpeed: Math.round(windSpeed + (Math.random() * 4 - 2)),
+      windDirection: Math.round(Math.random() * 360),
+      precipitation: Math.round(Math.random() * 30)
     });
   }
   
@@ -246,9 +306,14 @@ function getSimulatedForecast(): WeatherForecastData {
   // Today
   dailyForecasts.push({
     day: 'Oggi',
+    date: formatDateInItalian(now),
     maxTemp: Math.round(currentTemp + tempRange/2),
     minTemp: Math.round(currentTemp - tempRange/2),
-    icon: mainIcon
+    icon: mainIcon,
+    description: description,
+    windSpeed: Math.round(windSpeed + (Math.random() * 5 - 2)),
+    precipitation: Math.round(Math.random() * 40),
+    humidity: Math.round(humidity + (Math.random() * 10 - 5))
   });
   
   // Next 4 days with realistic progression
@@ -257,12 +322,19 @@ function getSimulatedForecast(): WeatherForecastData {
   for (let i = 1; i <= 4; i++) {
     const dayTemp = Math.round(baseTemp + (Math.random() * 6 - 3));
     const dayIcon = weatherProgression[i % weatherProgression.length];
+    const futureDate = new Date();
+    futureDate.setDate(now.getDate() + i);
     
     dailyForecasts.push({
       day: getDayNameInItalian(i),
+      date: formatDateInItalian(futureDate),
       maxTemp: Math.round(dayTemp + tempRange/2),
       minTemp: Math.round(dayTemp - tempRange/2),
-      icon: dayIcon
+      icon: dayIcon,
+      description: description,
+      windSpeed: Math.round(windSpeed + (Math.random() * 5 - 2)),
+      precipitation: Math.round(Math.random() * 40),
+      humidity: Math.round(humidity + (Math.random() * 10 - 5))
     });
   }
 
@@ -275,7 +347,9 @@ function getSimulatedForecast(): WeatherForecastData {
     icon: mainIcon,
     description: description,
     hourlyForecasts: hourlyForecasts,
-    dailyForecasts: dailyForecasts
+    dailyForecasts: dailyForecasts,
+    uv: Math.random() * 7,
+    pressure: 1010 + Math.random() * 5
   };
 }
 
@@ -296,12 +370,4 @@ function getWeatherProgression(startIcon: string): string[] {
   
   const baseIcon = startIcon.substring(0, 2) + 'd';
   return patterns[baseIcon as keyof typeof patterns] || patterns['01d'];
-}
-
-// Type definition for Google Maps API
-declare global {
-  interface Window {
-    initMapForWeather: (() => void) | undefined;
-    google?: any;
-  }
 }

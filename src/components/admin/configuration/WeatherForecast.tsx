@@ -1,8 +1,8 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Sun, Map } from "lucide-react";
-import { fetchWeatherForecast, geocodeCity, WeatherForecastData, GeoLocation } from "@/services/weatherService";
+import { Sun, Map, Wind } from "lucide-react";
+import { fetchWeatherForecast, geocodeCity, WeatherForecastData, GeoLocation, estimateSolarProduction, estimateWindProduction } from "@/services/weatherService";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TodayForecast } from "./weather/TodayForecast";
 import { HourlyForecast } from "./weather/HourlyForecast";
@@ -10,6 +10,7 @@ import { DailyForecast } from "./weather/DailyForecast";
 import { GoogleMap } from "./weather/GoogleMap";
 import { MapWeatherSummary } from "./weather/MapWeatherSummary";
 import { toast } from "@/hooks/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface WeatherForecastProps {
   city: string;
@@ -20,6 +21,7 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
   const [forecast, setForecast] = useState<WeatherForecastData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [location, setLocation] = useState<GeoLocation | null>(null);
+  const [activeTab, setActiveTab] = useState<"overview" | "daily" | "hourly">("overview");
 
   useEffect(() => {
     const loadWeatherData = async () => {
@@ -98,39 +100,50 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {/* Vista combinata: mappa e previsioni meteo */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-            {/* Mappa Google */}
-            <div>
-              {location && <GoogleMap city={city} location={location} />}
-            </div>
+          <Tabs 
+            defaultValue="overview" 
+            value={activeTab} 
+            onValueChange={(value) => setActiveTab(value as "overview" | "daily" | "hourly")}
+            className="w-full mb-6"
+          >
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="overview">Panoramica</TabsTrigger>
+              <TabsTrigger value="daily">Previsioni Giornaliere</TabsTrigger>
+              <TabsTrigger value="hourly">Previsioni Orarie</TabsTrigger>
+            </TabsList>
             
-            {/* Previsioni meteo attuali */}
-            <div>
-              <TodayForecast forecast={forecast} />
-            </div>
-          </div>
-          
-          {/* Weather summary below map */}
-          <MapWeatherSummary 
-            forecast={forecast} 
-            city={city} 
-            province={province}
-          />
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-            {/* Previsioni orarie */}
-            <div>
-              {forecast.hourlyForecasts && 
-                <HourlyForecast hourlyForecasts={forecast.hourlyForecasts} />}
-            </div>
+            <TabsContent value="overview" className="pt-4">
+              {/* Vista combinata: mappa e previsioni meteo */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+                {/* Mappa Google */}
+                <div>
+                  {location && <GoogleMap city={city} location={location} />}
+                </div>
+                
+                {/* Previsioni meteo attuali */}
+                <div>
+                  <TodayForecast forecast={forecast} />
+                </div>
+              </div>
+              
+              {/* Weather summary below map */}
+              <MapWeatherSummary 
+                forecast={forecast} 
+                city={city} 
+                province={province}
+              />
+            </TabsContent>
             
-            {/* Previsioni 5 giorni */}
-            <div>
+            <TabsContent value="daily" className="pt-4">
               {forecast.dailyForecasts && 
                 <DailyForecast forecasts={forecast.dailyForecasts} />}
-            </div>
-          </div>
+            </TabsContent>
+            
+            <TabsContent value="hourly" className="pt-4">
+              {forecast.hourlyForecasts && 
+                <HourlyForecast hourlyForecasts={forecast.hourlyForecasts} />}
+            </TabsContent>
+          </Tabs>
           
           <div className="text-xs text-center mt-4 text-gray-500">
             *La stima della produzione è basata su condizioni meteo previste e può variare. 
