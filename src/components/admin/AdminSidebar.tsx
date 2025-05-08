@@ -7,10 +7,10 @@ import {
   ChevronRight,
   ChevronLeft,
   Settings,
-  ChartBar,
   FileText,
   Zap,
-  List
+  List,
+  BarChart
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -45,7 +45,7 @@ const navItems = [
   {
     title: 'Dati Energetici',
     href: '/admin/energy',
-    icon: ChartBar,
+    icon: BarChart,
   },
   {
     title: 'Report',
