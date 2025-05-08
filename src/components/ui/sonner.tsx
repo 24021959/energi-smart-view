@@ -1,10 +1,14 @@
 
-import * as React from "react"
-import { Toaster as SonnerToaster } from "sonner"
+"use client";
 
-const Toaster = (props: React.ComponentProps<typeof SonnerToaster>) => {
+import { Toaster as SonnerToaster } from "sonner";
+
+type ToasterProps = React.ComponentProps<typeof SonnerToaster>;
+
+export function Toaster({ ...props }: ToasterProps) {
   return (
     <SonnerToaster
+      theme="light"
       className="toaster group"
       toastOptions={{
         classNames: {
@@ -19,8 +23,5 @@ const Toaster = (props: React.ComponentProps<typeof SonnerToaster>) => {
       }}
       {...props}
     />
-  )
+  );
 }
-
-export { Toaster }
-export { toast } from "sonner"

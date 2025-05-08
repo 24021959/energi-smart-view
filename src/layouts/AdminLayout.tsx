@@ -5,6 +5,7 @@ import { AdminHeader } from '@/components/admin/AdminHeader';
 import { useAuth } from '@/hooks/useAuthContext';
 import { Navigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
+import { getFullPath, APP_CONFIG } from '@/lib/config';
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -34,7 +35,7 @@ export function AdminLayout({ children, title = 'Dashboard Gestore CER' }: Admin
       title: "Accesso non autorizzato",
       description: "Effettua il login per accedere alla dashboard"
     });
-    return <Navigate to="/energi-smart-view/login" replace />;
+    return <Navigate to={getFullPath(APP_CONFIG.paths.login)} replace />;
   }
 
   // Verifica se l'utente è un gestore CER
@@ -47,15 +48,8 @@ export function AdminLayout({ children, title = 'Dashboard Gestore CER' }: Admin
     });
     
     // Reindirizza in base al ruolo con il basename corretto
-    if (user.role === 'consumer') {
-      return <Navigate to="/energi-smart-view/consumer" replace />;
-    } else if (user.role === 'producer') {
-      return <Navigate to="/energi-smart-view/producer" replace />;
-    } else if (user.role === 'prosumer') {
-      return <Navigate to="/energi-smart-view/prosumer" replace />;
-    } else {
-      return <Navigate to="/energi-smart-view/" replace />;
-    }
+    const redirectPath = getFullPath(getRedirectPathForRole(user.role));
+    return <Navigate to={redirectPath} replace />;
   }
 
   // Se l'utente è autenticato e ha il ruolo corretto, mostra il layout

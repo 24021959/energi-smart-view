@@ -36,7 +36,8 @@ export const ProtectedRoute = ({
       error, 
       allowedRoles,
       pathname: window.location.pathname,
-      redirectPath
+      redirectPath,
+      fullRedirectPath: getFullPath(redirectPath)
     });
   }, [user, isLoading, error, allowedRoles, redirectPath]);
 
@@ -53,7 +54,10 @@ export const ProtectedRoute = ({
   // If authentication error or no user, redirect to login
   if (error || !user) {
     console.log("Redirecting to login due to:", { error, user });
-    return <Navigate to={redirectPath} replace />;
+    // Make sure we use getFullPath to include the base path
+    const fullRedirectPath = getFullPath(redirectPath);
+    console.log("Full redirect path:", fullRedirectPath);
+    return <Navigate to={fullRedirectPath} replace />;
   }
 
   // If there are allowed roles and user doesn't have the required role
@@ -67,9 +71,10 @@ export const ProtectedRoute = ({
     
     // Redirect to appropriate dashboard based on role
     const redirectTo = getRedirectPathForRole(user.role);
+    const fullRedirectTo = getFullPath(redirectTo);
     
-    console.log("Redirecting user to:", redirectTo);
-    return <Navigate to={redirectTo} replace />;
+    console.log("Redirecting user to:", redirectTo, "Full path:", fullRedirectTo);
+    return <Navigate to={fullRedirectTo} replace />;
   }
 
   // If there's a children component, render it, otherwise use Outlet

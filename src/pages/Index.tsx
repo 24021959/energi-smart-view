@@ -15,11 +15,13 @@ const Index = () => {
   // Handle redirects when user is authenticated
   useEffect(() => {
     console.log("Index page - Current location:", location);
+    console.log("Base path:", APP_CONFIG.basePath);
     
     if (user && !isLoading) {
       console.log("Authenticated user detected in Index page:", user);
       
       const dashboardPath = getRedirectPathForRole(user.role);
+      console.log("Dashboard path for role:", dashboardPath);
       
       let welcomeMessage = "Benvenuto";
       switch(user.role) {
@@ -68,7 +70,7 @@ const Index = () => {
   const handleLoginClick = () => {
     const loginPath = getFullPath(APP_CONFIG.paths.login);
     console.log("Navigating to login page:", loginPath);
-    navigate(APP_CONFIG.paths.login);
+    navigate(loginPath);  // Use full path with basePath
   };
 
   return (

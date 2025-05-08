@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -9,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Logo } from '@/components/Logo';
 import { LoginFormData } from '@/types/auth';
 import LoginForm from '@/components/auth/LoginForm';
-import { getRedirectPathForRole, getFullPath } from '@/lib/config';
+import { getRedirectPathForRole, getFullPath, APP_CONFIG } from '@/lib/config';
 
 // Form validation schema
 const loginSchema = z.object({
@@ -37,7 +38,8 @@ export default function Login() {
       error: authState.error,
       redirecting,
       currentPath: window.location.pathname,
-      fullLocation: location
+      fullLocation: location,
+      basePath: APP_CONFIG.basePath
     });
     
     if (authState.user && !redirecting) {
@@ -46,7 +48,8 @@ export default function Login() {
       
       // Redirect to appropriate dashboard based on role
       const path = getRedirectPathForRole(authState.user.role);
-      console.log(`Login - Redirecting to: ${path} for user with role ${authState.user.role}`);
+      const fullPath = getFullPath(path);
+      console.log(`Login - Redirecting to: ${path} (full path: ${fullPath}) for user with role ${authState.user.role}`);
       
       // Add a small delay to ensure state updates are complete
       setTimeout(() => {
@@ -70,7 +73,8 @@ export default function Login() {
   // If user is already authenticated, redirect
   if (authState.user && !authState.isLoading) {
     const path = getRedirectPathForRole(authState.user.role);
-    console.log(`Automatic redirect to ${path}`);
+    const fullPath = getFullPath(path);
+    console.log(`Automatic redirect to ${path} (full path: ${fullPath})`);
     return <Navigate to={path} replace />;
   }
 

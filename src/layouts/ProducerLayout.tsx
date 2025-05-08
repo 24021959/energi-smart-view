@@ -5,6 +5,7 @@ import { ProducerSidebar } from '@/components/producer/ProducerSidebar';
 import { useAuth } from '@/hooks/useAuthContext';
 import { Navigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
+import { getRedirectPathForRole, getFullPath, APP_CONFIG } from '@/lib/config';
 
 interface ProducerLayoutProps {
   children: ReactNode;
@@ -38,7 +39,7 @@ export function ProducerLayout({ children, title = 'Dashboard Produttore' }: Pro
       title: "Accesso non autorizzato",
       description: "Effettua il login per accedere alla dashboard"
     });
-    return <Navigate to="/energi-smart-view/login" replace />;
+    return <Navigate to={getFullPath(APP_CONFIG.paths.login)} replace />;
   }
 
   // Verifica se l'utente è un produttore
@@ -51,15 +52,8 @@ export function ProducerLayout({ children, title = 'Dashboard Produttore' }: Pro
     });
     
     // Reindirizza in base al ruolo con il basename corretto
-    if (user.role === 'cer_manager') {
-      return <Navigate to="/energi-smart-view/admin" replace />;
-    } else if (user.role === 'consumer') {
-      return <Navigate to="/energi-smart-view/consumer" replace />;
-    } else if (user.role === 'prosumer') {
-      return <Navigate to="/energi-smart-view/prosumer" replace />;
-    } else {
-      return <Navigate to="/energi-smart-view/" replace />;
-    }
+    const redirectPath = getFullPath(getRedirectPathForRole(user.role));
+    return <Navigate to={redirectPath} replace />;
   }
 
   console.log("ProducerLayout renderizzato correttamente per", user.email);

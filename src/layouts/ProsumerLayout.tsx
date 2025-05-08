@@ -5,6 +5,7 @@ import { ProsumerHeader } from '@/components/prosumer/ProsumerHeader';
 import { useAuth } from '@/hooks/useAuthContext';
 import { Navigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
+import { getRedirectPathForRole, getFullPath, APP_CONFIG } from '@/lib/config';
 
 interface ProsumerLayoutProps {
   children: ReactNode;
@@ -34,7 +35,7 @@ export function ProsumerLayout({ children, title = 'Dashboard Prosumer' }: Prosu
       title: "Accesso non autorizzato",
       description: "Effettua il login per accedere alla dashboard"
     });
-    return <Navigate to="/energi-smart-view/login" replace />;
+    return <Navigate to={getFullPath(APP_CONFIG.paths.login)} replace />;
   }
 
   // Verifica se l'utente è un prosumer
@@ -47,15 +48,8 @@ export function ProsumerLayout({ children, title = 'Dashboard Prosumer' }: Prosu
     });
     
     // Reindirizza in base al ruolo con il basename corretto
-    if (user.role === 'cer_manager') {
-      return <Navigate to="/energi-smart-view/admin" replace />;
-    } else if (user.role === 'consumer') {
-      return <Navigate to="/energi-smart-view/consumer" replace />;
-    } else if (user.role === 'producer') {
-      return <Navigate to="/energi-smart-view/producer" replace />;
-    } else {
-      return <Navigate to="/energi-smart-view/" replace />;
-    }
+    const redirectPath = getFullPath(getRedirectPathForRole(user.role));
+    return <Navigate to={redirectPath} replace />;
   }
 
   console.log("ProsumerLayout renderizzato correttamente per", user.email);
