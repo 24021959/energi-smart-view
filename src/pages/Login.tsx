@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Logo } from '@/components/Logo';
 import { LoginFormData } from '@/types/auth';
 import LoginForm from '@/components/auth/LoginForm';
-import { getRedirectPathForRole, APP_CONFIG } from '@/lib/config';
+import { getRedirectPathForRole } from '@/lib/config';
 
 // Form validation schema
 const loginSchema = z.object({
@@ -35,7 +35,8 @@ export default function Login() {
       user: authState.user, 
       isLoading: authState.isLoading,
       error: authState.error,
-      redirecting
+      redirecting,
+      currentPath: window.location.pathname
     });
     
     if (authState.user && !redirecting) {

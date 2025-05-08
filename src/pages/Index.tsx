@@ -1,9 +1,10 @@
+
 import { Logo } from "@/components/Logo";
 import { useAuth } from "@/hooks/useAuthContext";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { toast } from "sonner";
-import { getRedirectPathForRole, APP_CONFIG } from "@/lib/config";
+import { getRedirectPathForRole, APP_CONFIG, getFullPath } from "@/lib/config";
 
 const Index = () => {
   const { authState } = useAuth();

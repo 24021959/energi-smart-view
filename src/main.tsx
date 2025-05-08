@@ -5,11 +5,12 @@ import App from './App.tsx'
 import './index.css'
 import { AuthProvider } from './hooks/useAuthContext'
 import { Toaster } from 'sonner'
+import { APP_CONFIG } from './lib/config'
 
-console.log("Application initializing...");
+console.log("Application initializing with base path:", APP_CONFIG.basePath);
 
 createRoot(document.getElementById("root")!).render(
-  <BrowserRouter>
+  <BrowserRouter basename={APP_CONFIG.basePath}>
     <AuthProvider>
       <App />
       <Toaster position="top-right" />

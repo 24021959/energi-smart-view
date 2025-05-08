@@ -4,7 +4,7 @@ import { useAuth } from '@/hooks/useAuthContext';
 import { UserRole } from '@/types/auth';
 import { useEffect, ReactNode } from 'react';
 import { toast } from 'sonner';
-import { getRedirectPathForRole, APP_CONFIG } from '@/lib/config';
+import { getRedirectPathForRole, APP_CONFIG, getFullPath } from '@/lib/config';
 
 interface ProtectedRouteProps {
   allowedRoles?: UserRole[];
@@ -35,9 +35,10 @@ export const ProtectedRoute = ({
       isLoading, 
       error, 
       allowedRoles,
-      pathname: window.location.pathname 
+      pathname: window.location.pathname,
+      redirectPath
     });
-  }, [user, isLoading, error, allowedRoles]);
+  }, [user, isLoading, error, allowedRoles, redirectPath]);
 
   // Show loader while checking authentication
   if (isLoading) {
