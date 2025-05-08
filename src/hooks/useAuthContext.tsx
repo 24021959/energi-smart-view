@@ -11,6 +11,9 @@ const initialState: AuthState = {
   error: null,
 };
 
+// Chiavi localStorage
+const AUTH_USER_KEY = 'energi-smart-auth-user';
+
 // Creazione del contesto
 const AuthContext = createContext<{
   authState: AuthState;
@@ -31,6 +34,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const checkSession = async () => {
       try {
         console.log("Checking session...");
+        
+        // Prima verifica se c'è un utente in localStorage (per utenti demo)
+        const localUser = localStorage.getItem(AUTH_USER_KEY);
+        if (localUser) {
+          try {
+            const parsedUser = JSON.parse(localUser);
+            console.log("User found in localStorage:", parsedUser);
+            setAuthState({
+              user: parsedUser,
+              isLoading: false,
+              error: null,
+            });
+            return; // Interrompi qui se c'è un utente nel localStorage
+          } catch (e) {
+            console.error("Error parsing user from localStorage:", e);
+            localStorage.removeItem(AUTH_USER_KEY);
+          }
+        }
+        
+        // Se non c'è un utente nel localStorage, verifica con supabase
         const { data: { session } } = await supabase.auth.getSession();
         
         if (session) {
@@ -43,13 +66,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const role = await getUserRole();
             console.log("User role:", role);
             
+            const userProfile = {
+              id: user.id,
+              email: user.email || '',
+              role: role as 'cer_manager' | 'user' | 'producer' | 'consumer' | 'prosumer' || 'user', // Fallback al ruolo 'user' se non definito
+              created_at: user.created_at || new Date().toISOString(),
+            };
+            
             setAuthState({
-              user: {
-                id: user.id,
-                email: user.email || '',
-                role: role as 'cer_manager' | 'user' | 'producer' | 'consumer' | 'prosumer' || 'user', // Fallback al ruolo 'user' se non definito
-                created_at: user.created_at || new Date().toISOString(),
-              },
+              user: userProfile,
               isLoading: false,
               error: null,
             });
@@ -81,6 +106,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (event === 'SIGNED_IN' && session) {
         await checkSession();
       } else if (event === 'SIGNED_OUT') {
+        localStorage.removeItem(AUTH_USER_KEY); // Rimuovi utente dal localStorage al logout
         setAuthState({ ...initialState, isLoading: false });
       }
     });
@@ -110,6 +136,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       // Aggiorno lo stato manualmente per garantire un reindirizzamento corretto
       if (data && data.user) {
+        // Salva l'utente nel localStorage per utenti demo
+        localStorage.setItem(AUTH_USER_KEY, JSON.stringify({
+          id: data.user.id,
+          email: data.user.email,
+          role: data.user.role,
+          created_at: data.user.created_at
+        }));
+        
         setAuthState({
           user: {
             id: data.user.id,
@@ -136,6 +170,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = async () => {
     try {
       console.log("Logging out...");
+      // Rimuovi utente dal localStorage
+      localStorage.removeItem(AUTH_USER_KEY);
       await logoutUser();
       console.log("Logout successful");
       

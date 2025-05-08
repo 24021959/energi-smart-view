@@ -11,7 +11,13 @@ import { Logo } from '@/components/Logo';
 import { ProducerSidebar } from './ProducerSidebar';
 import { toast } from '@/hooks/use-toast';
 
-export function ProducerHeader({ title }: { title?: string }) {
+interface ProducerHeaderProps {
+  isSidebarOpen: boolean;
+  setIsSidebarOpen: (isOpen: boolean) => void;
+  title?: string;
+}
+
+export function ProducerHeader({ isSidebarOpen, setIsSidebarOpen, title = 'Dashboard Produttore' }: ProducerHeaderProps) {
   const { authState, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -46,15 +52,27 @@ export function ProducerHeader({ title }: { title?: string }) {
               <div className="px-4 py-6">
                 <Logo size="sm" />
               </div>
-              <ProducerSidebar onNavClick={() => setIsMenuOpen(false)} />
+              <ProducerSidebar 
+                isOpen={true} 
+                setIsOpen={() => {}} 
+                onNavClick={() => setIsMenuOpen(false)} 
+              />
             </SheetContent>
           </Sheet>
-          <Link to="/producer" className="hidden md:block">
+          <Link to="/energi-smart-view/producer" className="hidden md:block">
             <Logo size="sm" />
           </Link>
           <div className="text-lg font-semibold">{title}</div>
         </div>
         <div className="flex items-center gap-2">
+          <Button 
+            variant="ghost" 
+            size="icon"
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="hidden md:flex"
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-8 flex items-center gap-2">
@@ -67,7 +85,7 @@ export function ProducerHeader({ title }: { title?: string }) {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem asChild>
-                <Link to="/producer/profile">
+                <Link to="/energi-smart-view/producer/profile">
                   <User className="mr-2 h-4 w-4" />
                   <span>Profilo</span>
                 </Link>

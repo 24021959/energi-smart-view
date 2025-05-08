@@ -17,7 +17,7 @@ if (import.meta.env.VITE_SUPABASE_ANON_KEY) {
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Utenti demo per test con diversi ruoli
-const demoUsers = {
+export const demoUsers = {
   "utente@utente.it": {
     id: "user-123",
     email: "utente@utente.it",
@@ -124,5 +124,47 @@ export async function getUserRole() {
   } catch (err) {
     console.error("Error getting user role:", err);
     return null;
+  }
+}
+
+// Crea i tuoi utenti nel database Supabase
+export async function createDemoUsers() {
+  for (const [email, userData] of Object.entries(demoUsers)) {
+    try {
+      const { data: existingUsers, error: fetchError } = await supabase
+        .from('users')
+        .select('email')
+        .eq('email', email);
+      
+      if (fetchError) {
+        console.error(`Error checking if user ${email} exists:`, fetchError);
+        continue;
+      }
+      
+      if (existingUsers && existingUsers.length > 0) {
+        console.log(`User ${email} already exists, skipping creation`);
+        continue;
+      }
+      
+      // Insert user data into Supabase
+      const { error: insertError } = await supabase
+        .from('users')
+        .insert([
+          {
+            id: userData.id,
+            email: userData.email,
+            role: userData.role,
+            created_at: userData.created_at
+          }
+        ]);
+        
+      if (insertError) {
+        console.error(`Error creating user ${email}:`, insertError);
+      } else {
+        console.log(`Demo user ${email} created successfully`);
+      }
+    } catch (err) {
+      console.error(`Error processing user ${email}:`, err);
+    }
   }
 }

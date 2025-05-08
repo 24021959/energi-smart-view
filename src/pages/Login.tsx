@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -26,6 +26,37 @@ export default function Login() {
   const { authState, login } = useAuth();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [redirectTo, setRedirectTo] = useState<string | null>(null);
+
+  // Debug auth state changes
+  useEffect(() => {
+    console.log("Login - Auth state changed:", { user: authState.user, isLoading: authState.isLoading });
+    
+    if (authState.user) {
+      // Determina la dashboard appropriata in base al ruolo
+      let path = '/energi-smart-view/';
+      
+      switch(authState.user.role) {
+        case 'cer_manager':
+          path = '/energi-smart-view/admin';
+          break;
+        case 'consumer':
+          path = '/energi-smart-view/consumer';
+          break;
+        case 'prosumer':
+          path = '/energi-smart-view/prosumer';
+          break;
+        case 'producer':
+          path = '/energi-smart-view/producer';
+          break;
+        default:
+          path = '/energi-smart-view/';
+      }
+      
+      console.log(`Login - Impostando reindirizzamento a: ${path} per utente con ruolo ${authState.user.role}`);
+      setRedirectTo(path);
+    }
+  }, [authState.user, authState.isLoading]);
 
   // Configurazione del form con react-hook-form
   const form = useForm<LoginFormData>({
@@ -37,26 +68,9 @@ export default function Login() {
   });
 
   // Se l'utente è già autenticato, reindirizza
-  if (authState.user) {
-    console.log("Utente autenticato:", authState.user);
-    // Reindirizza in base al ruolo con il basename corretto
-    switch(authState.user.role) {
-      case 'cer_manager':
-        console.log("Reindirizzamento a /energi-smart-view/admin");
-        return <Navigate to="/energi-smart-view/admin" replace />;
-      case 'consumer':
-        console.log("Reindirizzamento a /energi-smart-view/consumer");
-        return <Navigate to="/energi-smart-view/consumer" replace />;
-      case 'prosumer':
-        console.log("Reindirizzamento a /energi-smart-view/prosumer");
-        return <Navigate to="/energi-smart-view/prosumer" replace />;
-      case 'producer':
-        console.log("Reindirizzamento a /energi-smart-view/producer");
-        return <Navigate to="/energi-smart-view/producer" replace />;
-      default:
-        console.log("Reindirizzamento a /energi-smart-view/");
-        return <Navigate to="/energi-smart-view/" replace />;
-    }
+  if (redirectTo) {
+    console.log(`Esecuzione reindirizzamento a ${redirectTo}`);
+    return <Navigate to={redirectTo} replace />;
   }
 
   // Gestione del submit del form
@@ -72,7 +86,7 @@ export default function Login() {
         });
         
         // Il reindirizzamento verrà gestito automaticamente in base al ruolo dell'utente
-        // dal controllo in cima a questa funzione quando authState.user sarà aggiornato
+        // tramite l'effect che monitora authState.user
       } else {
         toast({
           variant: "destructive",

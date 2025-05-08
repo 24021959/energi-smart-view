@@ -1,5 +1,5 @@
 
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
 import { ProducerHeader } from '@/components/producer/ProducerHeader';
 import { ProducerSidebar } from '@/components/producer/ProducerSidebar';
 import { useAuth } from '@/hooks/useAuthContext';
@@ -15,6 +15,10 @@ export function ProducerLayout({ children, title = 'Dashboard Produttore' }: Pro
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const { authState } = useAuth();
   const { user, isLoading } = authState;
+  
+  useEffect(() => {
+    console.log("ProducerLayout - Auth state:", { user, isLoading });
+  }, [user, isLoading]);
   
   // Mostra un loader mentre verifica l'autenticazione
   if (isLoading) {
@@ -62,7 +66,10 @@ export function ProducerLayout({ children, title = 'Dashboard Produttore' }: Pro
   return (
     <div className="flex h-screen bg-background">
       {/* Sidebar */}
-      <ProducerSidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
+      <ProducerSidebar 
+        isOpen={isSidebarOpen} 
+        setIsOpen={setIsSidebarOpen} 
+      />
       
       {/* Area principale */}
       <div className="flex flex-col flex-1 overflow-hidden">
