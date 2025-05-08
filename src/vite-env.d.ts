@@ -6,4 +6,13 @@ declare interface Window {
   google: any;
 }
 
-declare const google: any;
+declare namespace google {
+  namespace maps {
+    class Map {
+      constructor(element: HTMLElement, options: any);
+    }
+    class Marker {
+      constructor(options: any);
+    }
+  }
+}

@@ -18,7 +18,7 @@ export function GoogleMap({ city, location }: GoogleMapProps) {
   
   useEffect(() => {
     const apiKey = 'AIzaSyCvR92r28e114VivIzlQHWlLomEJ_gqzJg';
-    let mapInstance: google.maps.Map | null = null;
+    let mapInstance: any = null;
 
     const initializeMap = async () => {
       try {
@@ -31,13 +31,12 @@ export function GoogleMap({ city, location }: GoogleMapProps) {
         const loader = new Loader({
           apiKey,
           version: "weekly",
-          libraries: ["maps"]
         });
 
         // Load the Google Maps API
         await loader.load();
         
-        // Access the Maps JavaScript API
+        // Create a map instance
         mapInstance = new window.google.maps.Map(mapContainerRef.current, {
           center: { lat: location.lat, lng: location.lng },
           zoom: 14,
