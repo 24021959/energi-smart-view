@@ -70,7 +70,9 @@ export function useAuthSession() {
     });
 
     return () => {
-      authListener.data.subscription.unsubscribe();
+      if (authListener && authListener.data && authListener.data.subscription) {
+        authListener.data.subscription.unsubscribe();
+      }
     };
   }, []);
 

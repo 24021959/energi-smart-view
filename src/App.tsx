@@ -1,7 +1,8 @@
 
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { APP_CONFIG } from "@/lib/config";
 
 // Le pagine pubbliche
 import Index from "@/pages/Index";
@@ -44,6 +45,8 @@ import ProducerBills from "@/pages/producer/ProducerBills";
 import ProducerProduction from "@/pages/producer/ProducerProduction";
 
 export default function App() {
+  console.log("App rendering with base path:", APP_CONFIG.basePath);
+  
   return (
     <>
       <Toaster />

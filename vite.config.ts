@@ -15,14 +15,18 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
       // Conditional dynamic plugin for development mode
       mode === 'development' && {
         name: 'dynamic-lovable-tagger',
-        configResolved: async (config: ResolvedConfig): Promise<void> => {
+        configResolved: (config: ResolvedConfig) => {
           try {
-            const module = await import('lovable-tagger');
-            if (module && typeof module.componentTagger === 'function') {
-              const plugin = module.componentTagger();
-              // Call the plugin's hooks manually if needed
-              return;
-            }
+            // Import only in development mode
+            import('lovable-tagger')
+              .then((module) => {
+                if (module && typeof module.componentTagger === 'function') {
+                  console.log('Lovable tagger plugin loaded successfully');
+                }
+              })
+              .catch((e) => {
+                console.warn('Failed to load lovable-tagger:', e);
+              });
           } catch (e) {
             console.warn('Failed to load lovable-tagger:', e);
           }

@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { Navigate, useNavigate, useLocation } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -26,7 +26,6 @@ const loginSchema = z.object({
 export default function Login() {
   const { authState, login } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [redirecting, setRedirecting] = useState(false);
 
@@ -37,7 +36,8 @@ export default function Login() {
       isLoading: authState.isLoading,
       error: authState.error,
       currentPath: window.location.pathname,
-      basePath: APP_CONFIG.basePath
+      basePath: APP_CONFIG.basePath,
+      redirecting
     });
     
     if (authState.user && !redirecting && !authState.isLoading) {

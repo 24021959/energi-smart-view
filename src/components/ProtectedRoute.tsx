@@ -27,9 +27,10 @@ export const ProtectedRoute = ({
       isLoading, 
       error, 
       allowedRoles,
-      pathname: window.location.pathname
+      pathname: window.location.pathname,
+      redirectPath
     });
-  }, [user, isLoading, error, allowedRoles]);
+  }, [user, isLoading, error, allowedRoles, redirectPath]);
 
   useEffect(() => {
     if (error) {
@@ -51,7 +52,7 @@ export const ProtectedRoute = ({
 
   // If authentication error or no user, redirect to login
   if (error || !user) {
-    console.log("ProtectedRoute - No user, redirecting to login");
+    console.log("ProtectedRoute - No user, redirecting to login:", redirectPath);
     return <Navigate to={redirectPath} replace />;
   }
 
@@ -70,6 +71,7 @@ export const ProtectedRoute = ({
     return <Navigate to={redirectTo} replace />;
   }
 
+  console.log("ProtectedRoute - User authorized, rendering content");
   // If there's a children component, render it, otherwise use Outlet
   return children ? <>{children}</> : <Outlet />;
 };
