@@ -198,15 +198,15 @@ export function PlantTable() {
                   </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
+                      <DropdownMenuTrigger>
                         <Button variant="ghost" className="h-8 w-8 p-0">
                           <span className="sr-only">Apri menù</span>
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
+                      <DropdownMenuContent>
                         <DropdownMenuLabel>Azioni</DropdownMenuLabel>
-                        <DropdownMenuItem asChild>
+                        <DropdownMenuItem>
                           <Link to={`/admin/plants/edit/${plant.id}`} className="flex cursor-pointer items-center">
                             <Edit className="mr-2 h-4 w-4" /> Modifica
                           </Link>
@@ -218,7 +218,7 @@ export function PlantTable() {
                           <Trash2 className="mr-2 h-4 w-4" /> Elimina
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem asChild>
+                        <DropdownMenuItem>
                           <Link to={`/admin/plants/${plant.id}`} className="flex cursor-pointer items-center">
                             Visualizza Dettagli
                           </Link>

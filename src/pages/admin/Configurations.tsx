@@ -53,13 +53,13 @@ export default function Configurations() {
             </div>
             
             <DropdownMenu>
-              <DropdownMenuTrigger asChild>
+              <DropdownMenuTrigger>
                 <Button variant="outline" className="flex items-center gap-2">
                   <Filter className="h-4 w-4" />
                   {activeFilter ? configurationTypes.find(t => t.value === activeFilter)?.label : 'Filtro'}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuContent className="w-48">
                 <DropdownMenuItem onClick={() => handleFilterSelect('all')}>
                   Tutti i tipi
                 </DropdownMenuItem>

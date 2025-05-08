@@ -64,12 +64,10 @@ export function AddMemberToConfigDialog({ configId }: AddMemberToConfigDialogPro
   
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button size="sm">
-          <Plus className="h-4 w-4 mr-1" />
-          Aggiungi Partecipante
-        </Button>
-      </DialogTrigger>
+      <Button size="sm" onClick={() => setIsOpen(true)}>
+        <Plus className="h-4 w-4 mr-1" />
+        Aggiungi Partecipante
+      </Button>
       <DialogContent className="sm:max-w-[800px]">
         <DialogHeader>
           <DialogTitle>Aggiungi Partecipanti alla Configurazione</DialogTitle>

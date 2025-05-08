@@ -8,8 +8,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
-  DialogTrigger
+  DialogFooter
 } from '@/components/ui/dialog';
 import { Home, Plus, User, UserPlus, Edit, Trash2 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
@@ -98,12 +97,10 @@ export default function PropertyList({ propertyOwnerId, memberId }: PropertyList
         </h3>
         {isOwner && (
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm" className="gap-1">
-                <Plus size={16} />
-                Aggiungi Proprietà
-              </Button>
-            </DialogTrigger>
+            <Button size="sm" className="gap-1" onClick={() => setIsAddDialogOpen(true)}>
+              <Plus size={16} />
+              Aggiungi Proprietà
+            </Button>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Aggiungi Nuova Proprietà</DialogTitle>

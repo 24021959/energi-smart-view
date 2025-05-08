@@ -22,7 +22,5 @@ const Toaster = (props: React.ComponentProps<typeof SonnerToaster>) => {
   )
 }
 
-// Import toast from our hooks
-import { toast } from "@/hooks/use-toast"
-
-export { Toaster, toast }
+export { Toaster }
+export { toast } from "sonner"
