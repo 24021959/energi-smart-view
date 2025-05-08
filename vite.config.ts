@@ -15,18 +15,20 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
       // Conditional dynamic plugin for development mode
       mode === 'development' && {
         name: 'dynamic-lovable-tagger',
-        configResolved: async () => {
+        configResolved: async (config) => {
           try {
             const module = await import('lovable-tagger');
             if (module && typeof module.componentTagger === 'function') {
-              return module.componentTagger();
+              const plugin = module.componentTagger();
+              // Call the plugin's hooks manually if needed
+              return;
             }
           } catch (e) {
             console.warn('Failed to load lovable-tagger:', e);
           }
         }
       },
-    ].filter(Boolean),
+    ].filter(Boolean) as Plugin[],
     server: {
       port: 8080,
       allowedHosts: ['1df53166-26c0-4851-ac01-243a6176645c.lovableproject.com']
