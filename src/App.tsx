@@ -48,6 +48,7 @@ export default function App() {
     <>
       <Toaster />
       <Routes>
+        {/* Public Routes */}
         <Route path="/" element={<Index />} />
         <Route path="login" element={<Login />} />
         
@@ -67,8 +68,6 @@ export default function App() {
         <Route path="admin/energy" element={<ProtectedRoute allowedRoles={['cer_manager']}><EnergyData /></ProtectedRoute>} />
         <Route path="admin/reports" element={<ProtectedRoute allowedRoles={['cer_manager']}><Reports /></ProtectedRoute>} />
         <Route path="admin/settings" element={<ProtectedRoute allowedRoles={['cer_manager']}><Settings /></ProtectedRoute>} />
-        
-        {/* Rotte per la gestione delle proprietà */}
         <Route path="admin/properties" element={<ProtectedRoute allowedRoles={['cer_manager']}><Properties /></ProtectedRoute>} />
         <Route path="admin/properties/add" element={<ProtectedRoute allowedRoles={['cer_manager']}><AddProperty /></ProtectedRoute>} />
         <Route path="admin/properties/:id" element={<ProtectedRoute allowedRoles={['cer_manager']}><PropertyDetail /></ProtectedRoute>} />

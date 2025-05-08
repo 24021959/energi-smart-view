@@ -14,7 +14,7 @@ interface ProtectedRouteProps {
 export const ProtectedRoute = ({ 
   allowedRoles, 
   children, 
-  redirectPath = '/energi-smart-view/login' 
+  redirectPath = '/login' 
 }: ProtectedRouteProps) => {
   const { authState } = useAuth();
   const { user, isLoading, error } = authState;
@@ -29,9 +29,15 @@ export const ProtectedRoute = ({
     }
   }, [error]);
 
-  // Debugging
+  // Log per debugging
   useEffect(() => {
-    console.log("ProtectedRoute - Stato auth:", { user, isLoading, error, allowedRoles });
+    console.log("ProtectedRoute - Auth state:", { 
+      user, 
+      isLoading, 
+      error, 
+      allowedRoles,
+      pathname: window.location.pathname 
+    });
   }, [user, isLoading, error, allowedRoles]);
 
   // Mostra un loader mentre verifica l'autenticazione
@@ -46,13 +52,14 @@ export const ProtectedRoute = ({
 
   // Se c'è un errore di autenticazione o non c'è un utente, reindirizza al login
   if (error || !user) {
-    console.log("Reindirizzamento al login:", { error, user });
+    console.log("Redirecting to login due to:", { error, user });
     return <Navigate to={redirectPath} replace />;
   }
 
   // Se ci sono ruoli consentiti e l'utente non ha il ruolo adeguato
   if (allowedRoles && !allowedRoles.includes(user.role)) {
-    console.log("Utente non ha il ruolo richiesto", { userRole: user.role, allowedRoles });
+    console.log("User does not have required role", { userRole: user.role, allowedRoles });
+    
     // Mostra un toast per informare l'utente
     toast({
       variant: "destructive",
@@ -61,26 +68,26 @@ export const ProtectedRoute = ({
     });
     
     // Reindirizza alla dashboard appropriata in base al ruolo
-    let redirectTo = '/energi-smart-view/';
+    let redirectTo = '/';
     
     switch(user.role) {
       case 'cer_manager':
-        redirectTo = '/energi-smart-view/admin';
+        redirectTo = '/admin';
         break;
       case 'producer':
-        redirectTo = '/energi-smart-view/producer';
+        redirectTo = '/producer';
         break;
       case 'consumer':
-        redirectTo = '/energi-smart-view/consumer';
+        redirectTo = '/consumer';
         break;
       case 'prosumer':
-        redirectTo = '/energi-smart-view/prosumer';
+        redirectTo = '/prosumer';
         break;
       default:
-        redirectTo = '/energi-smart-view/';
+        redirectTo = '/';
     }
     
-    console.log("Reindirizzamento a:", redirectTo);
+    console.log("Redirecting user to:", redirectTo);
     return <Navigate to={redirectTo} replace />;
   }
 

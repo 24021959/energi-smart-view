@@ -66,12 +66,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const role = await getUserRole();
             console.log("User role:", role);
             
-            const userProfile = {
+            const userProfile: UserProfile = {
               id: user.id,
               email: user.email || '',
               role: role as 'cer_manager' | 'user' | 'producer' | 'consumer' | 'prosumer' || 'user', // Fallback al ruolo 'user' se non definito
               created_at: user.created_at || new Date().toISOString(),
             };
+            
+            // Salva anche in localStorage per maggiore persistenza
+            localStorage.setItem(AUTH_USER_KEY, JSON.stringify(userProfile));
             
             setAuthState({
               user: userProfile,
@@ -134,27 +137,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       console.log("Login successful:", data);
       
-      // Aggiorno lo stato manualmente per garantire un reindirizzamento corretto
-      if (data && data.user) {
-        // Salva l'utente nel localStorage per utenti demo
-        localStorage.setItem(AUTH_USER_KEY, JSON.stringify({
-          id: data.user.id,
-          email: data.user.email,
-          role: data.user.role,
-          created_at: data.user.created_at
-        }));
-        
-        setAuthState({
-          user: {
-            id: data.user.id,
-            email: data.user.email,
-            role: data.user.role,
-            created_at: data.user.created_at
-          },
-          isLoading: false,
-          error: null
-        });
+      if (!data || !data.user) {
+        console.error("No user data returned from login");
+        return { 
+          success: false,
+          error: 'Dati utente non trovati'
+        };
       }
+      
+      // Creo un oggetto completo del profilo utente
+      const userProfile: UserProfile = {
+        id: data.user.id,
+        email: data.user.email || '',
+        role: data.user.role as 'cer_manager' | 'user' | 'producer' | 'consumer' | 'prosumer',
+        created_at: data.user.created_at || new Date().toISOString()
+      };
+      
+      console.log("User profile created:", userProfile);
+      
+      // Salvo l'utente nel localStorage per persistenza
+      localStorage.setItem(AUTH_USER_KEY, JSON.stringify(userProfile));
+      
+      // Aggiorno lo stato di autenticazione
+      setAuthState({
+        user: userProfile,
+        isLoading: false,
+        error: null
+      });
       
       return { success: true };
     } catch (error) {

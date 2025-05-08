@@ -1,5 +1,6 @@
 
 import { createClient } from '@supabase/supabase-js';
+import { UserRole } from '@/types/auth';
 
 // Valori fittizi per test
 let supabaseUrl = 'https://yoursupabaseurl.supabase.co';
@@ -16,8 +17,17 @@ if (import.meta.env.VITE_SUPABASE_ANON_KEY) {
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
+// Tipizzazione per gli utenti demo
+interface DemoUser {
+  id: string;
+  email: string;
+  password: string;
+  role: UserRole;
+  created_at: string;
+}
+
 // Utenti demo per test con diversi ruoli
-export const demoUsers = {
+export const demoUsers: Record<string, DemoUser> = {
   "utente@utente.it": {
     id: "user-123",
     email: "utente@utente.it",
@@ -120,7 +130,7 @@ export async function getUserRole() {
     
     // Per test, restituisci un ruolo fittizio se non è un utente demo
     console.log("Nessun utente demo trovato, restituisco ruolo default");
-    return 'user'; // oppure 'cer_manager' per testare accessi admin
+    return 'user'; 
   } catch (err) {
     console.error("Error getting user role:", err);
     return null;

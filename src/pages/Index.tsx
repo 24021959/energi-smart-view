@@ -1,65 +1,55 @@
 
 import { Logo } from "@/components/Logo";
 import { useAuth } from "@/hooks/useAuthContext";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 
 const Index = () => {
   const { authState } = useAuth();
   const { user, isLoading } = authState;
+  const navigate = useNavigate();
 
-  // Aggiunge log per debug
+  // Gestisce i reindirizzamenti quando l'utente è autenticato
   useEffect(() => {
-    if (user) {
-      console.log("Utente autenticato in Index.tsx:", user);
-      console.log("Ruolo utente:", user.role);
-    } else {
-      console.log("Nessun utente autenticato in Index.tsx");
+    if (user && !isLoading) {
+      console.log("Authenticated user detected in Index page:", user);
+      
+      let dashboardPath = '/';
+      let welcomeMessage = "Benvenuto";
+      
+      switch(user.role) {
+        case 'cer_manager':
+          dashboardPath = '/admin';
+          welcomeMessage = "Benvenuto Gestore CER";
+          break;
+        case 'consumer':
+          dashboardPath = '/consumer';
+          welcomeMessage = "Benvenuto Consumatore";
+          break;
+        case 'prosumer':
+          dashboardPath = '/prosumer';
+          welcomeMessage = "Benvenuto Prosumer";
+          break;
+        case 'producer':
+          dashboardPath = '/producer';
+          welcomeMessage = "Benvenuto Produttore";
+          break;
+      }
+      
+      // Mostra un toast di benvenuto
+      toast({
+        title: welcomeMessage,
+        description: "Accesso alla dashboard"
+      });
+      
+      // Naviga alla dashboard appropriata
+      console.log("Redirecting to dashboard:", dashboardPath);
+      navigate(dashboardPath, { replace: true });
     }
-  }, [user]);
+  }, [user, isLoading, navigate]);
 
-  // Se l'utente è autenticato, reindirizzalo alla dashboard appropriata
-  if (!isLoading && user) {
-    console.log("Reindirizzamento alla dashboard per il ruolo:", user.role);
-    
-    // Reindirizza in base al ruolo con il basename corretto
-    switch(user.role) {
-      case 'cer_manager':
-        toast({
-          title: "Benvenuto Gestore CER",
-          description: "Accesso alla dashboard amministrativa"
-        });
-        return <Navigate to="/energi-smart-view/admin" replace />;
-      
-      case 'consumer':
-        toast({
-          title: "Benvenuto Consumatore",
-          description: "Accesso alla dashboard consumatore"
-        });
-        return <Navigate to="/energi-smart-view/consumer" replace />;
-      
-      case 'producer':
-        toast({
-          title: "Benvenuto Produttore",
-          description: "Accesso alla dashboard produttore"
-        });
-        return <Navigate to="/energi-smart-view/producer" replace />;
-      
-      case 'prosumer':
-        toast({
-          title: "Benvenuto Prosumer",
-          description: "Accesso alla dashboard prosumer"
-        });
-        return <Navigate to="/energi-smart-view/prosumer" replace />;
-      
-      default:
-        console.log("Ruolo sconosciuto, reindirizzo alla pagina principale");
-        return null;
-    }
-  }
-
-  // Se stiamo ancora caricando, mostra un indicatore (opzionale)
+  // Se stiamo ancora caricando, mostra un indicatore
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -71,7 +61,12 @@ const Index = () => {
     );
   }
 
-  // Se l'utente non è autenticato, mostra la pagina di benvenuto normale
+  // Se l'utente è autenticato, il reindirizzamento sarà gestito dall'effect
+  // Se l'utente non è autenticato, mostra la pagina di benvenuto
+  if (user) {
+    return null; // L'effect si occuperà del reindirizzamento
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header with Logo */}
@@ -80,6 +75,14 @@ const Index = () => {
           <div className="flex items-center gap-3">
             <Logo size="sm" />
             <h1 className="text-xl font-bold text-gray-800">Energy Smart</h1>
+          </div>
+          <div>
+            <button 
+              onClick={() => navigate('/login')} 
+              className="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90 transition-colors"
+            >
+              Accedi
+            </button>
           </div>
         </div>
       </header>

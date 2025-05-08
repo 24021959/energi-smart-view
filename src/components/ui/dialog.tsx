@@ -46,7 +46,6 @@ const DialogContent = React.forwardRef<
 ))
 DialogContent.displayName = "DialogContent"
 
-// Add missing Dialog components
 const DialogHeader = ({
   className,
   ...props
@@ -95,8 +94,8 @@ DialogDescription.displayName = "DialogDescription"
 
 const DialogTrigger = React.forwardRef<
   HTMLButtonElement,
-  React.ButtonHTMLAttributes<HTMLButtonElement> & { asChild?: boolean }
->(({ className, asChild = false, ...props }, ref) => (
+  React.ButtonHTMLAttributes<HTMLButtonElement>
+>(({ className, ...props }, ref) => (
   <button
     ref={ref}
     className={cn("", className)}

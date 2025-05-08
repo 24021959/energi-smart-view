@@ -7,7 +7,7 @@ import { AuthProvider } from './hooks/useAuthContext'
 import { Toaster } from './components/ui/toaster'
 
 createRoot(document.getElementById("root")!).render(
-  <BrowserRouter basename="/energi-smart-view/">
+  <BrowserRouter>
     <AuthProvider>
       <App />
       <Toaster />

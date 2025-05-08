@@ -26,37 +26,45 @@ export default function Login() {
   const { authState, login } = useAuth();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [redirectTo, setRedirectTo] = useState<string | null>(null);
 
   // Debug auth state changes
   useEffect(() => {
-    console.log("Login - Auth state changed:", { user: authState.user, isLoading: authState.isLoading });
+    console.log("Login component - Auth state changed:", { 
+      user: authState.user, 
+      isLoading: authState.isLoading,
+      error: authState.error
+    });
     
     if (authState.user) {
       // Determina la dashboard appropriata in base al ruolo
-      let path = '/energi-smart-view/';
-      
-      switch(authState.user.role) {
-        case 'cer_manager':
-          path = '/energi-smart-view/admin';
-          break;
-        case 'consumer':
-          path = '/energi-smart-view/consumer';
-          break;
-        case 'prosumer':
-          path = '/energi-smart-view/prosumer';
-          break;
-        case 'producer':
-          path = '/energi-smart-view/producer';
-          break;
-        default:
-          path = '/energi-smart-view/';
-      }
-      
-      console.log(`Login - Impostando reindirizzamento a: ${path} per utente con ruolo ${authState.user.role}`);
-      setRedirectTo(path);
+      redirectToUserDashboard(authState.user.role);
     }
   }, [authState.user, authState.isLoading]);
+
+  // Funzione di reindirizzamento
+  const redirectToUserDashboard = (role: string) => {
+    let path = '/';
+    
+    switch(role) {
+      case 'cer_manager':
+        path = '/admin';
+        break;
+      case 'consumer':
+        path = '/consumer';
+        break;
+      case 'prosumer':
+        path = '/prosumer';
+        break;
+      case 'producer':
+        path = '/producer';
+        break;
+      default:
+        path = '/';
+    }
+    
+    console.log(`Login - Reindirizzamento a: ${path} per utente con ruolo ${role}`);
+    navigate(path, { replace: true });
+  };
 
   // Configurazione del form con react-hook-form
   const form = useForm<LoginFormData>({
@@ -68,9 +76,17 @@ export default function Login() {
   });
 
   // Se l'utente è già autenticato, reindirizza
-  if (redirectTo) {
-    console.log(`Esecuzione reindirizzamento a ${redirectTo}`);
-    return <Navigate to={redirectTo} replace />;
+  if (authState.user && !authState.isLoading) {
+    const path = {
+      cer_manager: '/admin',
+      consumer: '/consumer',
+      prosumer: '/prosumer',
+      producer: '/producer',
+      user: '/'
+    }[authState.user.role] || '/';
+    
+    console.log(`Reindirizzamento automatico a ${path}`);
+    return <Navigate to={path} replace />;
   }
 
   // Gestione del submit del form
@@ -79,14 +95,13 @@ export default function Login() {
     try {
       console.log("Tentativo di login con:", data);
       const { success, error } = await login(data.email, data.password);
+      
       if (success) {
         toast({
           title: "Accesso effettuato",
           description: `Benvenuto nel sistema EnergiSmart`
         });
-        
-        // Il reindirizzamento verrà gestito automaticamente in base al ruolo dell'utente
-        // tramite l'effect che monitora authState.user
+        // Il reindirizzamento verrà gestito dall'effect che monitora authState.user
       } else {
         toast({
           variant: "destructive",

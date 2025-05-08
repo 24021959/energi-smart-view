@@ -3,7 +3,6 @@ import * as React from "react"
 import { Toaster as SonnerToaster } from "sonner"
 
 const Toaster = (props: React.ComponentProps<typeof SonnerToaster>) => {
-  // Use a more simplified version that doesn't depend on next-themes
   return (
     <SonnerToaster
       className="toaster group"
@@ -23,7 +22,7 @@ const Toaster = (props: React.ComponentProps<typeof SonnerToaster>) => {
   )
 }
 
-// Import toast from our toast hook
+// Import toast from our hooks
 import { toast } from "@/hooks/use-toast"
 
 export { Toaster, toast }
