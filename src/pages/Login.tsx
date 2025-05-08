@@ -19,7 +19,7 @@ const loginSchema = z.object({
   password: z.string().min(6, {
     message: 'Password deve contenere almeno 6 caratteri'
   })
-}) satisfies z.ZodType<LoginFormData>;
+}) as z.ZodType<LoginFormData>;
 
 // Componente principale Login
 export default function Login() {

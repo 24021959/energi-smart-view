@@ -113,11 +113,13 @@ export async function getUserRole() {
     if (user.email) {
       const demoUser = demoUsers[user.email.toLowerCase()];
       if (demoUser) {
+        console.log("Utente demo trovato con ruolo:", demoUser.role);
         return demoUser.role;
       }
     }
     
     // Per test, restituisci un ruolo fittizio se non è un utente demo
+    console.log("Nessun utente demo trovato, restituisco ruolo default");
     return 'user'; // oppure 'cer_manager' per testare accessi admin
   } catch (err) {
     console.error("Error getting user role:", err);

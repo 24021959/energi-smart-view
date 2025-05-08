@@ -1,7 +1,77 @@
 
 import { Logo } from "@/components/Logo";
+import { useAuth } from "@/hooks/useAuthContext";
+import { Navigate } from "react-router-dom";
+import { useEffect } from "react";
+import { toast } from "@/hooks/use-toast";
 
 const Index = () => {
+  const { authState } = useAuth();
+  const { user, isLoading } = authState;
+
+  // Aggiunge log per debug
+  useEffect(() => {
+    if (user) {
+      console.log("Utente autenticato in Index.tsx:", user);
+      console.log("Ruolo utente:", user.role);
+    } else {
+      console.log("Nessun utente autenticato in Index.tsx");
+    }
+  }, [user]);
+
+  // Se l'utente è autenticato, reindirizzalo alla dashboard appropriata
+  if (!isLoading && user) {
+    console.log("Reindirizzamento alla dashboard per il ruolo:", user.role);
+    
+    // Reindirizza in base al ruolo
+    switch(user.role) {
+      case 'cer_manager':
+        toast({
+          title: "Benvenuto Gestore CER",
+          description: "Accesso alla dashboard amministrativa"
+        });
+        return <Navigate to="/admin" replace />;
+      
+      case 'consumer':
+        toast({
+          title: "Benvenuto Consumatore",
+          description: "Accesso alla dashboard consumatore"
+        });
+        return <Navigate to="/consumer" replace />;
+      
+      case 'producer':
+        toast({
+          title: "Benvenuto Produttore",
+          description: "Accesso alla dashboard produttore"
+        });
+        return <Navigate to="/producer" replace />;
+      
+      case 'prosumer':
+        toast({
+          title: "Benvenuto Prosumer",
+          description: "Accesso alla dashboard prosumer"
+        });
+        return <Navigate to="/prosumer" replace />;
+      
+      default:
+        console.log("Ruolo sconosciuto, reindirizzo alla pagina principale");
+        return null;
+    }
+  }
+
+  // Se stiamo ancora caricando, mostra un indicatore (opzionale)
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-t-primary border-primary/30 rounded-full animate-spin mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">Caricamento...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Se l'utente non è autenticato, mostra la pagina di benvenuto normale
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header with Logo */}

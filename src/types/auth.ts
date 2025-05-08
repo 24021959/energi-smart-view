@@ -1,3 +1,4 @@
+
 export type UserRole = 'cer_manager' | 'user' | 'producer' | 'consumer' | 'prosumer';
 
 export interface UserProfile {
