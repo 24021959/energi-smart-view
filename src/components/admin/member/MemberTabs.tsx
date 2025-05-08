@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import MemberEnergyData from '@/components/admin/member/MemberEnergyData';
 import MemberAddressCredentials from '@/components/admin/member/MemberAddressCredentials';
@@ -32,16 +32,16 @@ const MemberTabs = ({ memberDetail, details }: MemberTabsProps) => {
           <MemberAddressCredentials 
             memberInfo={{
               email: memberDetail.email,
-              phone: details.phone || 'Non specificato',
-              address: details.legalAddress || details.supplyAddress || 'Non specificato',
-              fiscalCode: details.fiscalCode || 'Non specificato',
-              vatNumber: details.vatNumber || 'Non specificato'
+              phone: details?.phone || 'Non specificato',
+              address: details?.legalAddress || details?.supplyAddress || 'Non specificato',
+              fiscalCode: details?.fiscalCode || 'Non specificato',
+              vatNumber: details?.vatNumber || 'Non specificato'
             }}
           />
         </TabsContent>
         
         <TabsContent value="energy">
-          <MemberEnergyData energyData={details.energyData} />
+          <MemberEnergyData energyData={details?.energyData || {}} />
         </TabsContent>
         
         <TabsContent value="analysis">
@@ -54,7 +54,7 @@ const MemberTabs = ({ memberDetail, details }: MemberTabsProps) => {
         
         <TabsContent value="documents">
           <MemberDocuments 
-            documentsList={details.documents || []}
+            documentsList={details?.documents || []}
             memberId={memberDetail.id}
           />
         </TabsContent>

@@ -3,17 +3,22 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
-interface DocumentInfo {
-  idNumber?: string;
-  registrationDate: string;
+interface Document {
+  id?: number;
+  type?: string;
+  name?: string;
+  date?: string;
+  url?: string;
 }
 
 interface MemberDocumentsProps {
-  documentInfo: DocumentInfo;
+  documentsList: Document[];
+  memberId: number;
 }
 
-const MemberDocuments = ({ documentInfo }: MemberDocumentsProps) => {
-  const { idNumber, registrationDate } = documentInfo;
+const MemberDocuments = ({ documentsList, memberId }: MemberDocumentsProps) => {
+  // Usiamo i mock data se non abbiamo documenti reali
+  const documents = documentsList.length > 0 ? documentsList : [];
   
   return (
     <Card>
@@ -23,23 +28,23 @@ const MemberDocuments = ({ documentInfo }: MemberDocumentsProps) => {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {idNumber && (
-            <div className="flex justify-between items-center p-3 border rounded-md">
-              <div>
-                <div className="font-medium">Documento di identità</div>
-                <div className="text-sm text-muted-foreground">Carta d'identità - {idNumber}</div>
+          {documents.length === 0 ? (
+            <div className="text-center py-4">
+              <p className="text-muted-foreground">Nessun documento disponibile</p>
+            </div>
+          ) : (
+            documents.map((doc, index) => (
+              <div key={doc.id || index} className="flex justify-between items-center p-3 border rounded-md">
+                <div>
+                  <div className="font-medium">{doc.type || 'Documento'}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {doc.name || ''} {doc.date ? `- ${doc.date}` : ''}
+                  </div>
+                </div>
+                <Button variant="outline" size="sm">Visualizza</Button>
               </div>
-              <Button variant="outline" size="sm">Visualizza</Button>
-            </div>
+            ))
           )}
-          
-          <div className="flex justify-between items-center p-3 border rounded-md">
-            <div>
-              <div className="font-medium">Contratto CER</div>
-              <div className="text-sm text-muted-foreground">Firmato il {registrationDate}</div>
-            </div>
-            <Button variant="outline" size="sm">Visualizza</Button>
-          </div>
 
           <Button className="w-full mt-4">
             Carica Nuovo Documento

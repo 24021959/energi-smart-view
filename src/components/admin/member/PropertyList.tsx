@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Property } from '@/types/member';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,14 +15,50 @@ import { Home, Plus, User, UserPlus, Edit, Trash2 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 interface PropertyListProps {
-  properties: Property[];
-  memberId: number;
-  isOwner: boolean;
+  propertyOwnerId?: number;
+  memberId?: number;
 }
 
-export default function PropertyList({ properties, memberId, isOwner }: PropertyListProps) {
+export default function PropertyList({ propertyOwnerId, memberId }: PropertyListProps) {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+  
+  // Determiniamo se l'utente è un proprietario o solo un consumatore
+  const isOwner = !!propertyOwnerId;
+  const ownerId = propertyOwnerId || memberId;
+  
+  // Mock delle proprietà - in un'app reale andrebbe recuperato dal server
+  const properties: Property[] = isOwner 
+    ? [
+        {
+          id: 101,
+          address: 'Via Roma 123',
+          city: 'Roma',
+          postalCode: '00100',
+          province: 'RM',
+          type: 'residential',
+          ownerId: ownerId || 0,
+          consumerId: 3,
+          podCode: 'IT001E98765432',
+          status: 'active',
+          area: 120,
+          energyClass: 'B'
+        },
+        {
+          id: 102,
+          address: 'Via Milano 456',
+          city: 'Milano',
+          postalCode: '20100',
+          province: 'MI',
+          type: 'commercial',
+          ownerId: ownerId || 0,
+          podCode: 'IT001E23456789',
+          status: 'pending',
+          area: 250,
+          energyClass: 'C'
+        }
+      ] 
+    : [];
   
   const handleAddProperty = () => {
     toast({
