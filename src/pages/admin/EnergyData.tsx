@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BarChart, LineChart, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { CEROptimization } from '@/components/admin/energy/CEROptimization';
 
 // Dati di esempio per i grafici
 const monthlyData = [
@@ -45,9 +46,10 @@ export default function EnergyData() {
           <h1 className="text-2xl font-bold mb-6">Dati Energetici</h1>
           
           <Tabs defaultValue="monthly">
-            <TabsList className="grid w-full max-w-md grid-cols-2 mb-4">
+            <TabsList className="grid w-full max-w-md grid-cols-3 mb-4">
               <TabsTrigger value="monthly">Dati Mensili</TabsTrigger>
               <TabsTrigger value="daily">Dati Giornalieri</TabsTrigger>
+              <TabsTrigger value="optimization">Ottimizzazione CER</TabsTrigger>
             </TabsList>
             
             <TabsContent value="monthly">
@@ -137,6 +139,10 @@ export default function EnergyData() {
                   </ResponsiveContainer>
                 </CardContent>
               </Card>
+            </TabsContent>
+            
+            <TabsContent value="optimization">
+              <CEROptimization />
             </TabsContent>
           </Tabs>
         </main>
