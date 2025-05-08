@@ -1,4 +1,3 @@
-
 import { useParams, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { AdminLayout } from '@/layouts/AdminLayout';
@@ -23,6 +22,10 @@ const ConfigurationDetail = () => {
   const [configuration, setConfiguration] = useState<Configuration | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isComponentsOpen, setIsComponentsOpen] = useState(false);
+
+  // Get current date and time
+  const now = new Date();
+  const formattedDateTime = `${now.getDate().toString().padStart(2, '0')}/${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getFullYear()} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
 
   useEffect(() => {
     // In a real app, this would be a call to fetch configuration data
@@ -191,7 +194,7 @@ const ConfigurationDetail = () => {
         {/* Data update info */}
         <div className="text-sm text-gray-500 p-4">
           <p>Ultimi flussi rilevati</p>
-          <p>Ultimo aggiornamento: 22/07/2024 13:45</p>
+          <p>Ultimo aggiornamento: {formattedDateTime}</p>
         </div>
       </div>
     </AdminLayout>

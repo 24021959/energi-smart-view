@@ -1,4 +1,3 @@
-
 export interface WeatherForecastData {
   temperature: number;
   feelsLike: number;
@@ -35,12 +34,6 @@ function getDayNameInItalian(dayOffset = 0) {
   const today = new Date();
   today.setDate(today.getDate() + dayOffset);
   return days[today.getDay()];
-}
-
-// Function to get current date
-function getCurrentDate() {
-  const today = new Date();
-  return `${today.getDate().toString().padStart(2, '0')}/${(today.getMonth() + 1).toString().padStart(2, '0')}/${today.getFullYear()}`;
 }
 
 // Helper function to get wind direction text
@@ -87,7 +80,7 @@ export const estimateSolarProduction = (forecast: WeatherForecastData): number =
 export const geocodeCity = async (city: string): Promise<GeoLocation> => {
   try {
     // Use OpenWeatherMap Geocoding API
-    const apiKey = '1a78eb2dc006e4d0f1334fb5a9d47ac3'; // Free tier API key for OpenWeatherMap
+    const apiKey = '72547ec8c6cb00d75320173614534a46'; // API key fornita dall'utente
     const response = await fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(city)},IT&limit=1&appid=${apiKey}`);
     
     if (!response.ok) {
@@ -131,9 +124,9 @@ export const fetchWeatherForecast = async (city: string, province?: string): Pro
     // Get coordinates first
     const location = await geocodeCity(city);
     
-    // Fetch current weather
-    const apiKey = '1a78eb2dc006e4d0f1334fb5a9d47ac3'; // Free tier API key
-    const response = await fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${location.lat}&lon=${location.lng}&exclude=minutely&units=metric&appid=${apiKey}`);
+    // Fetch current weather using OneCall API 3.0
+    const apiKey = '72547ec8c6cb00d75320173614534a46'; // API key fornita dall'utente
+    const response = await fetch(`https://api.openweathermap.org/data/3.0/onecall?lat=${location.lat}&lon=${location.lng}&units=metric&appid=${apiKey}`);
     
     if (!response.ok) {
       throw new Error('Weather API error');

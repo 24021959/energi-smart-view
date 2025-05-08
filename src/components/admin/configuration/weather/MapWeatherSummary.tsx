@@ -46,15 +46,15 @@ export function MapWeatherSummary({ forecast, city, province }: MapWeatherSummar
         <div className="flex flex-col items-center">
           <div className="flex items-center">
             <Battery className="h-5 w-5 text-green-500 mr-1" />
-            <span className="font-medium">Produzione</span>
+            <span className="font-medium">Efficienza</span>
           </div>
-          <p className="text-sm">{productionPercentage}% efficienza</p>
+          <p className="text-sm">{productionPercentage}%</p>
         </div>
         
         <div className="flex flex-col items-center">
           <div className="flex items-center">
             <Gauge className="h-5 w-5 text-blue-500 mr-1" />
-            <span className="font-medium">Stima</span>
+            <span className="font-medium">Produzione stimata</span>
           </div>
           <p className="text-sm">{estimatedProduction} kWh</p>
         </div>

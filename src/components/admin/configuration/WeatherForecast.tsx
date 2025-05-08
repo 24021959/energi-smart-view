@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sun, Map } from "lucide-react";
 import { fetchWeatherForecast, geocodeCity, WeatherForecastData, GeoLocation } from "@/services/weatherService";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TodayForecast } from "./weather/TodayForecast";
 import { HourlyForecast } from "./weather/HourlyForecast";
 import { DailyForecast } from "./weather/DailyForecast";
@@ -20,7 +19,6 @@ interface WeatherForecastProps {
 export function WeatherForecast({ city, province }: WeatherForecastProps) {
   const [forecast, setForecast] = useState<WeatherForecastData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [currentTab, setCurrentTab] = useState("forecast");
   const [location, setLocation] = useState<GeoLocation | null>(null);
 
   useEffect(() => {
@@ -100,43 +98,39 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-4">
-              <TabsTrigger value="forecast" className="flex items-center gap-2">
-                <Sun className="h-4 w-4" />
-                <span>Previsioni</span>
-              </TabsTrigger>
-              <TabsTrigger value="map" className="flex items-center gap-2">
-                <Map className="h-4 w-4" />
-                <span>Mappa</span>
-              </TabsTrigger>
-            </TabsList>
+          {/* Vista combinata: mappa e previsioni meteo */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+            {/* Mappa Google */}
+            <div>
+              {location && <GoogleMap city={city} location={location} />}
+            </div>
             
-            <TabsContent value="forecast" className="space-y-4">
-              {/* Today's weather details card */}
+            {/* Previsioni meteo attuali */}
+            <div>
               <TodayForecast forecast={forecast} />
-              
-              {/* Hourly forecast scrollable section */}
+            </div>
+          </div>
+          
+          {/* Weather summary below map */}
+          <MapWeatherSummary 
+            forecast={forecast} 
+            city={city} 
+            province={province}
+          />
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            {/* Previsioni orarie */}
+            <div>
               {forecast.hourlyForecasts && 
                 <HourlyForecast hourlyForecasts={forecast.hourlyForecasts} />}
-              
-              {/* 5-day forecast */}
+            </div>
+            
+            {/* Previsioni 5 giorni */}
+            <div>
               {forecast.dailyForecasts && 
                 <DailyForecast forecasts={forecast.dailyForecasts} />}
-            </TabsContent>
-            
-            <TabsContent value="map">
-              {/* Google Map */}
-              {location && <GoogleMap city={city} location={location} />}
-              
-              {/* Weather summary below map */}
-              <MapWeatherSummary 
-                forecast={forecast} 
-                city={city} 
-                province={province}
-              />
-            </TabsContent>
-          </Tabs>
+            </div>
+          </div>
           
           <div className="text-xs text-center mt-4 text-gray-500">
             *La stima della produzione è basata su condizioni meteo previste e può variare. 

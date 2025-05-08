@@ -6,6 +6,19 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
 
+// Definizione dei tipi per Google Maps API
+declare global {
+  interface Window {
+    google: {
+      maps: {
+        Map: new (container: HTMLElement, options: any) => any;
+        Marker: new (options: any) => any;
+        LatLng: new (lat: number, lng: number) => any;
+      };
+    };
+  }
+}
+
 export interface GoogleMapProps {
   city: string;
   location: GeoLocation;
@@ -18,7 +31,7 @@ export function GoogleMap({ city, location }: GoogleMapProps) {
   
   useEffect(() => {
     const apiKey = 'AIzaSyBz-SCJGkRzZini9Wt2IpgGrGJl-uJTFxI';
-    let mapInstance: google.maps.Map | null = null;
+    let mapInstance: any = null;
 
     const initializeMap = async () => {
       if (!mapContainerRef.current) {
@@ -37,7 +50,7 @@ export function GoogleMap({ city, location }: GoogleMapProps) {
         await loader.load();
         
         // Create a map instance
-        mapInstance = new google.maps.Map(mapContainerRef.current, {
+        mapInstance = new window.google.maps.Map(mapContainerRef.current, {
           center: location,
           zoom: 14,
           mapTypeControl: false,
@@ -46,7 +59,7 @@ export function GoogleMap({ city, location }: GoogleMapProps) {
         });
 
         // Add a marker for the city
-        new google.maps.Marker({
+        new window.google.maps.Marker({
           position: location,
           map: mapInstance,
           title: city
