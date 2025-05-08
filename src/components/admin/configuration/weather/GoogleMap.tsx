@@ -1,5 +1,6 @@
 
 import { useRef, useEffect, useState } from "react";
+import { Loader } from "@googlemaps/js-api-loader";
 import { GeoLocation } from "@/services/weatherService";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -14,27 +15,29 @@ export function GoogleMap({ city, location }: GoogleMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
-  const [mapInitialized, setMapInitialized] = useState(false);
-
+  
   useEffect(() => {
-    // Skip if already initialized or if there's an error
-    if (mapInitialized || mapError) return;
-    
-    // Set initialized flag to prevent multiple initialization attempts
-    setMapInitialized(true);
-    
     const apiKey = 'AIzaSyBz-SCJGkRzZini9Wt2IpgGrGJl-uJTFxI';
+    let mapInstance: google.maps.Map | null = null;
 
-    // Function to initialize the map
-    const initializeMap = () => {
-      if (!mapContainerRef.current || !window.google) {
-        console.error("Map container not ready or Google Maps not loaded");
+    const initializeMap = async () => {
+      if (!mapContainerRef.current) {
+        console.error("Map container not ready");
         return;
       }
-      
+
       try {
+        // Initialize the Google Maps loader
+        const loader = new Loader({
+          apiKey,
+          version: "weekly",
+        });
+
+        // Load the Google Maps API
+        await loader.load();
+        
         // Create a map instance
-        const map = new window.google.maps.Map(mapContainerRef.current, {
+        mapInstance = new google.maps.Map(mapContainerRef.current, {
           center: location,
           zoom: 14,
           mapTypeControl: false,
@@ -43,9 +46,9 @@ export function GoogleMap({ city, location }: GoogleMapProps) {
         });
 
         // Add a marker for the city
-        new window.google.maps.Marker({
+        new google.maps.Marker({
           position: location,
-          map: map,
+          map: mapInstance,
           title: city
         });
         
@@ -56,46 +59,14 @@ export function GoogleMap({ city, location }: GoogleMapProps) {
       }
     };
 
-    // Create a unique callback name to avoid conflicts
-    const callbackName = `initGoogleMap_${Date.now()}`;
-    
-    // Define the callback function
-    window.initMapForWeather = () => {
-      console.log("Google Maps API loaded successfully");
-      initializeMap();
-    };
-
-    // Check if the script is already loaded
-    const existingScript = document.getElementById('google-maps-script');
-    if (existingScript) {
-      existingScript.remove();
-    }
-
-    // Create and add the script element
-    const script = document.createElement('script');
-    script.id = 'google-maps-script';
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMapForWeather&v=weekly`;
-    script.async = true;
-    script.defer = true;
-    script.onerror = () => {
-      console.error("Failed to load Google Maps API");
-      setMapError("Impossibile caricare l'API di Google Maps");
-    };
-    
-    document.head.appendChild(script);
+    initializeMap();
 
     // Cleanup function
     return () => {
-      // Remove the callback
-      window.initMapForWeather = undefined;
-      
-      // Remove script if it exists
-      const scriptToRemove = document.getElementById('google-maps-script');
-      if (scriptToRemove) {
-        scriptToRemove.remove();
-      }
+      // Google Maps doesn't require explicit cleanup as the DOM element will be removed
+      mapInstance = null;
     };
-  }, [city, location, mapInitialized, mapError]);
+  }, [city, location]);
 
   if (mapError) {
     return (

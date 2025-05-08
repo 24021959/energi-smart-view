@@ -1,3 +1,4 @@
+
 import { Configuration, ConfigurationFormData } from '@/types/configuration';
 import { toast } from '@/hooks/use-toast';
 
@@ -7,7 +8,7 @@ export const mockConfigurations = [
     id: '1',
     name: 'CER Di Peccioli',
     type: 'cer' as const,
-    description: 'Simulazione Gruppo di autoconsumo',
+    description: 'Comunità Energetica Rinnovabile di Peccioli',
     address: 'Via Carlo Serassi, 21',
     city: 'Bergamo',
     postalCode: '24124',

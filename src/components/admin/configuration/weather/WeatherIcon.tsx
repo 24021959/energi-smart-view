@@ -13,7 +13,8 @@ export function WeatherIcon({ icon, className = "h-8 w-8" }: WeatherIconProps) {
       return <Sun className={`${className} text-yellow-400`} />;
     }
     
-    const iconCode = icon.substring(0, 2);
+    // Handle both full icon codes (e.g., "01d") and shortened versions (e.g., "01")
+    const iconCode = icon.length >= 2 ? icon.substring(0, 2) : icon;
     
     switch (iconCode) {
       case '01': // clear sky

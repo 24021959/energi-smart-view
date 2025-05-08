@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sun, Map } from "lucide-react";
 import { fetchWeatherForecast, geocodeCity, WeatherForecastData, GeoLocation } from "@/services/weatherService";
@@ -10,6 +10,7 @@ import { HourlyForecast } from "./weather/HourlyForecast";
 import { DailyForecast } from "./weather/DailyForecast";
 import { GoogleMap } from "./weather/GoogleMap";
 import { MapWeatherSummary } from "./weather/MapWeatherSummary";
+import { toast } from "@/hooks/use-toast";
 
 interface WeatherForecastProps {
   city: string;
@@ -21,7 +22,6 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [currentTab, setCurrentTab] = useState("forecast");
   const [location, setLocation] = useState<GeoLocation | null>(null);
-  const scriptRef = useRef<HTMLScriptElement | null>(null);
 
   useEffect(() => {
     const loadWeatherData = async () => {
@@ -37,6 +37,11 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
           setForecast(data);
         } catch (error) {
           console.error("Error in weather data loading:", error);
+          toast({
+            variant: "destructive",
+            title: "Errore",
+            description: "Impossibile caricare i dati meteo. Riprova più tardi."
+          });
         }
       }
       setIsLoading(false);
@@ -44,31 +49,10 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
 
     loadWeatherData();
   }, [city, province]);
-
-  // Clean up on tab change
-  useEffect(() => {
-    // Clean up only if switching away from the map tab
-    if (currentTab !== "map" && scriptRef.current && scriptRef.current.parentNode) {
-      scriptRef.current.parentNode.removeChild(scriptRef.current);
-      scriptRef.current = null;
-    }
-  }, [currentTab]);
   
-  // Clean up on unmount
-  useEffect(() => {
-    return () => {
-      if (scriptRef.current && scriptRef.current.parentNode) {
-        scriptRef.current.parentNode.removeChild(scriptRef.current);
-        scriptRef.current = null;
-      }
-      
-      // Remove the global callback to avoid memory leaks
-      if (window.initMapForWeather) {
-        // @ts-ignore - Just set to undefined instead of delete to avoid TypeScript errors
-        window.initMapForWeather = undefined;
-      }
-    };
-  }, []);
+  // Get current date and time
+  const now = new Date();
+  const formattedDateTime = `${now.getDate().toString().padStart(2, '0')}/${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getFullYear()} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
 
   if (isLoading) {
     return (
@@ -155,7 +139,8 @@ export function WeatherForecast({ city, province }: WeatherForecastProps) {
           </Tabs>
           
           <div className="text-xs text-center mt-4 text-gray-500">
-            *La stima della produzione è basata su condizioni meteo previste e può variare
+            *La stima della produzione è basata su condizioni meteo previste e può variare. 
+            Ultimo aggiornamento: {formattedDateTime}
           </div>
         </CardContent>
       </Card>

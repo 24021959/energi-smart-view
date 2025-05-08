@@ -15,10 +15,7 @@ export function MapWeatherSummary({ forecast, city, province }: MapWeatherSummar
   // Calculate estimated production in kWh based on weather conditions
   // Assuming a standard 6kW system
   const systemCapacity = 6;
-  const peakSunHours = forecast.icon.includes('01') ? 5 : 
-                       forecast.icon.includes('02') ? 4 : 
-                       forecast.icon.includes('03') ? 3 : 
-                       forecast.icon.includes('04') ? 2 : 1.5;
+  const peakSunHours = calculatePeakSunHours(forecast);
                        
   const estimatedProduction = ((systemCapacity * peakSunHours) * (productionPercentage / 100)).toFixed(1);
   
@@ -64,4 +61,21 @@ export function MapWeatherSummary({ forecast, city, province }: MapWeatherSummar
       </div>
     </div>
   );
+}
+
+// Helper function to calculate peak sun hours based on weather conditions
+function calculatePeakSunHours(forecast: WeatherForecastData): number {
+  // Peak sun hours vary by weather condition and season
+  if (forecast.icon.includes('01')) return 5.5; // Clear sky
+  if (forecast.icon.includes('02')) return 4.5; // Few clouds
+  if (forecast.icon.includes('03')) return 3.5; // Scattered clouds
+  if (forecast.icon.includes('04')) return 2.5; // Broken clouds
+  if (forecast.icon.includes('09')) return 1.5; // Shower rain
+  if (forecast.icon.includes('10')) return 2.0; // Rain
+  if (forecast.icon.includes('11')) return 1.0; // Thunderstorm
+  if (forecast.icon.includes('13')) return 1.0; // Snow
+  if (forecast.icon.includes('50')) return 2.0; // Mist
+  
+  // Default for unknown conditions
+  return 3.0;
 }
