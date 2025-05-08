@@ -4,60 +4,126 @@ import { useParams } from 'react-router-dom';
 import { AdminLayout } from '@/layouts/AdminLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/hooks/use-toast';
-import { MemberListItem } from '@/types/member';
+import { MemberListItem, Property, MemberDetailData } from '@/types/member';
 import MemberHeader from '@/components/admin/member/MemberHeader';
 import MemberOverview from '@/components/admin/member/MemberOverview';
 import MemberAddressCredentials from '@/components/admin/member/MemberAddressCredentials';
 import MemberEnergyData from '@/components/admin/member/MemberEnergyData';
 import MemberDocuments from '@/components/admin/member/MemberDocuments';
+import PropertyList from '@/components/admin/member/PropertyList';
+
+// Mock di proprietà per test
+const mockProperties: Property[] = [
+  {
+    id: 101,
+    address: 'Via Roma 123',
+    city: 'Roma',
+    postalCode: '00100',
+    province: 'RM',
+    type: 'residential',
+    ownerId: 2,
+    consumerId: 3,
+    podCode: 'IT001E98765432',
+    status: 'active',
+    area: 120,
+    energyClass: 'B'
+  },
+  {
+    id: 102,
+    address: 'Via Milano 456',
+    city: 'Milano',
+    postalCode: '20100',
+    province: 'MI',
+    type: 'commercial',
+    ownerId: 2,
+    podCode: 'IT001E23456789',
+    status: 'pending',
+    area: 250,
+    energyClass: 'C'
+  },
+  {
+    id: 103,
+    address: 'Via Napoli 789',
+    city: 'Napoli',
+    postalCode: '80100',
+    province: 'NA',
+    type: 'residential',
+    ownerId: 4,
+    consumerId: 1,
+    podCode: 'IT001E34567890',
+    status: 'active',
+    area: 85,
+    energyClass: 'A'
+  }
+];
 
 // Dati di esempio per singolo membro
-const getMemberById = (id: number): MemberListItem | undefined => {
+const getMemberById = (id: number): MemberDetailData | undefined => {
   const members = [
     { 
       id: 1, 
       name: 'Mario Rossi', 
       email: 'mario.rossi@example.com', 
+      phone: '333-1234567',
+      fiscalCode: 'RSSMRA80A01H501Z',
       type: 'Domestico', 
       status: 'Attivo',
       memberType: 'consumer' as const,
       isActive: true,
+      registrationDate: '01/01/2023',
+      properties: mockProperties.filter(p => p.consumerId === 1)
     },
     { 
       id: 2, 
       name: 'Laura Bianchi', 
-      email: 'laura.bianchi@example.com', 
+      email: 'laura.bianchi@example.com',
+      phone: '333-7654321',
+      fiscalCode: 'BNCLRA75M41H501Y',
       type: 'Commerciale', 
       status: 'Attivo',
       memberType: 'prosumer' as const,
       isActive: true,
+      registrationDate: '15/02/2023',
+      properties: mockProperties.filter(p => p.ownerId === 2)
     },
     { 
       id: 3, 
       name: 'Giuseppe Verdi', 
-      email: 'giuseppe.verdi@example.com', 
+      email: 'giuseppe.verdi@example.com',
+      phone: '333-9876543',
+      fiscalCode: 'VRDGPP82L30H501X',
       type: 'Domestico', 
       status: 'In attesa',
       memberType: 'consumer' as const,
       isActive: false,
+      registrationDate: '10/03/2023',
+      properties: mockProperties.filter(p => p.consumerId === 3)
     },
     { 
       id: 4, 
       name: 'Francesca Neri', 
-      email: 'francesca.neri@example.com', 
+      email: 'francesca.neri@example.com',
+      phone: '333-5432198',
+      fiscalCode: 'NREFNC78P44H501W',
       type: 'Industriale', 
       status: 'Attivo',
       memberType: 'prosumer' as const,
       isActive: true,
+      registrationDate: '05/04/2023',
+      properties: mockProperties.filter(p => p.ownerId === 4)
     },
     { 
       id: 5, 
       name: 'Energia Sole srl', 
-      email: 'info@energiasole.it', 
+      email: 'info@energiasole.it',
+      phone: '06-12345678',
+      vatNumber: '12345678901',
       type: 'Industriale', 
       status: 'Attivo',
       memberType: 'producer' as const,
       isActive: true,
+      registrationDate: '20/05/2023',
+      properties: []
     },
   ];
   
@@ -100,35 +166,35 @@ const getMemberDetails = (id: number) => {
 export default function MemberDetail() {
   const { id } = useParams();
   const memberId = id ? parseInt(id) : 0;
-  const [member, setMember] = useState<MemberListItem | null>(null);
+  const [memberDetail, setMemberDetail] = useState<MemberDetailData | null>(null);
   const [details, setDetails] = useState<any>(null);
 
   useEffect(() => {
     // In un'app reale, qui ci sarebbe una chiamata API
     const fetchedMember = getMemberById(memberId);
     if (fetchedMember) {
-      setMember(fetchedMember);
+      setMemberDetail(fetchedMember);
       setDetails(getMemberDetails(memberId));
     }
   }, [memberId]);
 
   const toggleMemberStatus = (isActive: boolean) => {
-    if (!member) return;
+    if (!memberDetail) return;
     
-    setMember({
-      ...member,
+    setMemberDetail({
+      ...memberDetail,
       isActive,
       status: isActive ? 'Attivo' : 'In attesa'
     });
     
     toast({
       title: isActive ? "Membro attivato" : "Membro disattivato",
-      description: `${member.name} è stato ${isActive ? 'attivato' : 'disattivato'} con successo.`,
+      description: `${memberDetail.name} è stato ${isActive ? 'attivato' : 'disattivato'} con successo.`,
       variant: isActive ? "default" : "destructive",
     });
   };
 
-  if (!member || !details) {
+  if (!memberDetail || !details) {
     return (
       <AdminLayout title="Dettaglio Membro">
         <div className="text-center">
@@ -139,24 +205,36 @@ export default function MemberDetail() {
     );
   }
 
+  const canManageProperties = memberDetail.memberType === 'prosumer';
+  const hasConsumerRole = memberDetail.memberType === 'consumer' || memberDetail.memberType === 'prosumer';
+
   return (
-    <AdminLayout title={`Dettaglio: ${member.name}`}>
-      <MemberHeader member={member} onToggleStatus={toggleMemberStatus} />
+    <AdminLayout title={`Dettaglio: ${memberDetail.name}`}>
+      <MemberHeader member={{
+        id: memberDetail.id,
+        name: memberDetail.name,
+        email: memberDetail.email,
+        type: memberDetail.type,
+        status: memberDetail.status,
+        memberType: memberDetail.memberType,
+        isActive: memberDetail.isActive
+      }} onToggleStatus={toggleMemberStatus} />
 
       <Tabs defaultValue="overview">
         <TabsList className="mb-4">
           <TabsTrigger value="overview">Panoramica</TabsTrigger>
           <TabsTrigger value="energy">Dati Energetici</TabsTrigger>
+          <TabsTrigger value="properties">Proprietà</TabsTrigger>
           <TabsTrigger value="documents">Documenti</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
           <MemberOverview 
             personalInfo={{
-              name: member.name,
-              email: member.email,
-              type: member.type,
-              status: member.status,
+              name: memberDetail.name,
+              email: memberDetail.email,
+              type: memberDetail.type,
+              status: memberDetail.status,
               fiscalCode: details.fiscalCode,
               vatNumber: details.vatNumber,
               idType: details.idType,
@@ -183,9 +261,35 @@ export default function MemberDetail() {
               supplyAddress: details.supplyAddress,
               hasConsumptionData: details.consumptionData.length > 0,
               hasProductionData: details.productionData.length > 0,
-              memberType: member.memberType
+              memberType: memberDetail.memberType
             }}
           />
+        </TabsContent>
+
+        <TabsContent value="properties" className="space-y-4">
+          {canManageProperties && (
+            <PropertyList 
+              properties={memberDetail.properties.filter(p => p.ownerId === memberId)} 
+              memberId={memberId}
+              isOwner={true}
+            />
+          )}
+          
+          {hasConsumerRole && (
+            <PropertyList 
+              properties={memberDetail.properties.filter(p => p.consumerId === memberId)} 
+              memberId={memberId}
+              isOwner={false}
+            />
+          )}
+          
+          {!canManageProperties && !hasConsumerRole && (
+            <div className="text-center py-8">
+              <p className="text-muted-foreground">
+                Questo membro non può gestire proprietà in quanto è di tipo {memberDetail.memberType}.
+              </p>
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="documents">

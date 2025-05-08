@@ -50,4 +50,38 @@ export interface MemberListItem {
   status: string;
   memberType: 'consumer' | 'prosumer' | 'producer';
   isActive: boolean;
+  // Aggiungiamo un campo per tenere traccia delle proprietà associate
+  associatedProperties?: number[];
+}
+
+// Nuovo tipo per le proprietà
+export interface Property {
+  id: number;
+  address: string;
+  city: string;
+  postalCode: string;
+  province: string;
+  type: 'residential' | 'commercial' | 'industrial';
+  ownerId: number;
+  consumerId?: number; // Può essere undefined se non c'è un consumatore associato
+  podCode: string;
+  status: 'active' | 'pending' | 'inactive';
+  area: number; // Superficie in metri quadri
+  energyClass: string; // Classe energetica
+}
+
+// Tipo per i dati del membro nei tab
+export interface MemberDetailData {
+  id: number;
+  name: string;
+  email: string;
+  phone?: string;
+  fiscalCode?: string;
+  vatNumber?: string;
+  type: string;
+  memberType: 'consumer' | 'prosumer' | 'producer';
+  status: string;
+  isActive: boolean;
+  registrationDate: string;
+  properties: Property[];
 }

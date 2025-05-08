@@ -1,3 +1,4 @@
+
 import { Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
@@ -19,10 +20,13 @@ import AddMember from "@/pages/admin/AddMember";
 import Plants from "@/pages/admin/Plants";
 import PlantDetail from "@/pages/admin/PlantDetail";
 import AddPlant from "@/pages/admin/AddPlant";
-import EditPlant from "@/pages/admin/EditPlant"; // Importiamo il nuovo componente
+import EditPlant from "@/pages/admin/EditPlant";
 import EnergyData from "@/pages/admin/EnergyData";
 import Reports from "@/pages/admin/Reports";
 import Settings from "@/pages/admin/Settings";
+import Properties from "@/pages/admin/Properties"; // Nuova pagina per la gestione proprietà
+import AddProperty from "@/pages/admin/AddProperty"; // Nuova pagina per aggiungere proprietà
+import PropertyDetail from "@/pages/admin/PropertyDetail"; // Nuova pagina per i dettagli proprietà
 
 export default function App() {
   return (
@@ -48,6 +52,11 @@ export default function App() {
         <Route path="admin/energy" element={<ProtectedRoute allowedRoles={['cer_manager']}><EnergyData /></ProtectedRoute>} />
         <Route path="admin/reports" element={<ProtectedRoute allowedRoles={['cer_manager']}><Reports /></ProtectedRoute>} />
         <Route path="admin/settings" element={<ProtectedRoute allowedRoles={['cer_manager']}><Settings /></ProtectedRoute>} />
+        
+        {/* Nuove rotte per la gestione delle proprietà */}
+        <Route path="admin/properties" element={<ProtectedRoute allowedRoles={['cer_manager']}><Properties /></ProtectedRoute>} />
+        <Route path="admin/properties/add" element={<ProtectedRoute allowedRoles={['cer_manager']}><AddProperty /></ProtectedRoute>} />
+        <Route path="admin/properties/:id" element={<ProtectedRoute allowedRoles={['cer_manager']}><PropertyDetail /></ProtectedRoute>} />
 
         {/* Default route for unmatched paths */}
         <Route path="*" element={<NotFound />} />
