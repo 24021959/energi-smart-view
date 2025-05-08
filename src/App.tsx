@@ -38,6 +38,11 @@ import ProsumerDashboard from "@/pages/prosumer/ProsumerDashboard";
 import ProsumerBills from "@/pages/prosumer/ProsumerBills";
 import ProsumerBillUpload from "@/pages/prosumer/ProsumerBillUpload";
 
+// Le pagine producer
+import ProducerDashboard from "@/pages/producer/ProducerDashboard";
+import ProducerBills from "@/pages/producer/ProducerBills";
+import ProducerProduction from "@/pages/producer/ProducerProduction";
+
 export default function App() {
   return (
     <>
@@ -77,6 +82,11 @@ export default function App() {
         <Route path="prosumer" element={<ProtectedRoute allowedRoles={['prosumer']}><ProsumerDashboard /></ProtectedRoute>} />
         <Route path="prosumer/bills" element={<ProtectedRoute allowedRoles={['prosumer']}><ProsumerBills /></ProtectedRoute>} />
         <Route path="prosumer/bills/upload" element={<ProtectedRoute allowedRoles={['prosumer']}><ProsumerBillUpload /></ProtectedRoute>} />
+        
+        {/* Producer Routes */}
+        <Route path="producer" element={<ProtectedRoute allowedRoles={['producer']}><ProducerDashboard /></ProtectedRoute>} />
+        <Route path="producer/bills" element={<ProtectedRoute allowedRoles={['producer']}><ProducerBills /></ProtectedRoute>} />
+        <Route path="producer/production" element={<ProtectedRoute allowedRoles={['producer']}><ProducerProduction /></ProtectedRoute>} />
 
         {/* Default route for unmatched paths */}
         <Route path="*" element={<NotFound />} />

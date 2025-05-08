@@ -40,12 +40,22 @@ export default function Login() {
   if (authState.user) {
     console.log("Utente autenticato:", authState.user);
     // Reindirizza in base al ruolo
-    if (authState.user.role === 'cer_manager') {
-      console.log("Reindirizzamento a /admin");
-      return <Navigate to="/admin" replace />;
-    } else {
-      console.log("Reindirizzamento a /");
-      return <Navigate to="/" replace />;
+    switch(authState.user.role) {
+      case 'cer_manager':
+        console.log("Reindirizzamento a /admin");
+        return <Navigate to="/admin" replace />;
+      case 'consumer':
+        console.log("Reindirizzamento a /consumer");
+        return <Navigate to="/consumer" replace />;
+      case 'prosumer':
+        console.log("Reindirizzamento a /prosumer");
+        return <Navigate to="/prosumer" replace />;
+      case 'producer':
+        console.log("Reindirizzamento a /producer");
+        return <Navigate to="/producer" replace />;
+      default:
+        console.log("Reindirizzamento a /");
+        return <Navigate to="/" replace />;
     }
   }
 
