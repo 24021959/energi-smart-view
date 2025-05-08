@@ -8,20 +8,19 @@ export default defineConfig(({ mode }) => ({
   base: '/energi-smart-view/', // questo è il nome del tuo repo
   plugins: [
     react(),
-    // Modified to handle ESM module - using dynamic import
+    // Modified to handle ESM module correctly
     mode === 'development' && {
       name: 'dynamic-lovable-tagger',
-      async configResolved() {
+      async configResolved(config) {
         if (mode === 'development') {
           try {
-            const { componentTagger } = await import('lovable-tagger');
-            return componentTagger();
+            const module = await import('lovable-tagger');
+            const plugin = module.componentTagger();
+            return plugin;
           } catch (e) {
             console.warn('Failed to load lovable-tagger:', e);
-            return null;
           }
         }
-        return null;
       }
     },
   ].filter(Boolean),
