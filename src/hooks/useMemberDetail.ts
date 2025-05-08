@@ -8,17 +8,35 @@ export function useMemberDetail(memberId: number) {
   const [memberDetail, setMemberDetail] = useState<MemberDetailData | null>(null);
   const [details, setDetails] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [dataLoading, setDataLoading] = useState(false);
 
   useEffect(() => {
-    // In a real app, this would be an API call
-    const fetchedMember = getMemberById(memberId);
-    
-    if (fetchedMember) {
-      setMemberDetail(fetchedMember);
-      setDetails(getMemberDetails(memberId));
-    }
-    
-    setLoading(false);
+    const fetchMemberData = async () => {
+      setLoading(true);
+      try {
+        // Simulate network delay
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // In a real app, this would be an API call
+        const fetchedMember = getMemberById(memberId);
+        
+        if (fetchedMember) {
+          setMemberDetail(fetchedMember);
+          setDetails(getMemberDetails(memberId));
+        }
+      } catch (error) {
+        console.error("Error fetching member data:", error);
+        toast({
+          title: "Errore",
+          description: "Si è verificato un errore durante il caricamento dei dati.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMemberData();
   }, [memberId]);
 
   const toggleMemberStatus = (isActive: boolean) => {
@@ -37,10 +55,33 @@ export function useMemberDetail(memberId: number) {
     });
   };
 
+  const loadAnalysisData = async (period: string) => {
+    setDataLoading(true);
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      toast({
+        title: "Dati caricati",
+        description: `I dati di analisi per il periodo ${period} sono stati caricati con successo.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Errore",
+        description: "Si è verificato un errore durante il caricamento dei dati di analisi.",
+        variant: "destructive",
+      });
+    } finally {
+      setDataLoading(false);
+    }
+  };
+
   return {
     memberDetail,
     details,
     loading,
-    toggleMemberStatus
+    dataLoading,
+    toggleMemberStatus,
+    loadAnalysisData
   };
 }

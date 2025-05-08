@@ -1,102 +1,72 @@
 
+import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import MemberOverview from '@/components/admin/member/MemberOverview';
-import MemberAddressCredentials from '@/components/admin/member/MemberAddressCredentials';
 import MemberEnergyData from '@/components/admin/member/MemberEnergyData';
+import MemberAddressCredentials from '@/components/admin/member/MemberAddressCredentials';
 import MemberDocuments from '@/components/admin/member/MemberDocuments';
 import PropertyList from '@/components/admin/member/PropertyList';
-import { MemberDetailData } from '@/types/member';
+import MemberDataAnalysis from '@/components/admin/member/MemberDataAnalysis';
+import { useMemberDetail } from '@/hooks/useMemberDetail';
 
 interface MemberTabsProps {
-  memberDetail: MemberDetailData;
+  memberDetail: any;
   details: any;
 }
 
-export default function MemberTabs({ memberDetail, details }: MemberTabsProps) {
-  const canManageProperties = memberDetail.memberType === 'prosumer';
-  const hasConsumerRole = memberDetail.memberType === 'consumer' || memberDetail.memberType === 'prosumer';
-
+const MemberTabs = ({ memberDetail, details }: MemberTabsProps) => {
+  // Get the data loading functionality from useMemberDetail hook
+  const { dataLoading, loadAnalysisData } = useMemberDetail(memberDetail.id);
+  
   return (
-    <Tabs defaultValue="overview">
-      <TabsList className="mb-4">
-        <TabsTrigger value="overview">Panoramica</TabsTrigger>
-        <TabsTrigger value="energy">Dati Energetici</TabsTrigger>
-        <TabsTrigger value="properties">Proprietà</TabsTrigger>
-        <TabsTrigger value="documents">Documenti</TabsTrigger>
-      </TabsList>
-
-      <TabsContent value="overview" className="space-y-4">
-        <MemberOverview 
-          personalInfo={{
-            name: memberDetail.name,
-            email: memberDetail.email,
-            type: memberDetail.type,
-            status: memberDetail.status,
-            fiscalCode: details.fiscalCode,
-            vatNumber: details.vatNumber,
-            idType: details.idType,
-            idNumber: details.idNumber,
-            registrationDate: details.registrationDate
-          }} 
-        />
-
-        <MemberAddressCredentials 
-          addresses={{
-            legalAddress: details.legalAddress,
-            supplyAddress: details.supplyAddress
-          }}
-          credentials={{
-            username: details.username
-          }}
-        />
-      </TabsContent>
-
-      <TabsContent value="energy">
-        <MemberEnergyData 
-          energyData={{
-            podCode: details.podCode,
-            supplyAddress: details.supplyAddress,
-            hasConsumptionData: details.consumptionData.length > 0,
-            hasProductionData: details.productionData.length > 0,
-            memberType: memberDetail.memberType
-          }}
-        />
-      </TabsContent>
-
-      <TabsContent value="properties" className="space-y-4">
-        {canManageProperties && (
-          <PropertyList 
-            properties={memberDetail.properties.filter(p => p.ownerId === memberDetail.id)} 
-            memberId={memberDetail.id}
-            isOwner={true}
-          />
-        )}
+    <div className="mt-6">
+      <Tabs defaultValue="overview">
+        <TabsList className="mb-4">
+          <TabsTrigger value="overview">Panoramica</TabsTrigger>
+          <TabsTrigger value="energy">Dati Energetici</TabsTrigger>
+          <TabsTrigger value="analysis">Analisi</TabsTrigger>
+          <TabsTrigger value="documents">Documenti</TabsTrigger>
+          {memberDetail.type === 'owner' && <TabsTrigger value="properties">Proprietà</TabsTrigger>}
+        </TabsList>
         
-        {hasConsumerRole && (
-          <PropertyList 
-            properties={memberDetail.properties.filter(p => p.consumerId === memberDetail.id)} 
-            memberId={memberDetail.id}
-            isOwner={false}
+        <TabsContent value="overview">
+          <MemberAddressCredentials 
+            memberInfo={{
+              email: memberDetail.email,
+              phone: details.phone || 'Non specificato',
+              address: details.address,
+              fiscalCode: details.fiscalCode || 'Non specificato',
+              vatNumber: details.vatNumber || 'Non specificato'
+            }}
           />
-        )}
+        </TabsContent>
         
-        {!canManageProperties && !hasConsumerRole && (
-          <div className="text-center py-8">
-            <p className="text-muted-foreground">
-              Questo membro non può gestire proprietà in quanto è di tipo {memberDetail.memberType}.
-            </p>
-          </div>
+        <TabsContent value="energy">
+          <MemberEnergyData energyData={details.energyData} />
+        </TabsContent>
+        
+        <TabsContent value="analysis">
+          <MemberDataAnalysis 
+            memberId={memberDetail.id} 
+            dataLoading={dataLoading} 
+            onLoadData={loadAnalysisData} 
+          />
+        </TabsContent>
+        
+        <TabsContent value="documents">
+          <MemberDocuments 
+            documents={details.documents || []}
+            memberId={memberDetail.id}
+          />
+        </TabsContent>
+        
+        {memberDetail.type === 'owner' && (
+          <TabsContent value="properties">
+            <PropertyList ownerId={memberDetail.id} />
+          </TabsContent>
         )}
-      </TabsContent>
-
-      <TabsContent value="documents">
-        <MemberDocuments 
-          documentInfo={{
-            idNumber: details.idNumber,
-            registrationDate: details.registrationDate
-          }}
-        />
-      </TabsContent>
-    </Tabs>
+      </Tabs>
+    </div>
   );
-}
+};
+
+export default MemberTabs;
