@@ -3,8 +3,8 @@ import {
   WeatherForecastData, 
   estimateSolarProduction, 
   estimateWindProduction, 
-  calculatePeakSunHours as getPeakSunHours, 
-  getWindIntensityText as getWindText 
+  calculatePeakSunHours, 
+  getWindIntensityText 
 } from "@/services/weather";
 import { WeatherIcon } from "./WeatherIcon";
 import { Sun, Battery, Gauge, Wind } from "lucide-react";
@@ -23,7 +23,7 @@ export function MapWeatherSummary({ forecast, city, province }: MapWeatherSummar
   // Calculate estimated production in kWh based on weather conditions
   // Assuming a standard 6kW solar system
   const solarSystemCapacity = 6;
-  const peakSunHours = getPeakSunHours(forecast.icon);
+  const peakSunHours = calculatePeakSunHours(forecast.icon);
   const estimatedSolarProduction = ((solarSystemCapacity * peakSunHours) * (solarProductionPercentage / 100)).toFixed(1);
   
   // Assuming a standard 3kW wind turbine

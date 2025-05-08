@@ -18,7 +18,7 @@ export function GoogleMap({ city, location }: GoogleMapProps) {
   
   useEffect(() => {
     const apiKey = 'AIzaSyBz-SCJGkRzZini9Wt2IpgGrGJl-uJTFxI';
-    let mapInstance: any = null;
+    let mapInstance: google.maps.Map | null = null;
 
     const initializeMap = async () => {
       if (!mapContainerRef.current) {
@@ -34,10 +34,10 @@ export function GoogleMap({ city, location }: GoogleMapProps) {
         });
 
         // Load the Google Maps API
-        const google = await loader.load();
+        const { Map, Marker } = await loader.importLibrary("maps");
         
         // Create a map instance
-        mapInstance = new google.maps.Map(mapContainerRef.current, {
+        mapInstance = new Map(mapContainerRef.current, {
           center: location,
           zoom: 14,
           mapTypeControl: false,
@@ -46,7 +46,7 @@ export function GoogleMap({ city, location }: GoogleMapProps) {
         });
 
         // Add a marker for the city
-        new google.maps.Marker({
+        new Marker({
           position: location,
           map: mapInstance,
           title: city
