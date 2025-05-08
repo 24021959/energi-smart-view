@@ -17,28 +17,30 @@ export function GoogleMap({ city, location }: GoogleMapProps) {
   const [mapError, setMapError] = useState<string | null>(null);
   
   useEffect(() => {
-    const apiKey = 'AIzaSyBz-SCJGkRzZini9Wt2IpgGrGJl-uJTFxI';
+    const apiKey = 'AIzaSyCvR92r28e114VivIzlQHWlLomEJ_gqzJg';
     let mapInstance: any = null;
 
     const initializeMap = async () => {
-      if (!mapContainerRef.current) {
-        console.error("Map container not ready");
-        return;
-      }
-
       try {
+        if (!mapContainerRef.current) {
+          console.error("Map container not ready");
+          return;
+        }
+
         // Initialize the Google Maps loader
         const loader = new Loader({
           apiKey,
           version: "weekly",
+          libraries: ["maps"]
         });
 
         // Load the Google Maps API
-        const { Map, Marker } = await loader.importLibrary("maps");
+        await loader.load();
+        const { Map, Marker } = await google.maps.importLibrary("maps") as any;
         
         // Create a map instance
         mapInstance = new Map(mapContainerRef.current, {
-          center: location,
+          center: { lat: location.lat, lng: location.lng },
           zoom: 14,
           mapTypeControl: false,
           fullscreenControl: true,
@@ -47,7 +49,7 @@ export function GoogleMap({ city, location }: GoogleMapProps) {
 
         // Add a marker for the city
         new Marker({
-          position: location,
+          position: { lat: location.lat, lng: location.lng },
           map: mapInstance,
           title: city
         });
@@ -59,6 +61,7 @@ export function GoogleMap({ city, location }: GoogleMapProps) {
       }
     };
 
+    // Initialize the map when the component mounts
     initializeMap();
 
     // Cleanup function
