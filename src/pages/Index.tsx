@@ -1,7 +1,7 @@
 
 import { Logo } from "@/components/Logo";
 import { useAuth } from "@/hooks/useAuthContext";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate, useNavigate, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { getRedirectPathForRole, APP_CONFIG, getFullPath } from "@/lib/config";
@@ -10,9 +10,12 @@ const Index = () => {
   const { authState } = useAuth();
   const { user, isLoading } = authState;
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Handle redirects when user is authenticated
   useEffect(() => {
+    console.log("Index page - Current location:", location);
+    
     if (user && !isLoading) {
       console.log("Authenticated user detected in Index page:", user);
       
@@ -43,7 +46,7 @@ const Index = () => {
       console.log("Redirecting to dashboard:", dashboardPath);
       navigate(dashboardPath, { replace: true });
     }
-  }, [user, isLoading, navigate]);
+  }, [user, isLoading, navigate, location]);
 
   // Show loader while loading
   if (isLoading) {
@@ -62,6 +65,12 @@ const Index = () => {
     return null; // The effect will handle redirection
   }
 
+  const handleLoginClick = () => {
+    const loginPath = getFullPath(APP_CONFIG.paths.login);
+    console.log("Navigating to login page:", loginPath);
+    navigate(APP_CONFIG.paths.login);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header with Logo */}
@@ -73,7 +82,7 @@ const Index = () => {
           </div>
           <div>
             <button 
-              onClick={() => navigate(APP_CONFIG.paths.login)} 
+              onClick={handleLoginClick} 
               className="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90 transition-colors"
             >
               Accedi

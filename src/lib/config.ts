@@ -49,14 +49,12 @@ export const APP_CONFIG = {
 
 // Helper for redirects based on role
 export const getRedirectPathForRole = (role: string): string => {
-  const basePath = APP_CONFIG.basePath;
-  
   switch(role) {
-    case 'cer_manager': return `${basePath}${APP_CONFIG.paths.admin.root}`;
-    case 'consumer': return `${basePath}${APP_CONFIG.paths.consumer.root}`;
-    case 'producer': return `${basePath}${APP_CONFIG.paths.producer.root}`;
-    case 'prosumer': return `${basePath}${APP_CONFIG.paths.prosumer.root}`;
-    default: return `${basePath}${APP_CONFIG.paths.home}`;
+    case 'cer_manager': return `${APP_CONFIG.paths.admin.root}`;
+    case 'consumer': return `${APP_CONFIG.paths.consumer.root}`;
+    case 'producer': return `${APP_CONFIG.paths.producer.root}`;
+    case 'prosumer': return `${APP_CONFIG.paths.prosumer.root}`;
+    default: return `${APP_CONFIG.paths.home}`;
   }
 };
 

@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Logo } from '@/components/Logo';
 import { LoginFormData } from '@/types/auth';
 import LoginForm from '@/components/auth/LoginForm';
-import { getRedirectPathForRole } from '@/lib/config';
+import { getRedirectPathForRole, getFullPath } from '@/lib/config';
 
 // Form validation schema
 const loginSchema = z.object({
@@ -26,6 +26,7 @@ const loginSchema = z.object({
 export default function Login() {
   const { authState, login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [redirecting, setRedirecting] = useState(false);
 
@@ -36,7 +37,8 @@ export default function Login() {
       isLoading: authState.isLoading,
       error: authState.error,
       redirecting,
-      currentPath: window.location.pathname
+      currentPath: window.location.pathname,
+      fullLocation: location
     });
     
     if (authState.user && !redirecting) {
@@ -55,7 +57,7 @@ export default function Login() {
         navigate(path, { replace: true });
       }, 100);
     }
-  }, [authState.user, authState.isLoading, navigate, redirecting]);
+  }, [authState.user, authState.isLoading, navigate, redirecting, location]);
 
   // Form setup with react-hook-form
   const form = useForm<LoginFormData>({

@@ -15,7 +15,7 @@ interface ProtectedRouteProps {
 export const ProtectedRoute = ({ 
   allowedRoles, 
   children, 
-  redirectPath = getFullPath(APP_CONFIG.paths.login) 
+  redirectPath = APP_CONFIG.paths.login 
 }: ProtectedRouteProps) => {
   const { authState } = useAuth();
   const { user, isLoading, error } = authState;
