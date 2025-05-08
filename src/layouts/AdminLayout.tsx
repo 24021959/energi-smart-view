@@ -5,7 +5,7 @@ import { AdminHeader } from '@/components/admin/AdminHeader';
 import { useAuth } from '@/hooks/useAuthContext';
 import { Navigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
-import { getFullPath, APP_CONFIG } from '@/lib/config';
+import { getRedirectPathForRole, getFullPath, APP_CONFIG } from '@/lib/config';
 
 interface AdminLayoutProps {
   children: ReactNode;
