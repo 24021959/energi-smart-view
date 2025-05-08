@@ -6,7 +6,7 @@ import './index.css'
 import { AuthProvider } from './hooks/useAuthContext'
 
 createRoot(document.getElementById("root")!).render(
-  <BrowserRouter>
+  <BrowserRouter basename="/energi-smart-view/">
     <AuthProvider>
       <App />
     </AuthProvider>

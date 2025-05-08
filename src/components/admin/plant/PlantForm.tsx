@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from 'react-router-dom';
 import * as z from 'zod';
@@ -57,6 +57,9 @@ const plantFormSchema = z.object({
   }),
 });
 
+// Definire il tipo dello schema per correggere gli errori TypeScript
+type PlantFormValues = z.infer<typeof plantFormSchema>;
+
 // Opzioni per il tipo di impianto
 const plantTypeOptions = [
   { value: 'solar', label: 'Fotovoltaico' },
@@ -77,7 +80,7 @@ export function PlantForm({ initialData, plantId, mode = 'create' }: PlantFormPr
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isEditing = mode === 'edit';
 
-  const form = useForm<PlantFormData>({
+  const form = useForm<PlantFormValues>({
     resolver: zodResolver(plantFormSchema),
     defaultValues: initialData || {
       name: '',
@@ -96,12 +99,12 @@ export function PlantForm({ initialData, plantId, mode = 'create' }: PlantFormPr
   useEffect(() => {
     if (initialData && isEditing) {
       Object.keys(initialData).forEach((key) => {
-        form.setValue(key as keyof PlantFormData, initialData[key as keyof PlantFormData]);
+        form.setValue(key as keyof PlantFormValues, initialData[key as keyof PlantFormData] as any);
       });
     }
   }, [initialData, form, isEditing]);
 
-  const onSubmit = async (data: PlantFormData) => {
+  const onSubmit: SubmitHandler<PlantFormValues> = async (data) => {
     setIsSubmitting(true);
     try {
       if (isEditing && plantId) {
