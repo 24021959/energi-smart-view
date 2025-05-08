@@ -92,7 +92,7 @@ export function MapWeatherSummary({ forecast, city, province }: MapWeatherSummar
               </div>
               <div>
                 <h4 className="font-medium">{forecast.wind} km/h</h4>
-                <p className="text-sm text-gray-600">Vento {getWindText(forecast.wind)}</p>
+                <p className="text-sm text-gray-600">Vento {getWindIntensityText(forecast.wind)}</p>
                 <p className="text-xs text-gray-400">{formattedDate}</p>
               </div>
             </div>

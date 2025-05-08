@@ -18,7 +18,7 @@ export function GoogleMap({ city, location }: GoogleMapProps) {
   
   useEffect(() => {
     const apiKey = 'AIzaSyBz-SCJGkRzZini9Wt2IpgGrGJl-uJTFxI';
-    let mapInstance: google.maps.Map | null = null;
+    let mapInstance: any = null;
 
     const initializeMap = async () => {
       if (!mapContainerRef.current) {
