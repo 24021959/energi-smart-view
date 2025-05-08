@@ -2,13 +2,13 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { LoginFormData } from '@/types/auth';
-import { useForm } from 'react-hook-form';
+import { UseFormReturn } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 
 interface LoginFormProps {
-  form: ReturnType<typeof useForm<LoginFormData>>;
+  form: UseFormReturn<LoginFormData>;
   onSubmit: (data: LoginFormData) => Promise<void>;
   isSubmitting: boolean;
 }

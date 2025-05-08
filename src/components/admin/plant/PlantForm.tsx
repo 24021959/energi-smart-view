@@ -109,7 +109,7 @@ export function PlantForm({ initialData, plantId, mode = 'create' }: PlantFormPr
     try {
       if (isEditing && plantId) {
         // Aggiorna un impianto esistente
-        await updatePlant(plantId, data);
+        await updatePlant(plantId, data as PlantFormData);
         
         toast({
           title: 'Impianto aggiornato con successo',
@@ -117,7 +117,7 @@ export function PlantForm({ initialData, plantId, mode = 'create' }: PlantFormPr
         });
       } else {
         // Crea un nuovo impianto
-        await createPlant(data);
+        await createPlant(data as PlantFormData);
         
         toast({
           title: 'Impianto aggiunto con successo',
