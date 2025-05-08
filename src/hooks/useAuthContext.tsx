@@ -1,19 +1,22 @@
 
 import { createContext, useContext, ReactNode } from 'react';
-import { AuthState, UserProfile } from '@/types/auth';
+import { AuthState, UserProfile, LoginResult, LogoutResult } from '@/types/auth';
 import { useAuthSession } from './useAuthSession';
 import { useAuthLogin } from './useAuthLogin';
 import { useAuthLogout } from './useAuthLogout';
 
-// Create context
-const AuthContext = createContext<{
+// Define strongly typed context interface
+interface AuthContextType {
   authState: AuthState;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  logout: () => Promise<void>;
-}>({
+  login: (email: string, password: string) => Promise<LoginResult>;
+  logout: () => Promise<LogoutResult>;
+}
+
+// Create context with default values
+const AuthContext = createContext<AuthContextType>({
   authState: { user: null, isLoading: true, error: null },
   login: async () => ({ success: false }),
-  logout: async () => {},
+  logout: async () => ({ success: false }),
 });
 
 // Provider component
@@ -23,7 +26,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const { logout: logoutHook } = useAuthLogout();
 
   // Login function
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string): Promise<LoginResult> => {
     const result = await loginHook(email, password);
     
     if (result.success && result.user) {
@@ -43,7 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   // Logout function
-  const logout = async () => {
+  const logout = async (): Promise<LogoutResult> => {
     const result = await logoutHook();
     
     if (result.success) {
@@ -54,6 +57,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         error: null
       });
     }
+    
+    return result;
   };
 
   return (
@@ -64,6 +69,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 }
 
 // Custom hook to use the auth context
-export function useAuth() {
+export function useAuth(): AuthContextType {
   return useContext(AuthContext);
 }

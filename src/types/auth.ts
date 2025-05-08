@@ -18,3 +18,14 @@ export interface LoginFormData {
   email: string;
   password: string;
 }
+
+export interface LoginResult {
+  success: boolean;
+  user?: UserProfile;
+  error?: string;
+}
+
+export interface LogoutResult {
+  success: boolean;
+  error?: string;
+}

@@ -1,13 +1,13 @@
 
 import { useState } from 'react';
 import { loginUser } from '@/lib/supabase';
-import { UserProfile } from '@/types/auth';
+import { UserProfile, LoginResult } from '@/types/auth';
 import { saveUserToLocalStorage } from '@/lib/auth/authUtils';
 
 export function useAuthLogin() {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string): Promise<LoginResult> => {
     setIsLoggingIn(true);
     try {
       console.log("Attempting login for:", email);
@@ -38,7 +38,7 @@ export function useAuthLogin() {
       const userProfile: UserProfile = {
         id: data.user.id,
         email: data.user.email || '',
-        role: data.user.role as 'cer_manager' | 'user' | 'producer' | 'consumer' | 'prosumer',
+        role: data.user.role as UserProfile['role'],
         created_at: data.user.created_at || new Date().toISOString()
       };
       

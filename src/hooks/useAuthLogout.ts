@@ -2,11 +2,12 @@
 import { useState } from 'react';
 import { logoutUser } from '@/lib/supabase';
 import { removeUserFromLocalStorage } from '@/lib/auth/authUtils';
+import { LogoutResult } from '@/types/auth';
 
 export function useAuthLogout() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  const logout = async () => {
+  const logout = async (): Promise<LogoutResult> => {
     setIsLoggingOut(true);
     try {
       console.log("Logging out...");
