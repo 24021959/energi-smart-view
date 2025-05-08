@@ -3,6 +3,7 @@ import { useAuth } from '@/hooks/useAuthContext';
 import { Button } from '@/components/ui/button';
 import { Menu } from 'lucide-react';
 import { Logo } from '@/components/Logo';
+import { toast } from 'sonner';
 
 type AdminHeaderProps = {
   isSidebarOpen: boolean;
@@ -15,7 +16,10 @@ export function AdminHeader({ isSidebarOpen, setIsSidebarOpen, title = 'Dashboar
   const user = authState.user;
 
   const handleLogout = async () => {
-    await logout();
+    const result = await logout();
+    toast.success("Logout effettuato", {
+      description: "Hai effettuato il logout con successo"
+    });
   };
 
   return (

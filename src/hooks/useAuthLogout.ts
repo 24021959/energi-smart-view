@@ -2,7 +2,6 @@
 import { useState } from 'react';
 import { logoutUser } from '@/lib/supabase';
 import { removeUserFromLocalStorage } from '@/lib/auth/authUtils';
-import { toast } from 'sonner';
 
 export function useAuthLogout() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -19,7 +18,6 @@ export function useAuthLogout() {
       return { success: true };
     } catch (error) {
       console.error("Error during logout:", error);
-      toast.error('Error during logout');
       setIsLoggingOut(false);
       return { 
         success: false,

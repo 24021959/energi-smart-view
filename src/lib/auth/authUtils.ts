@@ -1,7 +1,6 @@
 
 import { supabase } from '@/lib/supabase';
 import { UserProfile } from '@/types/auth';
-import { toast } from 'sonner';
 
 // LocalStorage key
 export const AUTH_USER_KEY = 'energi-smart-auth-user';
@@ -75,7 +74,6 @@ export const fetchUserSession = async (): Promise<UserProfile | null> => {
     return null;
   } catch (error) {
     console.error("Error fetching user session:", error);
-    toast.error('Error loading session');
     return null;
   }
 };
