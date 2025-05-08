@@ -2,7 +2,7 @@
 import { ProducerLayout } from '@/layouts/ProducerLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { LineChart, Receipt, TrendingDown, TrendingUp, Zap } from 'lucide-react';
+import { LineChart, Receipt, TrendingDown, TrendingUp, Zap, Activity } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function ProducerDashboard() {
