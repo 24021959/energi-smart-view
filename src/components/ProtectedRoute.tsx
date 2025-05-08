@@ -3,7 +3,8 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuthContext';
 import { UserRole } from '@/types/auth';
 import { useEffect, ReactNode } from 'react';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
+import { getRedirectPathForRole, APP_CONFIG } from '@/lib/config';
 
 interface ProtectedRouteProps {
   allowedRoles?: UserRole[];
@@ -14,22 +15,20 @@ interface ProtectedRouteProps {
 export const ProtectedRoute = ({ 
   allowedRoles, 
   children, 
-  redirectPath = '/login' 
+  redirectPath = APP_CONFIG.paths.login 
 }: ProtectedRouteProps) => {
   const { authState } = useAuth();
   const { user, isLoading, error } = authState;
 
   useEffect(() => {
     if (error) {
-      toast({
-        variant: "destructive",
-        title: "Errore di autenticazione",
-        description: error,
+      toast.error("Errore di autenticazione", {
+        description: error
       });
     }
   }, [error]);
 
-  // Log per debugging
+  // Debug logs
   useEffect(() => {
     console.log("ProtectedRoute - Auth state:", { 
       user, 
@@ -40,7 +39,7 @@ export const ProtectedRoute = ({
     });
   }, [user, isLoading, error, allowedRoles]);
 
-  // Mostra un loader mentre verifica l'autenticazione
+  // Show loader while checking authentication
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
@@ -50,47 +49,28 @@ export const ProtectedRoute = ({
     );
   }
 
-  // Se c'è un errore di autenticazione o non c'è un utente, reindirizza al login
+  // If authentication error or no user, redirect to login
   if (error || !user) {
     console.log("Redirecting to login due to:", { error, user });
     return <Navigate to={redirectPath} replace />;
   }
 
-  // Se ci sono ruoli consentiti e l'utente non ha il ruolo adeguato
+  // If there are allowed roles and user doesn't have the required role
   if (allowedRoles && !allowedRoles.includes(user.role)) {
     console.log("User does not have required role", { userRole: user.role, allowedRoles });
     
-    // Mostra un toast per informare l'utente
-    toast({
-      variant: "destructive",
-      title: "Accesso non autorizzato",
-      description: "Non hai i permessi necessari per accedere a questa pagina",
+    // Show toast
+    toast.error("Accesso non autorizzato", {
+      description: "Non hai i permessi necessari per accedere a questa pagina"
     });
     
-    // Reindirizza alla dashboard appropriata in base al ruolo
-    let redirectTo = '/';
-    
-    switch(user.role) {
-      case 'cer_manager':
-        redirectTo = '/admin';
-        break;
-      case 'producer':
-        redirectTo = '/producer';
-        break;
-      case 'consumer':
-        redirectTo = '/consumer';
-        break;
-      case 'prosumer':
-        redirectTo = '/prosumer';
-        break;
-      default:
-        redirectTo = '/';
-    }
+    // Redirect to appropriate dashboard based on role
+    const redirectTo = getRedirectPathForRole(user.role);
     
     console.log("Redirecting user to:", redirectTo);
     return <Navigate to={redirectTo} replace />;
   }
 
-  // Se è presente il children, renderizzalo, altrimenti usa Outlet
+  // If there's a children component, render it, otherwise use Outlet
   return children ? <>{children}</> : <Outlet />;
 };

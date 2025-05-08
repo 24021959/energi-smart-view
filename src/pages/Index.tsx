@@ -3,53 +3,49 @@ import { Logo } from "@/components/Logo";
 import { useAuth } from "@/hooks/useAuthContext";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
+import { getRedirectPathForRole } from "@/lib/config";
 
 const Index = () => {
   const { authState } = useAuth();
   const { user, isLoading } = authState;
   const navigate = useNavigate();
 
-  // Gestisce i reindirizzamenti quando l'utente è autenticato
+  // Handle redirects when user is authenticated
   useEffect(() => {
     if (user && !isLoading) {
       console.log("Authenticated user detected in Index page:", user);
       
-      let dashboardPath = '/';
-      let welcomeMessage = "Benvenuto";
+      const dashboardPath = getRedirectPathForRole(user.role);
       
+      let welcomeMessage = "Benvenuto";
       switch(user.role) {
         case 'cer_manager':
-          dashboardPath = '/admin';
           welcomeMessage = "Benvenuto Gestore CER";
           break;
         case 'consumer':
-          dashboardPath = '/consumer';
           welcomeMessage = "Benvenuto Consumatore";
           break;
         case 'prosumer':
-          dashboardPath = '/prosumer';
           welcomeMessage = "Benvenuto Prosumer";
           break;
         case 'producer':
-          dashboardPath = '/producer';
           welcomeMessage = "Benvenuto Produttore";
           break;
       }
       
-      // Mostra un toast di benvenuto
-      toast({
-        title: welcomeMessage,
+      // Show welcome toast
+      toast.success(welcomeMessage, {
         description: "Accesso alla dashboard"
       });
       
-      // Naviga alla dashboard appropriata
+      // Navigate to appropriate dashboard
       console.log("Redirecting to dashboard:", dashboardPath);
       navigate(dashboardPath, { replace: true });
     }
   }, [user, isLoading, navigate]);
 
-  // Se stiamo ancora caricando, mostra un indicatore
+  // Show loader while loading
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -61,10 +57,9 @@ const Index = () => {
     );
   }
 
-  // Se l'utente è autenticato, il reindirizzamento sarà gestito dall'effect
-  // Se l'utente non è autenticato, mostra la pagina di benvenuto
+  // If user is authenticated, redirection will be handled by the effect
   if (user) {
-    return null; // L'effect si occuperà del reindirizzamento
+    return null; // The effect will handle redirection
   }
 
   return (

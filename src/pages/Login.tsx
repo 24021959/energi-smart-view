@@ -4,14 +4,15 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Logo } from '@/components/Logo';
 import { LoginFormData } from '@/types/auth';
 import LoginForm from '@/components/auth/LoginForm';
+import { getRedirectPathForRole } from '@/lib/config';
 
-// Schema di validazione del form
+// Form validation schema
 const loginSchema = z.object({
   email: z.string().email({
     message: 'Email non valida'
@@ -21,7 +22,7 @@ const loginSchema = z.object({
   })
 }) as z.ZodType<LoginFormData>;
 
-// Componente principale Login
+// Login component
 export default function Login() {
   const { authState, login } = useAuth();
   const navigate = useNavigate();
@@ -36,37 +37,19 @@ export default function Login() {
     });
     
     if (authState.user) {
-      // Determina la dashboard appropriata in base al ruolo
+      // Redirect to appropriate dashboard based on role
       redirectToUserDashboard(authState.user.role);
     }
   }, [authState.user, authState.isLoading]);
 
-  // Funzione di reindirizzamento
+  // Redirect function
   const redirectToUserDashboard = (role: string) => {
-    let path = '/';
-    
-    switch(role) {
-      case 'cer_manager':
-        path = '/admin';
-        break;
-      case 'consumer':
-        path = '/consumer';
-        break;
-      case 'prosumer':
-        path = '/prosumer';
-        break;
-      case 'producer':
-        path = '/producer';
-        break;
-      default:
-        path = '/';
-    }
-    
-    console.log(`Login - Reindirizzamento a: ${path} per utente con ruolo ${role}`);
+    const path = getRedirectPathForRole(role);
+    console.log(`Login - Redirecting to: ${path} for user with role ${role}`);
     navigate(path, { replace: true });
   };
 
-  // Configurazione del form con react-hook-form
+  // Form setup with react-hook-form
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -75,44 +58,32 @@ export default function Login() {
     }
   });
 
-  // Se l'utente è già autenticato, reindirizza
+  // If user is already authenticated, redirect
   if (authState.user && !authState.isLoading) {
-    const path = {
-      cer_manager: '/admin',
-      consumer: '/consumer',
-      prosumer: '/prosumer',
-      producer: '/producer',
-      user: '/'
-    }[authState.user.role] || '/';
-    
-    console.log(`Reindirizzamento automatico a ${path}`);
+    const path = getRedirectPathForRole(authState.user.role);
+    console.log(`Automatic redirect to ${path}`);
     return <Navigate to={path} replace />;
   }
 
-  // Gestione del submit del form
+  // Form submission handler
   const onSubmit = async (data: LoginFormData) => {
     setIsSubmitting(true);
     try {
-      console.log("Tentativo di login con:", data);
+      console.log("Login attempt with:", data);
       const { success, error } = await login(data.email, data.password);
       
       if (success) {
-        toast({
-          title: "Accesso effettuato",
+        toast.success("Accesso effettuato", {
           description: `Benvenuto nel sistema EnergiSmart`
         });
-        // Il reindirizzamento verrà gestito dall'effect che monitora authState.user
+        // Redirection will be handled by the effect monitoring authState.user
       } else {
-        toast({
-          variant: "destructive",
-          title: "Errore di accesso",
+        toast.error("Errore di accesso", {
           description: error || "Credenziali non valide"
         });
       }
     } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Errore",
+      toast.error("Errore", {
         description: "Si è verificato un errore durante il login"
       });
     } finally {

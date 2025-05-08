@@ -2,19 +2,19 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { supabase, getUserRole, loginUser, logoutUser } from '@/lib/supabase';
 import { AuthState, UserProfile } from '@/types/auth';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
-// Valore predefinito del contesto
+// LocalStorage key
+const AUTH_USER_KEY = 'energi-smart-auth-user';
+
+// Default context state
 const initialState: AuthState = {
   user: null,
   isLoading: true,
   error: null,
 };
 
-// Chiavi localStorage
-const AUTH_USER_KEY = 'energi-smart-auth-user';
-
-// Creazione del contesto
+// Create context
 const AuthContext = createContext<{
   authState: AuthState;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
@@ -25,17 +25,17 @@ const AuthContext = createContext<{
   logout: async () => {},
 });
 
-// Provider del contesto
+// Provider component
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [authState, setAuthState] = useState<AuthState>(initialState);
 
-  // Controlla la sessione all'avvio
+  // Check session on startup
   useEffect(() => {
     const checkSession = async () => {
       try {
         console.log("Checking session...");
         
-        // Prima verifica se c'è un utente in localStorage (per utenti demo)
+        // First check localStorage for demo user
         const localUser = localStorage.getItem(AUTH_USER_KEY);
         if (localUser) {
           try {
@@ -46,14 +46,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               isLoading: false,
               error: null,
             });
-            return; // Interrompi qui se c'è un utente nel localStorage
+            return; // Stop here if we have a localStorage user
           } catch (e) {
             console.error("Error parsing user from localStorage:", e);
             localStorage.removeItem(AUTH_USER_KEY);
           }
         }
         
-        // Se non c'è un utente nel localStorage, verifica con supabase
+        // If no localStorage user, check Supabase
         const { data: { session } } = await supabase.auth.getSession();
         
         if (session) {
@@ -62,18 +62,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           
           if (user) {
             console.log("User found:", user);
-            // Recupera il ruolo dell'utente
+            // Get user role
             const role = await getUserRole();
             console.log("User role:", role);
             
             const userProfile: UserProfile = {
               id: user.id,
               email: user.email || '',
-              role: role as 'cer_manager' | 'user' | 'producer' | 'consumer' | 'prosumer' || 'user', // Fallback al ruolo 'user' se non definito
+              role: role as 'cer_manager' | 'user' | 'producer' | 'consumer' | 'prosumer' || 'user', 
               created_at: user.created_at || new Date().toISOString(),
             };
             
-            // Salva anche in localStorage per maggiore persistenza
+            // Save to localStorage for persistence
             localStorage.setItem(AUTH_USER_KEY, JSON.stringify(userProfile));
             
             setAuthState({
@@ -94,22 +94,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setAuthState({
           user: null,
           isLoading: false,
-          error: 'Errore durante il caricamento della sessione',
+          error: 'Error loading session',
         });
-        toast({
-          variant: "destructive",
-          title: "Errore",
-          description: "Impossibile caricare la sessione utente",
-        });
+        toast.error('Error loading session');
       }
     };
 
+    // Listen for auth state changes
     const authListener = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed:", event, session);
       if (event === 'SIGNED_IN' && session) {
         await checkSession();
       } else if (event === 'SIGNED_OUT') {
-        localStorage.removeItem(AUTH_USER_KEY); // Rimuovi utente dal localStorage al logout
+        localStorage.removeItem(AUTH_USER_KEY); // Remove user from localStorage on logout
         setAuthState({ ...initialState, isLoading: false });
       }
     });
@@ -120,7 +117,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  // Funzione di login
+  // Login function
   const login = async (email: string, password: string) => {
     try {
       console.log("Attempting login for:", email);
@@ -131,7 +128,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.error("Login error:", error);
         return {
           success: false,
-          error: error.message || 'Errore durante il login',
+          error: error.message || 'Login error',
         };
       }
 
@@ -141,11 +138,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.error("No user data returned from login");
         return { 
           success: false,
-          error: 'Dati utente non trovati'
+          error: 'User data not found'
         };
       }
       
-      // Creo un oggetto completo del profilo utente
+      // Create complete user profile
       const userProfile: UserProfile = {
         id: data.user.id,
         email: data.user.email || '',
@@ -155,10 +152,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       console.log("User profile created:", userProfile);
       
-      // Salvo l'utente nel localStorage per persistenza
+      // Save user to localStorage
       localStorage.setItem(AUTH_USER_KEY, JSON.stringify(userProfile));
       
-      // Aggiorno lo stato di autenticazione
+      // Update auth state
       setAuthState({
         user: userProfile,
         isLoading: false,
@@ -170,21 +167,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.error("Exception during login:", error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Errore durante il login',
+        error: error instanceof Error ? error.message : 'Login error',
       };
     }
   };
 
-  // Funzione di logout
+  // Logout function
   const logout = async () => {
     try {
       console.log("Logging out...");
-      // Rimuovi utente dal localStorage
+      // Remove user from localStorage
       localStorage.removeItem(AUTH_USER_KEY);
       await logoutUser();
       console.log("Logout successful");
       
-      // Aggiorno lo stato manualmente
+      // Update state manually
       setAuthState({
         user: null,
         isLoading: false,
@@ -193,11 +190,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
     } catch (error) {
       console.error("Error during logout:", error);
-      toast({
-        variant: "destructive",
-        title: "Errore",
-        description: "Impossibile effettuare il logout",
-      });
+      toast.error('Error during logout');
     }
   };
 
@@ -208,7 +201,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
-// Hook personalizzato per utilizzare il contesto
+// Custom hook to use the auth context
 export function useAuth() {
   return useContext(AuthContext);
 }
