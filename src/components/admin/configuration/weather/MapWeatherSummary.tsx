@@ -1,9 +1,10 @@
+
 import { 
   WeatherForecastData, 
   estimateSolarProduction, 
   estimateWindProduction, 
-  calculatePeakSunHours, 
-  getWindIntensityText 
+  calculatePeakSunHours as getPeakSunHours, 
+  getWindIntensityText as getWindText 
 } from "@/services/weather";
 import { WeatherIcon } from "./WeatherIcon";
 import { Sun, Battery, Gauge, Wind } from "lucide-react";
@@ -22,7 +23,7 @@ export function MapWeatherSummary({ forecast, city, province }: MapWeatherSummar
   // Calculate estimated production in kWh based on weather conditions
   // Assuming a standard 6kW solar system
   const solarSystemCapacity = 6;
-  const peakSunHours = calculatePeakSunHours(forecast.icon);
+  const peakSunHours = getPeakSunHours(forecast.icon);
   const estimatedSolarProduction = ((solarSystemCapacity * peakSunHours) * (solarProductionPercentage / 100)).toFixed(1);
   
   // Assuming a standard 3kW wind turbine
@@ -91,7 +92,7 @@ export function MapWeatherSummary({ forecast, city, province }: MapWeatherSummar
               </div>
               <div>
                 <h4 className="font-medium">{forecast.wind} km/h</h4>
-                <p className="text-sm text-gray-600">Vento {getWindIntensityText(forecast.wind)}</p>
+                <p className="text-sm text-gray-600">Vento {getWindText(forecast.wind)}</p>
                 <p className="text-xs text-gray-400">{formattedDate}</p>
               </div>
             </div>
@@ -120,30 +121,4 @@ export function MapWeatherSummary({ forecast, city, province }: MapWeatherSummar
       </Card>
     </div>
   );
-}
-
-// Helper function to calculate peak sun hours based on weather conditions
-function calculatePeakSunHours(forecast: WeatherForecastData): number {
-  // Peak sun hours vary by weather condition and season
-  if (forecast.icon.includes('01')) return 5.5; // Clear sky
-  if (forecast.icon.includes('02')) return 4.5; // Few clouds
-  if (forecast.icon.includes('03')) return 3.5; // Scattered clouds
-  if (forecast.icon.includes('04')) return 2.5; // Broken clouds
-  if (forecast.icon.includes('09')) return 1.5; // Shower rain
-  if (forecast.icon.includes('10')) return 2.0; // Rain
-  if (forecast.icon.includes('11')) return 1.0; // Thunderstorm
-  if (forecast.icon.includes('13')) return 1.0; // Snow
-  if (forecast.icon.includes('50')) return 2.0; // Mist
-  
-  // Default for unknown conditions
-  return 3.0;
-}
-
-// Helper function to describe wind intensity
-function getWindIntensityText(windSpeed: number): string {
-  if (windSpeed < 5) return "molto leggero";
-  if (windSpeed < 15) return "leggero";
-  if (windSpeed < 30) return "moderato";
-  if (windSpeed < 50) return "forte";
-  return "molto forte";
 }

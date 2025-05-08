@@ -34,10 +34,9 @@ export function GoogleMap({ city, location }: GoogleMapProps) {
         });
 
         // Load the Google Maps API
-        await loader.load();
+        const google = await loader.load();
         
         // Create a map instance
-        const google = window.google;
         mapInstance = new google.maps.Map(mapContainerRef.current, {
           center: location,
           zoom: 14,
