@@ -4,6 +4,7 @@ import { AdminLayout } from '@/layouts/AdminLayout';
 import MemberHeader from '@/components/admin/member/MemberHeader';
 import MemberTabs from '@/components/admin/member/MemberTabs';
 import MemberNotFound from '@/components/admin/member/MemberNotFound';
+import MemberLoadingState from '@/components/admin/member/MemberLoadingState';
 import { useMemberDetail } from '@/hooks/useMemberDetail';
 
 export default function MemberDetail() {
@@ -12,13 +13,7 @@ export default function MemberDetail() {
   const { memberDetail, details, loading, toggleMemberStatus } = useMemberDetail(memberId);
 
   if (loading) {
-    return (
-      <AdminLayout title="Caricamento...">
-        <div className="flex items-center justify-center h-64">
-          <p className="text-muted-foreground">Caricamento dati membro...</p>
-        </div>
-      </AdminLayout>
-    );
+    return <MemberLoadingState />;
   }
 
   if (!memberDetail || !details) {
