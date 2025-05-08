@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from 'react-router-dom';
@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { toast } from '@/hooks/use-toast';
+import { createPlant, updatePlant } from '@/services/plantService';
 
 // Schema di validazione per il form
 const plantFormSchema = z.object({
@@ -65,13 +66,20 @@ const plantTypeOptions = [
   { value: 'geothermal', label: 'Geotermico' },
 ];
 
-export function PlantForm() {
+interface PlantFormProps {
+  initialData?: PlantFormData;
+  plantId?: string;
+  mode?: 'create' | 'edit';
+}
+
+export function PlantForm({ initialData, plantId, mode = 'create' }: PlantFormProps) {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const isEditing = mode === 'edit';
 
   const form = useForm<PlantFormData>({
     resolver: zodResolver(plantFormSchema),
-    defaultValues: {
+    defaultValues: initialData || {
       name: '',
       type: 'solar' as PlantType,
       power: 0,
@@ -84,19 +92,35 @@ export function PlantForm() {
     },
   });
 
+  // Se arrivano nuovi dati iniziali, aggiorniamo il form
+  useEffect(() => {
+    if (initialData && isEditing) {
+      Object.keys(initialData).forEach((key) => {
+        form.setValue(key as keyof PlantFormData, initialData[key as keyof PlantFormData]);
+      });
+    }
+  }, [initialData, form, isEditing]);
+
   const onSubmit = async (data: PlantFormData) => {
     setIsSubmitting(true);
     try {
-      // Simuliamo il salvataggio dei dati
-      console.log('Dati impianto da salvare:', data);
-      
-      // Simuliamo un tempo di attesa per l'invio
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      toast({
-        title: 'Impianto aggiunto con successo',
-        description: `L'impianto ${data.name} è stato aggiunto.`,
-      });
+      if (isEditing && plantId) {
+        // Aggiorna un impianto esistente
+        await updatePlant(plantId, data);
+        
+        toast({
+          title: 'Impianto aggiornato con successo',
+          description: `L'impianto ${data.name} è stato aggiornato.`,
+        });
+      } else {
+        // Crea un nuovo impianto
+        await createPlant(data);
+        
+        toast({
+          title: 'Impianto aggiunto con successo',
+          description: `L'impianto ${data.name} è stato aggiunto.`,
+        });
+      }
       
       // Reindirizza alla lista impianti
       navigate('/admin/plants');
@@ -104,8 +128,9 @@ export function PlantForm() {
       toast({
         variant: 'destructive',
         title: 'Errore',
-        description: 'Si è verificato un errore durante il salvataggio.',
+        description: `Si è verificato un errore durante il ${isEditing ? 'aggiornamento' : 'salvataggio'}.`,
       });
+      console.error('Errore nel salvataggio:', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -288,7 +313,9 @@ export function PlantForm() {
             className="bg-purple-700 hover:bg-purple-800" 
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Salvataggio...' : 'Salva Impianto'}
+            {isSubmitting ? 
+              (isEditing ? 'Aggiornamento...' : 'Salvataggio...') : 
+              (isEditing ? 'Aggiorna Impianto' : 'Salva Impianto')}
           </Button>
         </div>
       </form>
