@@ -5,7 +5,7 @@ import { ConsumerHeader } from '@/components/consumer/ConsumerHeader';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuthContext';
 import { Navigate } from 'react-router-dom';
-import { getRedirectPathForRole, getFullPath, APP_CONFIG } from '@/lib/config';
+import { getRedirectPathForRole, APP_CONFIG } from '@/lib/config';
 
 interface ConsumerLayoutProps {
   children: ReactNode;
@@ -16,6 +16,9 @@ export function ConsumerLayout({ children, title = 'Dashboard Consumatore' }: Co
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const { authState } = useAuth();
   const { user, isLoading } = authState;
+  
+  // Debug logs
+  console.log("ConsumerLayout rendering with user:", user, "isLoading:", isLoading);
   
   // Mostra un loader mentre verifica l'autenticazione
   if (isLoading) {
@@ -33,7 +36,7 @@ export function ConsumerLayout({ children, title = 'Dashboard Consumatore' }: Co
     toast.error("Accesso non autorizzato", {
       description: "Effettua il login per accedere alla dashboard"
     });
-    return <Navigate to={getFullPath(APP_CONFIG.paths.login)} replace />;
+    return <Navigate to={APP_CONFIG.paths.login} replace />;
   }
 
   // Verifica se l'utente è un consumer
@@ -43,8 +46,8 @@ export function ConsumerLayout({ children, title = 'Dashboard Consumatore' }: Co
       description: "Non hai i permessi necessari per accedere a questa pagina"
     });
     
-    // Reindirizza in base al ruolo con il basename corretto
-    const redirectPath = getFullPath(getRedirectPathForRole(user.role));
+    // Reindirizza in base al ruolo
+    const redirectPath = getRedirectPathForRole(user.role);
     return <Navigate to={redirectPath} replace />;
   }
   

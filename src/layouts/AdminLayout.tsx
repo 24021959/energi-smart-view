@@ -4,7 +4,7 @@ import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { AdminHeader } from '@/components/admin/AdminHeader';
 import { useAuth } from '@/hooks/useAuthContext';
 import { Navigate } from 'react-router-dom';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { getRedirectPathForRole, getFullPath, APP_CONFIG } from '@/lib/config';
 
 interface AdminLayoutProps {
@@ -16,6 +16,9 @@ export function AdminLayout({ children, title = 'Dashboard Gestore CER' }: Admin
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const { authState } = useAuth();
   const { user, isLoading, error } = authState;
+  
+  // Debug logs
+  console.log("AdminLayout rendering with user:", user, "isLoading:", isLoading);
   
   // Mostra un loader mentre verifica l'autenticazione
   if (isLoading) {
@@ -30,25 +33,21 @@ export function AdminLayout({ children, title = 'Dashboard Gestore CER' }: Admin
   // Verifica se l'utente è autenticato
   if (!user) {
     console.log("Utente non autenticato, reindirizzamento al login");
-    toast({
-      variant: "destructive",
-      title: "Accesso non autorizzato",
+    toast.error("Accesso non autorizzato", {
       description: "Effettua il login per accedere alla dashboard"
     });
-    return <Navigate to={getFullPath(APP_CONFIG.paths.login)} replace />;
+    return <Navigate to={APP_CONFIG.paths.login} replace />;
   }
 
   // Verifica se l'utente è un gestore CER
   if (user.role !== 'cer_manager') {
     console.log(`Utente con ruolo ${user.role} non autorizzato, reindirizzamento`);
-    toast({
-      variant: "destructive",
-      title: "Accesso non autorizzato",
+    toast.error("Accesso non autorizzato", {
       description: "Non hai i permessi necessari per accedere a questa pagina"
     });
     
-    // Reindirizza in base al ruolo con il basename corretto
-    const redirectPath = getFullPath(getRedirectPathForRole(user.role));
+    // Reindirizza in base al ruolo
+    const redirectPath = getRedirectPathForRole(user.role);
     return <Navigate to={redirectPath} replace />;
   }
 

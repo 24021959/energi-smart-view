@@ -32,7 +32,9 @@ export default function Login() {
 
   // Debug auth state changes
   useEffect(() => {
-    console.log("Login component - Auth state changed:", { 
+    console.log("Login component mounted");
+    console.log("Current window location:", window.location.href);
+    console.log("Login component - Auth state:", { 
       user: authState.user, 
       isLoading: authState.isLoading,
       error: authState.error,
@@ -48,15 +50,14 @@ export default function Login() {
       
       // Redirect to appropriate dashboard based on role
       const path = getRedirectPathForRole(authState.user.role);
-      const fullPath = getFullPath(path);
-      console.log(`Login - Redirecting to: ${path} (full path: ${fullPath}) for user with role ${authState.user.role}`);
+      console.log(`Login - Redirecting to: ${path} for user with role ${authState.user.role}`);
       
       // Add a small delay to ensure state updates are complete
       setTimeout(() => {
         toast.success("Accesso effettuato", {
           description: `Benvenuto nel sistema EnergiSmart`
         });
-        navigate(path, { replace: true });
+        navigate(path);
       }, 100);
     }
   }, [authState.user, authState.isLoading, navigate, redirecting, location]);
@@ -73,8 +74,7 @@ export default function Login() {
   // If user is already authenticated, redirect
   if (authState.user && !authState.isLoading) {
     const path = getRedirectPathForRole(authState.user.role);
-    const fullPath = getFullPath(path);
-    console.log(`Automatic redirect to ${path} (full path: ${fullPath})`);
+    console.log(`Automatic redirect to ${path}`);
     return <Navigate to={path} replace />;
   }
 
@@ -94,6 +94,7 @@ export default function Login() {
         });
       }
     } catch (error) {
+      console.error("Exception during login:", error);
       toast.error("Errore", {
         description: "Si è verificato un errore durante il login"
       });

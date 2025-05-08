@@ -12,10 +12,12 @@ const Index = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Handle redirects when user is authenticated
+  // Debug logs
   useEffect(() => {
     console.log("Index page - Current location:", location);
+    console.log("Current window location:", window.location.href);
     console.log("Base path:", APP_CONFIG.basePath);
+    console.log("Auth state in Index:", authState);
     
     if (user && !isLoading) {
       console.log("Authenticated user detected in Index page:", user);
@@ -46,7 +48,7 @@ const Index = () => {
       
       // Navigate to appropriate dashboard
       console.log("Redirecting to dashboard:", dashboardPath);
-      navigate(dashboardPath, { replace: true });
+      navigate(dashboardPath);
     }
   }, [user, isLoading, navigate, location]);
 
@@ -68,9 +70,10 @@ const Index = () => {
   }
 
   const handleLoginClick = () => {
-    const loginPath = getFullPath(APP_CONFIG.paths.login);
-    console.log("Navigating to login page:", loginPath);
-    navigate(loginPath);  // Use full path with basePath
+    const loginPath = APP_CONFIG.paths.login;
+    console.log("Navigating to login page, raw path:", loginPath);
+    console.log("Full login path:", getFullPath(loginPath));
+    navigate(loginPath);  // No need for getFullPath here since we use BrowserRouter with basename
   };
 
   return (

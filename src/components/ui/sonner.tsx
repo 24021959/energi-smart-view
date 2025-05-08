@@ -9,6 +9,7 @@ export function Toaster({ ...props }: ToasterProps) {
   return (
     <SonnerToaster
       theme="light"
+      richColors
       className="toaster group"
       toastOptions={{
         classNames: {

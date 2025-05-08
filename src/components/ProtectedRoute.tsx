@@ -4,7 +4,7 @@ import { useAuth } from '@/hooks/useAuthContext';
 import { UserRole } from '@/types/auth';
 import { useEffect, ReactNode } from 'react';
 import { toast } from 'sonner';
-import { getRedirectPathForRole, APP_CONFIG, getFullPath } from '@/lib/config';
+import { getRedirectPathForRole, APP_CONFIG } from '@/lib/config';
 
 interface ProtectedRouteProps {
   allowedRoles?: UserRole[];
@@ -37,7 +37,6 @@ export const ProtectedRoute = ({
       allowedRoles,
       pathname: window.location.pathname,
       redirectPath,
-      fullRedirectPath: getFullPath(redirectPath)
     });
   }, [user, isLoading, error, allowedRoles, redirectPath]);
 
@@ -53,16 +52,13 @@ export const ProtectedRoute = ({
 
   // If authentication error or no user, redirect to login
   if (error || !user) {
-    console.log("Redirecting to login due to:", { error, user });
-    // Make sure we use getFullPath to include the base path
-    const fullRedirectPath = getFullPath(redirectPath);
-    console.log("Full redirect path:", fullRedirectPath);
-    return <Navigate to={fullRedirectPath} replace />;
+    console.log("ProtectedRoute - Redirecting to login due to:", { error, user });
+    return <Navigate to={redirectPath} replace />;
   }
 
   // If there are allowed roles and user doesn't have the required role
   if (allowedRoles && !allowedRoles.includes(user.role)) {
-    console.log("User does not have required role", { userRole: user.role, allowedRoles });
+    console.log("ProtectedRoute - User does not have required role", { userRole: user.role, allowedRoles });
     
     // Show toast
     toast.error("Accesso non autorizzato", {
@@ -71,10 +67,8 @@ export const ProtectedRoute = ({
     
     // Redirect to appropriate dashboard based on role
     const redirectTo = getRedirectPathForRole(user.role);
-    const fullRedirectTo = getFullPath(redirectTo);
-    
-    console.log("Redirecting user to:", redirectTo, "Full path:", fullRedirectTo);
-    return <Navigate to={fullRedirectTo} replace />;
+    console.log("ProtectedRoute - Redirecting user to:", redirectTo);
+    return <Navigate to={redirectTo} replace />;
   }
 
   // If there's a children component, render it, otherwise use Outlet

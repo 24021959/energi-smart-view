@@ -1,4 +1,5 @@
 
+// Base path without trailing slash to match vite.config.ts
 export const APP_CONFIG = {
   // Base path for the app - matches vite.config.ts base setting
   basePath: '/energi-smart-view',
@@ -50,15 +51,18 @@ export const APP_CONFIG = {
 // Helper for redirects based on role
 export const getRedirectPathForRole = (role: string): string => {
   switch(role) {
-    case 'cer_manager': return `${APP_CONFIG.paths.admin.root}`;
-    case 'consumer': return `${APP_CONFIG.paths.consumer.root}`;
-    case 'producer': return `${APP_CONFIG.paths.producer.root}`;
-    case 'prosumer': return `${APP_CONFIG.paths.prosumer.root}`;
-    default: return `${APP_CONFIG.paths.home}`;
+    case 'cer_manager': return APP_CONFIG.paths.admin.root;
+    case 'consumer': return APP_CONFIG.paths.consumer.root;
+    case 'producer': return APP_CONFIG.paths.producer.root;
+    case 'prosumer': return APP_CONFIG.paths.prosumer.root;
+    default: return APP_CONFIG.paths.home;
   }
 };
 
 // Helper to get the full path including base path
 export const getFullPath = (path: string): string => {
-  return `${APP_CONFIG.basePath}${path}`;
+  // Handle potential double slashes when joining paths
+  const joinedPath = `${APP_CONFIG.basePath}${path}`;
+  console.log(`getFullPath: ${APP_CONFIG.basePath} + ${path} = ${joinedPath}`);
+  return joinedPath;
 };

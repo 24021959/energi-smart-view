@@ -4,8 +4,8 @@ import { ProsumerSidebar } from '@/components/prosumer/ProsumerSidebar';
 import { ProsumerHeader } from '@/components/prosumer/ProsumerHeader';
 import { useAuth } from '@/hooks/useAuthContext';
 import { Navigate } from 'react-router-dom';
-import { toast } from '@/hooks/use-toast';
-import { getRedirectPathForRole, getFullPath, APP_CONFIG } from '@/lib/config';
+import { toast } from 'sonner';
+import { getRedirectPathForRole, APP_CONFIG } from '@/lib/config';
 
 interface ProsumerLayoutProps {
   children: ReactNode;
@@ -16,6 +16,9 @@ export function ProsumerLayout({ children, title = 'Dashboard Prosumer' }: Prosu
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const { authState } = useAuth();
   const { user, isLoading } = authState;
+  
+  // Debug logs
+  console.log("ProsumerLayout rendering with user:", user, "isLoading:", isLoading);
   
   // Mostra un loader mentre verifica l'autenticazione
   if (isLoading) {
@@ -30,25 +33,21 @@ export function ProsumerLayout({ children, title = 'Dashboard Prosumer' }: Prosu
   // Verifica se l'utente è autenticato
   if (!user) {
     console.log("Utente non autenticato, reindirizzamento al login");
-    toast({
-      variant: "destructive",
-      title: "Accesso non autorizzato",
+    toast.error("Accesso non autorizzato", {
       description: "Effettua il login per accedere alla dashboard"
     });
-    return <Navigate to={getFullPath(APP_CONFIG.paths.login)} replace />;
+    return <Navigate to={APP_CONFIG.paths.login} replace />;
   }
 
   // Verifica se l'utente è un prosumer
   if (user.role !== 'prosumer') {
     console.log(`Utente con ruolo ${user.role} non autorizzato, reindirizzamento`);
-    toast({
-      variant: "destructive",
-      title: "Accesso non autorizzato",
+    toast.error("Accesso non autorizzato", {
       description: "Non hai i permessi necessari per accedere a questa pagina"
     });
     
-    // Reindirizza in base al ruolo con il basename corretto
-    const redirectPath = getFullPath(getRedirectPathForRole(user.role));
+    // Reindirizza in base al ruolo
+    const redirectPath = getRedirectPathForRole(user.role);
     return <Navigate to={redirectPath} replace />;
   }
 

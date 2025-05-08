@@ -8,6 +8,7 @@ import { Toaster } from 'sonner'
 import { APP_CONFIG } from './lib/config'
 
 console.log("Application initializing with base path:", APP_CONFIG.basePath);
+console.log("Current window location:", window.location.href);
 
 createRoot(document.getElementById("root")!).render(
   <BrowserRouter basename={APP_CONFIG.basePath}>
