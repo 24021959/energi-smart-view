@@ -24,9 +24,19 @@ import EditPlant from "@/pages/admin/EditPlant";
 import EnergyData from "@/pages/admin/EnergyData";
 import Reports from "@/pages/admin/Reports";
 import Settings from "@/pages/admin/Settings";
-import Properties from "@/pages/admin/Properties"; // Nuova pagina per la gestione proprietà
-import AddProperty from "@/pages/admin/AddProperty"; // Nuova pagina per aggiungere proprietà
-import PropertyDetail from "@/pages/admin/PropertyDetail"; // Nuova pagina per i dettagli proprietà
+import Properties from "@/pages/admin/Properties"; 
+import AddProperty from "@/pages/admin/AddProperty"; 
+import PropertyDetail from "@/pages/admin/PropertyDetail"; 
+
+// Le pagine consumer
+import ConsumerDashboard from "@/pages/consumer/ConsumerDashboard";
+import ConsumerBills from "@/pages/consumer/ConsumerBills";
+import ConsumerBillUpload from "@/pages/consumer/ConsumerBillUpload";
+
+// Le pagine prosumer
+import ProsumerDashboard from "@/pages/prosumer/ProsumerDashboard";
+import ProsumerBills from "@/pages/prosumer/ProsumerBills";
+import ProsumerBillUpload from "@/pages/prosumer/ProsumerBillUpload";
 
 export default function App() {
   return (
@@ -53,10 +63,20 @@ export default function App() {
         <Route path="admin/reports" element={<ProtectedRoute allowedRoles={['cer_manager']}><Reports /></ProtectedRoute>} />
         <Route path="admin/settings" element={<ProtectedRoute allowedRoles={['cer_manager']}><Settings /></ProtectedRoute>} />
         
-        {/* Nuove rotte per la gestione delle proprietà */}
+        {/* Rotte per la gestione delle proprietà */}
         <Route path="admin/properties" element={<ProtectedRoute allowedRoles={['cer_manager']}><Properties /></ProtectedRoute>} />
         <Route path="admin/properties/add" element={<ProtectedRoute allowedRoles={['cer_manager']}><AddProperty /></ProtectedRoute>} />
         <Route path="admin/properties/:id" element={<ProtectedRoute allowedRoles={['cer_manager']}><PropertyDetail /></ProtectedRoute>} />
+
+        {/* Consumer Routes */}
+        <Route path="consumer" element={<ProtectedRoute allowedRoles={['consumer']}><ConsumerDashboard /></ProtectedRoute>} />
+        <Route path="consumer/bills" element={<ProtectedRoute allowedRoles={['consumer']}><ConsumerBills /></ProtectedRoute>} />
+        <Route path="consumer/bills/upload" element={<ProtectedRoute allowedRoles={['consumer']}><ConsumerBillUpload /></ProtectedRoute>} />
+        
+        {/* Prosumer Routes */}
+        <Route path="prosumer" element={<ProtectedRoute allowedRoles={['prosumer']}><ProsumerDashboard /></ProtectedRoute>} />
+        <Route path="prosumer/bills" element={<ProtectedRoute allowedRoles={['prosumer']}><ProsumerBills /></ProtectedRoute>} />
+        <Route path="prosumer/bills/upload" element={<ProtectedRoute allowedRoles={['prosumer']}><ProsumerBillUpload /></ProtectedRoute>} />
 
         {/* Default route for unmatched paths */}
         <Route path="*" element={<NotFound />} />
