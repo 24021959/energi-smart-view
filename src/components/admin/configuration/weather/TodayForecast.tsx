@@ -1,5 +1,5 @@
 
-import { WeatherForecastData, getWindDirectionText } from "@/services/weatherService";
+import { WeatherForecastData, getWindDirectionText } from "@/services/weather";
 import { Droplets, Wind, CloudRain, Cloud, Sun, Gauge } from "lucide-react";
 import { WeatherIcon } from "./WeatherIcon";
 import { Card, CardContent } from "@/components/ui/card";

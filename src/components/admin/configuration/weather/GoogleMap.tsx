@@ -1,7 +1,7 @@
 
 import { useRef, useEffect, useState } from "react";
 import { Loader } from "@googlemaps/js-api-loader";
-import { GeoLocation } from "@/services/weatherService";
+import { GeoLocation } from "@/services/weather";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";

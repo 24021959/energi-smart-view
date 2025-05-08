@@ -2,7 +2,14 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sun, Map, Wind } from "lucide-react";
-import { fetchWeatherForecast, geocodeCity, WeatherForecastData, GeoLocation, estimateSolarProduction, estimateWindProduction } from "@/services/weatherService";
+import { 
+  fetchWeatherForecast, 
+  geocodeCity, 
+  WeatherForecastData, 
+  GeoLocation, 
+  estimateSolarProduction, 
+  estimateWindProduction 
+} from "@/services/weather";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TodayForecast } from "./weather/TodayForecast";
 import { HourlyForecast } from "./weather/HourlyForecast";

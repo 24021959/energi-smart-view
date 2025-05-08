@@ -1,6 +1,6 @@
 
 import { Card, CardContent } from "@/components/ui/card";
-import { DailyForecastData } from "@/services/weatherService";
+import { DailyForecastData } from "@/services/weather";
 import { WeatherIcon } from "./WeatherIcon";
 import { Sun, Wind, Droplets } from "lucide-react";
 
