@@ -2,7 +2,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
-import type { ConfigEnv, Plugin, UserConfig } from 'vite'
+import type { ConfigEnv, Plugin, UserConfig, ResolvedConfig } from 'vite'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
@@ -15,7 +15,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
       // Conditional dynamic plugin for development mode
       mode === 'development' && {
         name: 'dynamic-lovable-tagger',
-        configResolved: async (config) => {
+        configResolved: async (config: ResolvedConfig): Promise<void> => {
           try {
             const module = await import('lovable-tagger');
             if (module && typeof module.componentTagger === 'function') {

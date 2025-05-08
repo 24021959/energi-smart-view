@@ -25,12 +25,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const { login: loginHook } = useAuthLogin();
   const { logout: logoutHook } = useAuthLogout();
 
+  console.log("AuthProvider rendering with state:", authState);
+
   // Login function
   const login = async (email: string, password: string): Promise<LoginResult> => {
+    console.log("AuthProvider login called for:", email);
     const result = await loginHook(email, password);
     
     if (result.success && result.user) {
       // Update auth state with the new user
+      console.log("Setting auth state with user:", result.user);
       setAuthState({
         user: result.user,
         isLoading: false,
@@ -47,10 +51,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Logout function
   const logout = async (): Promise<LogoutResult> => {
+    console.log("AuthProvider logout called");
     const result = await logoutHook();
     
     if (result.success) {
       // Update state manually
+      console.log("Logout successful, clearing auth state");
       setAuthState({
         user: null,
         isLoading: false,

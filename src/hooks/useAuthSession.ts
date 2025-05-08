@@ -21,6 +21,7 @@ export function useAuthSession() {
         // First check localStorage for demo user
         const localUser = loadUserFromLocalStorage();
         if (localUser) {
+          console.log("User found in localStorage:", localUser);
           setAuthState({
             user: localUser,
             isLoading: false,
@@ -30,16 +31,18 @@ export function useAuthSession() {
         }
         
         // If no localStorage user, check Supabase
+        console.log("No localStorage user found, checking Supabase session...");
         const userProfile = await fetchUserSession();
         
         if (userProfile) {
+          console.log("Supabase user session found:", userProfile);
           setAuthState({
             user: userProfile,
             isLoading: false,
             error: null,
           });
         } else {
-          console.log("No user session found");
+          console.log("No user session found in Supabase either");
           setAuthState({ ...initialState, isLoading: false });
         }
       } catch (error) {
@@ -47,11 +50,12 @@ export function useAuthSession() {
         setAuthState({
           user: null,
           isLoading: false,
-          error: 'Error loading session',
+          error: error instanceof Error ? error.message : 'Error loading session',
         });
       }
     };
 
+    console.log("useAuthSession hook initializing");
     checkSession();
 
     // Listen for auth state changes
@@ -60,6 +64,7 @@ export function useAuthSession() {
       if (event === 'SIGNED_IN' && session) {
         await checkSession();
       } else if (event === 'SIGNED_OUT') {
+        console.log("User signed out, clearing auth state");
         setAuthState({ ...initialState, isLoading: false });
       }
     });

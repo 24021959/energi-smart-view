@@ -14,7 +14,7 @@ createRoot(document.getElementById("root")!).render(
   <BrowserRouter basename={APP_CONFIG.basePath}>
     <AuthProvider>
       <App />
-      <Toaster position="top-right" richColors />
+      <Toaster position="top-right" richColors closeButton />
     </AuthProvider>
   </BrowserRouter>
 );

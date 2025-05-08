@@ -20,14 +20,6 @@ export const ProtectedRoute = ({
   const { authState } = useAuth();
   const { user, isLoading, error } = authState;
 
-  useEffect(() => {
-    if (error) {
-      toast.error("Errore di autenticazione", {
-        description: error
-      });
-    }
-  }, [error]);
-
   // Debug logs
   useEffect(() => {
     console.log("ProtectedRoute - Auth state:", { 
@@ -35,10 +27,17 @@ export const ProtectedRoute = ({
       isLoading, 
       error, 
       allowedRoles,
-      pathname: window.location.pathname,
-      redirectPath,
+      pathname: window.location.pathname
     });
-  }, [user, isLoading, error, allowedRoles, redirectPath]);
+  }, [user, isLoading, error, allowedRoles]);
+
+  useEffect(() => {
+    if (error) {
+      toast.error("Errore di autenticazione", {
+        description: error
+      });
+    }
+  }, [error]);
 
   // Show loader while checking authentication
   if (isLoading) {
@@ -52,7 +51,7 @@ export const ProtectedRoute = ({
 
   // If authentication error or no user, redirect to login
   if (error || !user) {
-    console.log("ProtectedRoute - Redirecting to login due to:", { error, user });
+    console.log("ProtectedRoute - No user, redirecting to login");
     return <Navigate to={redirectPath} replace />;
   }
 

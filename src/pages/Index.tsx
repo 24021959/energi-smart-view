@@ -1,10 +1,9 @@
-
 import { Logo } from "@/components/Logo";
 import { useAuth } from "@/hooks/useAuthContext";
-import { Navigate, useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { toast } from "sonner";
-import { getRedirectPathForRole, APP_CONFIG, getFullPath } from "@/lib/config";
+import { getRedirectPathForRole, APP_CONFIG } from "@/lib/config";
 
 const Index = () => {
   const { authState } = useAuth();
@@ -48,7 +47,7 @@ const Index = () => {
       
       // Navigate to appropriate dashboard
       console.log("Redirecting to dashboard:", dashboardPath);
-      navigate(dashboardPath);
+      navigate(dashboardPath, { replace: true });
     }
   }, [user, isLoading, navigate, location]);
 
@@ -64,16 +63,9 @@ const Index = () => {
     );
   }
 
-  // If user is authenticated, redirection will be handled by the effect
-  if (user) {
-    return null; // The effect will handle redirection
-  }
-
   const handleLoginClick = () => {
-    const loginPath = APP_CONFIG.paths.login;
-    console.log("Navigating to login page, raw path:", loginPath);
-    console.log("Full login path:", getFullPath(loginPath));
-    navigate(loginPath);  // No need for getFullPath here since we use BrowserRouter with basename
+    console.log("Navigating to login page");
+    navigate(APP_CONFIG.paths.login);
   };
 
   return (

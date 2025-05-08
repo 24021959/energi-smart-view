@@ -61,8 +61,15 @@ export const getRedirectPathForRole = (role: string): string => {
 
 // Helper to get the full path including base path
 export const getFullPath = (path: string): string => {
+  // Handle edge cases
+  if (!path) return APP_CONFIG.basePath;
+  
   // Handle potential double slashes when joining paths
-  const joinedPath = `${APP_CONFIG.basePath}${path}`;
-  console.log(`getFullPath: ${APP_CONFIG.basePath} + ${path} = ${joinedPath}`);
-  return joinedPath;
+  if (path.startsWith('/')) {
+    // Remove leading slash from path when joining to avoid double slashes
+    return `${APP_CONFIG.basePath}${path}`;
+  } else {
+    // Add slash between basePath and path
+    return `${APP_CONFIG.basePath}/${path}`;
+  }
 };

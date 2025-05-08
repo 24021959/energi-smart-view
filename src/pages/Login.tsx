@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Logo } from '@/components/Logo';
 import { LoginFormData } from '@/types/auth';
 import LoginForm from '@/components/auth/LoginForm';
-import { getRedirectPathForRole, getFullPath, APP_CONFIG } from '@/lib/config';
+import { getRedirectPathForRole, APP_CONFIG } from '@/lib/config';
 
 // Form validation schema
 const loginSchema = z.object({
@@ -32,19 +32,15 @@ export default function Login() {
 
   // Debug auth state changes
   useEffect(() => {
-    console.log("Login component mounted");
-    console.log("Current window location:", window.location.href);
     console.log("Login component - Auth state:", { 
       user: authState.user, 
       isLoading: authState.isLoading,
       error: authState.error,
-      redirecting,
       currentPath: window.location.pathname,
-      fullLocation: location,
       basePath: APP_CONFIG.basePath
     });
     
-    if (authState.user && !redirecting) {
+    if (authState.user && !redirecting && !authState.isLoading) {
       // Prevent multiple redirects
       setRedirecting(true);
       
@@ -52,15 +48,14 @@ export default function Login() {
       const path = getRedirectPathForRole(authState.user.role);
       console.log(`Login - Redirecting to: ${path} for user with role ${authState.user.role}`);
       
-      // Add a small delay to ensure state updates are complete
-      setTimeout(() => {
-        toast.success("Accesso effettuato", {
-          description: `Benvenuto nel sistema EnergiSmart`
-        });
-        navigate(path);
-      }, 100);
+      toast.success("Accesso effettuato", {
+        description: `Benvenuto nel sistema EnergiSmart`
+      });
+      
+      // Navigate to the dashboard
+      navigate(path);
     }
-  }, [authState.user, authState.isLoading, navigate, redirecting, location]);
+  }, [authState.user, authState.isLoading, navigate, redirecting]);
 
   // Form setup with react-hook-form
   const form = useForm<LoginFormData>({
@@ -70,13 +65,6 @@ export default function Login() {
       password: ''
     }
   });
-
-  // If user is already authenticated, redirect
-  if (authState.user && !authState.isLoading) {
-    const path = getRedirectPathForRole(authState.user.role);
-    console.log(`Automatic redirect to ${path}`);
-    return <Navigate to={path} replace />;
-  }
 
   // Form submission handler
   const onSubmit = async (data: LoginFormData) => {
@@ -102,6 +90,14 @@ export default function Login() {
       setIsSubmitting(false);
     }
   };
+
+  // If already authenticated, redirect to dashboard
+  if (authState.user && !authState.isLoading && !redirecting) {
+    const path = getRedirectPathForRole(authState.user.role);
+    console.log(`Login - Auto redirect to ${path}`);
+    setRedirecting(true);
+    return <Navigate to={path} replace />;
+  }
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-secondary/20 to-background p-4">
