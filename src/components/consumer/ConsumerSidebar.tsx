@@ -12,42 +12,43 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { APP_CONFIG } from '@/lib/config';
 
 type ConsumerSidebarProps = {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
 }
 
-// Dati di navigazione
-const navItems = [
-  {
-    title: 'Dashboard',
-    href: '/consumer',
-    icon: LayoutDashboard,
-  },
-  {
-    title: 'Bollette',
-    href: '/consumer/bills',
-    icon: Receipt,
-  },
-  {
-    title: 'Consumi',
-    href: '/consumer/consumption',
-    icon: LineChart,
-  },
-  {
-    title: 'Impostazioni',
-    href: '/consumer/settings',
-    icon: Settings,
-  },
-  {
-    title: 'Supporto',
-    href: '/consumer/help',
-    icon: HelpCircle,
-  },
-];
-
 export function ConsumerSidebar({ isOpen, setIsOpen }: ConsumerSidebarProps) {
+  // Use paths from central config
+  const navItems = [
+    {
+      title: 'Dashboard',
+      href: APP_CONFIG.paths.consumer.root,
+      icon: LayoutDashboard,
+    },
+    {
+      title: 'Bollette',
+      href: APP_CONFIG.paths.consumer.bills,
+      icon: Receipt,
+    },
+    {
+      title: 'Consumi',
+      href: APP_CONFIG.paths.consumer.consumption,
+      icon: LineChart,
+    },
+    {
+      title: 'Impostazioni',
+      href: APP_CONFIG.paths.consumer.settings,
+      icon: Settings,
+    },
+    {
+      title: 'Supporto',
+      href: APP_CONFIG.paths.consumer.help,
+      icon: HelpCircle,
+    },
+  ];
+
   return (
     <aside 
       className={cn(

@@ -1,10 +1,9 @@
-
 import { Logo } from "@/components/Logo";
 import { useAuth } from "@/hooks/useAuthContext";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { toast } from "sonner";
-import { getRedirectPathForRole } from "@/lib/config";
+import { getRedirectPathForRole, APP_CONFIG } from "@/lib/config";
 
 const Index = () => {
   const { authState } = useAuth();
@@ -73,7 +72,7 @@ const Index = () => {
           </div>
           <div>
             <button 
-              onClick={() => navigate('/login')} 
+              onClick={() => navigate(APP_CONFIG.paths.login)} 
               className="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90 transition-colors"
             >
               Accedi

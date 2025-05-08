@@ -51,6 +51,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             console.error("Error parsing user from localStorage:", e);
             localStorage.removeItem(AUTH_USER_KEY);
           }
+        } else {
+          console.log("No user found in localStorage");
         }
         
         // If no localStorage user, check Supabase

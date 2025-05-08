@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Logo } from '@/components/Logo';
 import { LoginFormData } from '@/types/auth';
 import LoginForm from '@/components/auth/LoginForm';
-import { getRedirectPathForRole } from '@/lib/config';
+import { getRedirectPathForRole, APP_CONFIG } from '@/lib/config';
 
 // Form validation schema
 const loginSchema = z.object({
@@ -27,27 +27,34 @@ export default function Login() {
   const { authState, login } = useAuth();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
 
   // Debug auth state changes
   useEffect(() => {
     console.log("Login component - Auth state changed:", { 
       user: authState.user, 
       isLoading: authState.isLoading,
-      error: authState.error
+      error: authState.error,
+      redirecting
     });
     
-    if (authState.user) {
+    if (authState.user && !redirecting) {
+      // Prevent multiple redirects
+      setRedirecting(true);
+      
       // Redirect to appropriate dashboard based on role
-      redirectToUserDashboard(authState.user.role);
+      const path = getRedirectPathForRole(authState.user.role);
+      console.log(`Login - Redirecting to: ${path} for user with role ${authState.user.role}`);
+      
+      // Add a small delay to ensure state updates are complete
+      setTimeout(() => {
+        toast.success("Accesso effettuato", {
+          description: `Benvenuto nel sistema EnergiSmart`
+        });
+        navigate(path, { replace: true });
+      }, 100);
     }
-  }, [authState.user, authState.isLoading]);
-
-  // Redirect function
-  const redirectToUserDashboard = (role: string) => {
-    const path = getRedirectPathForRole(role);
-    console.log(`Login - Redirecting to: ${path} for user with role ${role}`);
-    navigate(path, { replace: true });
-  };
+  }, [authState.user, authState.isLoading, navigate, redirecting]);
 
   // Form setup with react-hook-form
   const form = useForm<LoginFormData>({
@@ -73,10 +80,8 @@ export default function Login() {
       const { success, error } = await login(data.email, data.password);
       
       if (success) {
-        toast.success("Accesso effettuato", {
-          description: `Benvenuto nel sistema EnergiSmart`
-        });
-        // Redirection will be handled by the effect monitoring authState.user
+        console.log("Login successful, waiting for auth state update");
+        // Redirect will happen in the useEffect when authState.user is updated
       } else {
         toast.error("Errore di accesso", {
           description: error || "Credenziali non valide"

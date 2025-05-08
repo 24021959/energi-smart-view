@@ -26,6 +26,9 @@ export const APP_CONFIG = {
       root: '/consumer',
       bills: '/consumer/bills',
       billUpload: '/consumer/bills/upload',
+      consumption: '/consumer/consumption',
+      settings: '/consumer/settings',
+      help: '/consumer/help',
     },
     
     // Producer paths

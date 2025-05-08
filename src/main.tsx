@@ -6,11 +6,13 @@ import './index.css'
 import { AuthProvider } from './hooks/useAuthContext'
 import { Toaster } from 'sonner'
 
+console.log("Application initializing...");
+
 createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
     <AuthProvider>
       <App />
-      <Toaster />
+      <Toaster position="top-right" />
     </AuthProvider>
   </BrowserRouter>
 );
